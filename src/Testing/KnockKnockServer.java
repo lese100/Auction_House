@@ -14,9 +14,12 @@ import java.net.Socket;
  * clientServer.html). Originally built to communicate via strings;
  * later modified by thf to test communication using more general
  * serializable object(s).
+ * created: 11/17/18 by thf
+ * last modified: 11/18/18 by wdc (updating comments)
+ * previously modified: 11/17/18 by thf (creation)
  * @author Tyler Fenske (thf)
- * @author Liam Brady (lb)
  * @author Warren D. Craft (wdc)
+ * @author Liam Brady (lb)
  *
  */
 public class KnockKnockServer {
@@ -67,6 +70,10 @@ public class KnockKnockServer {
 
         public KnockKnock(Socket clientSocket) throws IOException {
             this.clientSocket = clientSocket;
+
+            // the commented-out code over the next few lines was part of
+            // the original code, which passed strings (instead of objects)
+            // over the network
 //            out =
 //                new PrintWriter(clientSocket.getOutputStream(),
 //                    true);

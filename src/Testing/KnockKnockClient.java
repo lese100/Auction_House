@@ -6,9 +6,17 @@ import java.net.Socket;
 /**
  * Client class for having a KnockKnockServer class tell Knock! Knock jokes.
  * Code originally provided by Brooke Chenoweth (CS 351), which she
- * borrowed and modifed from an Oracle tutorial on sockets.
- * Originally built to communicate via strings; later modified by Tyler Fenske
+ * borrowed and modifed from an Oracle tutorial on sockets
+ * (see https://docs.oracle.com/javase/tutorial/networking/sockets/
+ * clientServer.html).
+ * Originally built to communicate via strings; later modified by thf
  * to test communication using more general serializable object(s).
+ * created: 11/17/18 by thf
+ * last modified: 11/18/18 by wdc (updating comments)
+ * previously modified: 11/17/18 by thf (creation)
+ * @author Tyler Fenske (thf)
+ * @author Warren D. Craft (wdc)
+ * @author Liam Brady (lb)
  *
  */
 public class KnockKnockClient {
@@ -57,6 +65,8 @@ public class KnockKnockClient {
             fromServer = ts.getStringField();
         }
 
+        // the commented-out code below was part of the original code
+        // which simply passed strings back and forth over the network
 //        try (
 //            Socket socket = new  Socket(hostName , portNumber );
 //            PrintWriter out =
