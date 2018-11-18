@@ -31,7 +31,7 @@ The program was written in Java, using JavaFX and IntelliJ IDEA.
 
 Authors:<br>
 Tyler Fenske (thf)<br>
-Liam <br>
+Liam Brady (lb)<br>
 Warren D. Craft (wdc)<br>
 (along with hints and help, of course, from the
 instructor and course TAs). Also see acknowledgments below.
@@ -39,8 +39,11 @@ instructor and course TAs). Also see acknowledgments below.
 ## Acknowledgments ##
 
 THF largely developed …<br>
-L largely developed …<br>
-WDC largely developed …<br> 
+LB largely developed …<br>
+WDC largely developed …<br>
+Initial development used Knock!Knock! code supplied by Brooke Chenoweth
+which was borrowed and modified from
+https://docs.oracle.com/javase/tutorial/networking/sockets/clientServer.html
 
 ## Some Development Notes ##
 
