@@ -55,7 +55,7 @@ public class TestBank {
      * @param amountToBlock double the amount to block or hold in the account
      * @return boolean true if the hold was successful; false if not
      */
-    public boolean blockFunds (long secretNumber, double amountToBlock) {
+    public synchronized boolean blockFunds (long secretNumber, double amountToBlock) {
         TestBankAccount theAccount = secretNumbersToAccounts.get(secretNumber);
         if (theAccount != null) {
             if (theAccount.getTotalUnblocked() > amountToBlock ) {
@@ -63,10 +63,13 @@ public class TestBank {
                 // all or some portion of this process will need synchronization
                 // what happens if two block requests come in about same time
                 // and are interleaved?
+                theAccount.increaseBlock(amountToBlock);
                 return true;
             }
+            System.out.println("TestBank, blockFunds(): Insufficient funds.");
             return false; // not enough funds to block
         }
+        System.out.println("TestBank, blockFunds(): No account found.");
         return false;     // no such secret number; no such account
     }
 

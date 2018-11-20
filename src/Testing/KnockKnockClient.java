@@ -65,7 +65,8 @@ public class KnockKnockClient {
             fromServer = ts.getStringField();
         }
 
-        //Test comment for git stuff 
+        //Test comment for git stuff
+        // And a follow-up comment!
 
         // the commented-out code below was part of the original code
         // which simply passed strings back and forth over the network
