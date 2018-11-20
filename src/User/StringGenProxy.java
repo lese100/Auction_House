@@ -39,6 +39,6 @@ public class StringGenProxy {
             io.printStackTrace();
         }
 
-        return message.getString();
+        return (String) message.getObj();
     }
 }

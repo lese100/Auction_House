@@ -7,22 +7,22 @@ public class Message implements Serializable {
     public enum Content {GETSTRING, SWITCHDICTIONARY, NEWSTRING, SDCOMPLETE,
     TIMERUPDATE, NOTIFICATIONSERVERSETUP}
     private Content content;
-    private String string;
+    private Object obj;
 
-    public Message(Content content, String string){
+    public Message(Content content, Object obj){
         this.content = content;
-        this.string = string;
+        this.obj = obj;
     }
 
     public Content getContent(){
         return content;
     }
 
-    public String getString(){
-        return string;
+    public Object getObj(){
+        return obj;
     }
 
-    public void setString(String string){
-        this.string = string;
+    public void setObj(Object obj){
+        this.obj = obj;
     }
 }

@@ -8,6 +8,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -70,14 +72,16 @@ public class Main {
                         case SWITCHDICTIONARY:
                             numTimesDictChanged++;
                             msg = cs.sendMessage(new Message(Message.Content.SWITCHDICTIONARY, null));
-                            msg.setString(Integer.toString(numTimesDictChanged));
+                            List<String> stringList = new ArrayList<>();
+                            stringList.add(Integer.toString(numTimesDictChanged));
+                            msg.setObj(stringList);
 
                             Thread thread = new Thread(new ThreadTimer(this));
                             thread.start();
                             break;
                         case NOTIFICATIONSERVERSETUP:
-                            int portNum = Integer.parseInt(message.getString().substring(0, 4));
-                            String host = message.getString().substring(5);
+                            int portNum = Integer.parseInt(((String) message.getObj()).substring(0, 4));
+                            String host = ((String) message.getObj()).substring(5);
 
                             notificationCS = new CommunicationService(host,
                                     portNum);

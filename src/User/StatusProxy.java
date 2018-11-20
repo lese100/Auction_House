@@ -1,6 +1,7 @@
 package User;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class StatusProxy {
 
@@ -21,6 +22,6 @@ public class StatusProxy {
             io.printStackTrace();
         }
 
-        return message.getString();
+        return ((ArrayList<String>) message.getObj()).get(0);
     }
 }
