@@ -11,7 +11,7 @@ import java.io.Serializable;
  * (3) an int for storing a numerical ID
  * (4) a String for the entity's hostname (machine location)
  * (5) an int for storing a port number (for accessing/contacting
- * the entity)
+ *     the entity)
  * created: 11/24/18 by wdc
  * last modified: 11/24/18 by wdc
  * @author Liam Brady (lb)
@@ -63,7 +63,7 @@ public class IDRecord implements Serializable {
     /**
      * Gets the name associated with the IDRecord
      * @return String representing the (usually self-chosen)
-     *         name of the stakeholder
+     *         name of the entity assoc'd with the IDRecord
      */
     public String getName() {
         return name;
@@ -71,7 +71,7 @@ public class IDRecord implements Serializable {
 
     /**
      * Gets the the numerical ID associated with the IDRecord.
-     * This might, e.g., be an account # or some other integer
+     * This might, e.g., be an account # or some other useful integer
      * identifier.
      * @return int identification number
      */
@@ -81,9 +81,9 @@ public class IDRecord implements Serializable {
 
     /**
      * Gets the hostname of the entity associated with the IDRecord
-     * -- i.e. the machine where this stakeholder resides or machine
+     * -- i.e. the machine where this entity resides or machine
      * where the entity can be accessed.
-     * @return String representing the machine id where the stakeholder
+     * @return String representing the machine id where the entity
      *         resides
      */
     public String getHostname() {
