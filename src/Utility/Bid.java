@@ -30,6 +30,10 @@ public class Bid implements Serializable {
     //the most recent successful bid amount.
     private double currentBid;
 
+    // ****************************** //
+    //   Constructor(s)               //
+    // ****************************** //
+
     /**
      * Constructs a new Bid, always setting the state to open. A new bid
      * must know it's starting price (minBid) upon construction. Starts
@@ -41,6 +45,10 @@ public class Bid implements Serializable {
         bidState = BidState.OPEN;
         currentBid = 0;
     }
+
+    // ****************************** //
+    //   Getter(s) & Setter(s)        //
+    // ****************************** //
 
     /**
      * Returns the bidState enum value associated with this bid.

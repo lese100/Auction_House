@@ -24,6 +24,10 @@ public class AuctionItem implements Serializable {
     private String itemName;
     private Bid bid;
 
+    // ****************************** //
+    //   Constructor(s)               //
+    // ****************************** //
+
     /**
      * AuctionItem constructor. Requires all fields be established upon
      * creation as all fields are immutable.
@@ -42,6 +46,10 @@ public class AuctionItem implements Serializable {
         this.itemName = itemName;
         this.bid = bid;
     }
+
+    // ****************************** //
+    //   Getter(s) & Setter(s)        //
+    // ****************************** //
 
     /**
      * Returns the houseID associated with this AuctionItem.
