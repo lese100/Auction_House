@@ -71,7 +71,7 @@ public class Main {
                     switch(message.getContent()){
                         case SWITCHDICTIONARY:
                             numTimesDictChanged++;
-                            msg = cs.sendMessage(new Message(Message.Content.SWITCHDICTIONARY, null));
+                            msg = cs.sendMessage(new Message<>(Message.Content.SWITCHDICTIONARY, null));
                             List<String> stringList = new ArrayList<>();
                             stringList.add(Integer.toString(numTimesDictChanged));
                             msg.setObj(stringList);
@@ -100,7 +100,7 @@ public class Main {
 
         public void sendNotification() {
             try{
-                notificationCS.sendMessage(new Message(Message.Content.TIMERUPDATE, null));
+                notificationCS.sendMessage(new Message<String>(Message.Content.TIMERUPDATE, null));
             }catch(IOException e){
                 e.printStackTrace();
             }

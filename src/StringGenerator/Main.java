@@ -53,11 +53,11 @@ public class Main {
 
                     switch(message.getContent()){
                         case GETSTRING:
-                            msg = new Message(Message.Content.NEWSTRING,
+                            msg = new Message<>(Message.Content.NEWSTRING,
                                     dictionary.getRandomWord());
                             break;
                         case SWITCHDICTIONARY:
-                            msg = new Message(Message.Content.SDCOMPLETE,
+                            msg = new Message<String>(Message.Content.SDCOMPLETE,
                                     null);
                             dictionary.switchDictionary();
                             break;

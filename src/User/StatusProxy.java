@@ -12,16 +12,16 @@ public class StatusProxy {
     }
 
     public String changeDictionary(){
-        Message message = null;
+        Message<ArrayList<String>> message = null;
 
         try{
-            message = new Message(Message.Content.SWITCHDICTIONARY, null);
+            message = new Message<>(Message.Content.SWITCHDICTIONARY, null);
 
             message = cs.sendMessage(message);
         }catch(IOException io){
             io.printStackTrace();
         }
 
-        return ((ArrayList<String>) message.getObj()).get(0);
+        return message.getObj().get(0);
     }
 }

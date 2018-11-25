@@ -57,7 +57,7 @@ public class Controller extends Application {
         Thread thread = new Thread(nServer);
         thread.start();
 
-        Message message = new Message(Message.Content.NOTIFICATIONSERVERSETUP,
+        Message message = new Message<>(Message.Content.NOTIFICATIONSERVERSETUP,
                 notificationPortNumber + " " +  hostName3);
 
         statusCS.sendMessage(message);

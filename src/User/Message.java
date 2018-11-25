@@ -2,14 +2,14 @@ package User;
 
 import java.io.Serializable;
 
-public class Message implements Serializable {
+public class Message <T> implements Serializable {
 
     public enum Content {GETSTRING, SWITCHDICTIONARY, NEWSTRING, SDCOMPLETE,
     TIMERUPDATE, NOTIFICATIONSERVERSETUP}
     private Content content;
-    private Object obj;
+    private T obj;
 
-    public Message(Content content, Object obj){
+    public Message(Content content, T obj){
         this.content = content;
         this.obj = obj;
     }
@@ -18,11 +18,11 @@ public class Message implements Serializable {
         return content;
     }
 
-    public Object getObj(){
+    public T getObj(){
         return obj;
     }
 
-    public void setObj(Object obj){
+    public void setObj(T obj){
         this.obj = obj;
     }
 }
