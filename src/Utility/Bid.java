@@ -29,6 +29,10 @@ public class Bid implements Serializable {
     private double minBid;
     //the most recent successful bid amount.
     private double currentBid;
+    //secretKey and proposedBid are not initialized until an agent has
+    //placed a bid.
+    private int secretKey;
+    private int proposedBid;
 
     // ****************************** //
     //   Constructor(s)               //
@@ -101,6 +105,41 @@ public class Bid implements Serializable {
      */
     public void setCurrentBid(double currentBid){
         this.currentBid = currentBid;
+    }
+
+    /**
+     * Returns the secretKey of the last agent that bid on this successfully
+     * @return secretKey int that represents an agent's secret key
+     */
+    public int getSecretKey() {
+        return secretKey;
+    }
+
+    /**
+     * Sets the secretKey field of this bid.
+     * @param secretKey the secretKey an agent has established between
+     *                  itself and the AuctionHouse this bid is located in.
+     */
+    public void setSecretKey(int secretKey) {
+        this.secretKey = secretKey;
+    }
+
+    /**
+     * Returns the proposed bid an agent has made.
+     * @return proposedBid, the amount an agent is trying to bid on an
+     *         AuctionItem.
+     */
+    public int getProposedBid() {
+        return proposedBid;
+    }
+
+    /**
+     * Sets the proposedBid an agent would like to make.
+     * @param proposedBid the amount an agent is trying to bid on an
+     *                    AuctionItem.
+     */
+    public void setProposedBid(int proposedBid) {
+        this.proposedBid = proposedBid;
     }
 
 

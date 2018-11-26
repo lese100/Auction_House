@@ -13,14 +13,14 @@ import java.io.Serializable;
  * @author Warren D. Craft (wdc)
  * @author Liam Brady (lb)
  */
-public class Message implements Serializable {
+public class Message <T> implements Serializable {
 
     // enum to be further elaborated with other identifiers
     public enum MessageIdentifier {AGENT_OPENING_ACCOUNT,
                                    AUCTION_HOUSE_OPENING_ACCOUNT};
 
     private MessageIdentifier messageIdentifier;
-    private Object messageContent;
+    private T messageContent;
 
     // ****************************** //
     //   Constructor(s)               //
@@ -34,7 +34,7 @@ public class Message implements Serializable {
      * @param messageContent Object containing message information
      */
     public Message (MessageIdentifier messageIdentifier,
-                    Object messageContent) {
+                    T messageContent) {
 
         this.messageIdentifier = messageIdentifier;
         this.messageContent = messageContent;
@@ -58,7 +58,7 @@ public class Message implements Serializable {
      * can then be cast or interpreted based on the Message's MessageIdentifier
      * @return Object to be typecast representing the Message content.
      */
-    public Object getMessageContent() {
+    public T getMessageContent() {
         return messageContent;
     }
 
@@ -68,7 +68,7 @@ public class Message implements Serializable {
      * (for example, one could use an ArrayList, a String, etc).
      * @param messageContent An Object representing message information.
      */
-    public void setMessageContent(Object messageContent) {
+    public void setMessageContent(T messageContent) {
         this.messageContent = messageContent;
     }
 
