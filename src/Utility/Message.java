@@ -7,8 +7,8 @@ import java.io.Serializable;
  * communication among the triplet of entities Bank, Auction House,
  * and Agent.
  * created: 11/20/18 by thf
- * last modified: 11/21/18 by wdc (adapting to Utility package)
- * previously modified: 11/20/18 by thf (creation)
+ * last modified: 11/25/18 by thf (adding generics to message structure)
+ * previously modified: 11/21/18 by wdc (adapting to Utility package)
  * @author Tyler Fenske (thf)
  * @author Warren D. Craft (wdc)
  * @author Liam Brady (lb)
