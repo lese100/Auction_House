@@ -13,7 +13,8 @@ import java.io.Serializable;
  * (5) an int for storing a port number (for accessing/contacting
  *     the entity)
  * created: 11/24/18 by wdc
- * last modified: 11/24/18 by wdc
+ * last modified: 11/27/18 by wdc (adding initialBalance field)
+ * previously modified: 11/24/18 by wdc (creation)
  * @author Liam Brady (lb)
  * @author Warren D. Craft (wdc)
  * @author Tyler Fenske (thf)
@@ -24,6 +25,7 @@ public class IDRecord implements Serializable {
     public enum RecordType {AGENT, AUCTION_HOUSE, BANK};
     private RecordType recordType;
     private String name;
+    private double initialBalance;
     private int numericalID;
     private String hostname;
     private int portNumber;
@@ -39,10 +41,12 @@ public class IDRecord implements Serializable {
      * then (perhaps) augmented by other entities.
      */
     public IDRecord (RecordType recordType, String name,
+                     double initialBalance,
                      String hostname, int portNumber) {
 
         this.recordType = recordType;
         this.name = name;
+        this.initialBalance = initialBalance;
         this.hostname = hostname;
         this.portNumber = portNumber;
 
@@ -67,6 +71,15 @@ public class IDRecord implements Serializable {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Gets the initial balance associated with the IDRecord (typically
+     * used for establishing an agent's account with a Bank).
+     * @return double representing the entity's initial balance
+     */
+    public double getInitialBalance() {
+        return initialBalance;
     }
 
     /**
