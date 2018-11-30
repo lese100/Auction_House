@@ -19,7 +19,7 @@ public class Message <T> implements Serializable {
     enum comments use A = Agent, B = BANK, AH = Auction House
     Most recent count is 30 items, defined in the code in alphab order.
     Organized in comments below by category. "reply" indicates a reply to
-    a message initiated by another entity; "send" indicates an message
+    a message initiated by another entity; "send" indicates a message
     initiated by the entity.
 
     IDs for Agent-Sent Messages:
