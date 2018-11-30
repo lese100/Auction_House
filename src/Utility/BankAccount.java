@@ -7,7 +7,9 @@ import java.io.Serializable;
  * A BankAccount is conceived generally to be held or stored by a Bank, but
  * can also be communicated to a remote client of the Bank to update the
  * client with current account information, hence we also make the class
- * implement Serializable.
+ * implement Serializable. Methods to check and modify balance, frozen funds,
+ * and unfrozen funds are all synchronized to prevent multithread-based
+ * interference errors (e.g. to avoid two threads "freezing" the same funds).
  * created: 11/18/18 by wdc
  * last modified: 11/29/18 by wdc (udpating to Utility package)
  * previously modified: 11/18/18 by wdc (creation)
@@ -81,7 +83,7 @@ public class BankAccount implements Serializable {
      * and unfrozen funds.
      * @return double total balance = frozen funds + unfrozen funds
      */
-    public double getTotalBalance() {
+    public synchronized double getTotalBalance() {
         return totalBalance;
     }
 
@@ -90,7 +92,7 @@ public class BankAccount implements Serializable {
      * temporarily committed through a bidding or purchase process
      * @return double funds currently in account but frozen or on hold
      */
-    public double getTotalFrozen() {
+    public synchronized double getTotalFrozen() {
         return totalFrozen;
     }
 
@@ -100,7 +102,7 @@ public class BankAccount implements Serializable {
      * committed
      * @return double unfrozen funds = total balance - frozen funds
      */
-    public double getTotalUnfrozen() {
+    public synchronized double getTotalUnfrozen() {
         return totalUnfrozen;
     }
 
@@ -113,7 +115,7 @@ public class BankAccount implements Serializable {
      * the total balance and the unfrozen funds.
      * @param balanceIncrease double $ to add to total account balance
      */
-    public void increaseTotalBalance (double balanceIncrease) {
+    public synchronized void increaseTotalBalance (double balanceIncrease) {
         totalBalance += balanceIncrease;
         totalUnfrozen += balanceIncrease;
     }
@@ -127,7 +129,7 @@ public class BankAccount implements Serializable {
      * @param freezeIncrease double $ to add to total of frozen funds
      * @return true if increase successful; false if not possible
      */
-    public boolean increaseFreeze(double freezeIncrease) {
+    public synchronized boolean increaseFreeze(double freezeIncrease) {
         if ( totalUnfrozen >= freezeIncrease ) {
             totalFrozen += freezeIncrease;
             totalUnfrozen = totalUnfrozen - freezeIncrease;
@@ -145,13 +147,33 @@ public class BankAccount implements Serializable {
      * @param decrease double $ to decrease in account
      * @return true if decrease successful; false if not possible
      */
-    public boolean decreaseFrozenAndBalance (double decrease) {
+    public synchronized boolean decreaseFrozenAndBalance (double decrease) {
         // used when transferring previously blocked funds
         // over to an auction house
         if ( totalFrozen >= decrease ) {
             totalFrozen -= decrease;
             totalBalance -= decrease;
             // and does not change the unfrozen balance
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks to see if account has sufficient unfrozen funds to cover an
+     * amountToFreeze (e.g. like a "hold" on a credit card), and if so,
+     * freezes those funds, adjusts the frozen and unfrozen values, and
+     * returns true. If NSF for freezing, returns false.
+     * @param amountToFreeze double amount requested to be frozen
+     * @return Boolean true if freeze successful, false otherwise
+     */
+    public synchronized boolean checkAndFreeze (double amountToFreeze) {
+        // used when verifying an account has sufficient funds to cover
+        // an expenditure, and if it does, then freeze or hold those funds
+        if ( totalUnfrozen >= amountToFreeze ) {
+             totalFrozen += amountToFreeze;
+             totalUnfrozen -= amountToFreeze;
+             // and total balance does not change
             return true;
         }
         return false;
