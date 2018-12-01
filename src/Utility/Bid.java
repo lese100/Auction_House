@@ -23,7 +23,7 @@ import java.io.Serializable;
 public class Bid implements Serializable {
 
 
-    private enum BidState {OPEN, BIDDING, SOLD}
+    public enum BidState {OPEN, BIDDING, SOLD}
     private BidState bidState;
     //the minimum bid that must be made to out-bit the current bid.
     private double minBid;
@@ -32,7 +32,7 @@ public class Bid implements Serializable {
     //secretKey and proposedBid are not initialized until an agent has
     //placed a bid.
     private int secretKey;
-    private int proposedBid;
+    private double proposedBid;
 
     // ****************************** //
     //   Constructor(s)               //
@@ -129,7 +129,7 @@ public class Bid implements Serializable {
      * @return proposedBid, the amount an agent is trying to bid on an
      *         AuctionItem.
      */
-    public int getProposedBid() {
+    public double getProposedBid() {
         return proposedBid;
     }
 
@@ -138,7 +138,7 @@ public class Bid implements Serializable {
      * @param proposedBid the amount an agent is trying to bid on an
      *                    AuctionItem.
      */
-    public void setProposedBid(int proposedBid) {
+    public void setProposedBid(double proposedBid) {
         this.proposedBid = proposedBid;
     }
 

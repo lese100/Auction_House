@@ -50,11 +50,12 @@ public class BankProxy {
                 return reply.getMessageContent();
             }else if(reply.getMessageIdentifier() == Message.MessageIdentifier.CASE_NOT_FOUND){
                 System.out.println("bank missing get Secret Key");
+                return 123456;
             }
         }
         return -1;
     }
-    public Message sendMSG(Message message){
+    private Message sendMSG(Message message){
         Message reply = null;
         try {
             reply = coms.sendMessage(message);

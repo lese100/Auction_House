@@ -1,7 +1,7 @@
 package Utility;
 
 import java.io.Serializable;
-
+import Utility.Bid.BidState;
 /**
  * Provides a structure for managing and observing an Auction Item which
  * will be contained in an Auction House. Each AuctionItem holds its
@@ -83,4 +83,11 @@ public class AuctionItem implements Serializable {
     public Bid getBid() {
         return bid;
     }
+
+    /**
+     * Allows you to replace the old bid with the new updated one, so for when you
+     * are placing a bid or the Auction house is accepting the new proposed bid.
+     * @param newBid bid object that is replacing the old one
+     */
+    public void setBid(Bid newBid){bid = newBid;}
 }

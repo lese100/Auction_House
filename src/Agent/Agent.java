@@ -14,15 +14,18 @@ import Utility.*;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 
 public class Agent extends Application {
     private int holdPort,holdMyPort;
     private String holdHost, localHost;
     private IDRecord myRecords;
+    private HashMap<AuctionHouseProxy,IDRecord> auctionHouses;
     public Agent(){
     }
     public Agent(int port){
         AgentProtocol protocol = new AgentProtocol(this);
+        auctionHouses = new HashMap<AuctionHouseProxy, IDRecord>();
         try {
             NotificationServer notificationserver = new NotificationServer(port, protocol);
             Thread t = new Thread(notificationserver);
