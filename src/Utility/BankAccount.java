@@ -20,7 +20,7 @@ import java.io.Serializable;
 public class BankAccount implements Serializable {
 
     private AccountType accountType;
-    public enum AccountType { AGENT, AUCTION_HOUSE };
+    public enum AccountType { AGENT, AUCTION_HOUSE }
     private String userName;
     private int accountNumber;
     private double totalBalance;
