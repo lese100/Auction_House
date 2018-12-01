@@ -113,6 +113,16 @@ public class IDRecord implements Serializable {
     }
 
     /**
+     * Sets the initialBalance field, which is then used by a Bank in setting
+     * up a BankAccount when responding to a request from a client to open an
+     * account.
+     * @param initialBalance double initial account balance
+     */
+    public void setInitialBalance(double initialBalance) {
+        this.initialBalance = initialBalance;
+    }
+
+    /**
      * Sets the numerical ID for the entity associated with the
      * IDRecord -- used, e.g., by a Bank to set the entity's bank
      * account number.
