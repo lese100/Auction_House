@@ -10,5 +10,5 @@ public class BankProxy {
         this.cs = cs;
     }
 
-    
+
 }
