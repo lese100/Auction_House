@@ -55,6 +55,18 @@ public class BankProxy {
         }
         return -1;
     }
+    public BankAccount transferFunds(AuctionItem purchasedItem){
+        Message<AuctionItem> message = new Message<>(Message.MessageIdentifier.TRANSFER_FUNDS,purchasedItem);
+        Message<BankAccount> reply = sendMSG(message);
+        if(reply != null){
+            if(reply.getMessageIdentifier() == Message.MessageIdentifier.TRANSFER_SUCCESS){
+                return reply.getMessageContent();
+            }else{
+                System.out.println("Bank missing transfer funds");
+            }
+        }
+        return null;
+    }
     private Message sendMSG(Message message){
         Message reply = null;
         try {

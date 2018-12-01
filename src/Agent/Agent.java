@@ -1,6 +1,5 @@
 package Agent;
 
-import Bank.Bank;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -20,6 +19,7 @@ public class Agent extends Application {
     private int holdPort,holdMyPort;
     private String holdHost, localHost;
     private IDRecord myRecords;
+    private Display display;
     private HashMap<AuctionHouseProxy,IDRecord> auctionHouses;
     public Agent(){
     }
@@ -33,6 +33,10 @@ public class Agent extends Application {
         }catch (IOException e){
             e.printStackTrace();
         }
+    }
+    @Override
+    public void stop(){
+        System.exit(1);
     }
     @Override
     public void start(Stage stage) {
@@ -59,15 +63,16 @@ public class Agent extends Application {
 
         Scene scene = new Scene(grid, 240, 100);
         submit.setOnAction(event -> {
-            holdMyPort = Integer.parseInt(myPortNum.getText());
-            holdHost = hostName.getText();
-            holdPort = Integer.parseInt(portNum.getText());
             inputs.close();
         });
         inputs.setResizable(false);
         inputs.setScene(scene);
         inputs.initOwner(stage);
         inputs.showAndWait();
+        holdMyPort = Integer.parseInt(myPortNum.getText());
+        holdHost = hostName.getText();
+        holdPort = Integer.parseInt(portNum.getText());
+        System.out.println(holdMyPort + " " + holdHost + " " + holdPort);
         Agent agent = new Agent(holdMyPort);
         localHost = null;
         try {
@@ -94,17 +99,18 @@ public class Agent extends Application {
 
         Scene scene2 = new Scene(grid2, 240, 75);
         account.setOnAction(event -> {
-            myRecords = new IDRecord(IDRecord.RecordType.AGENT,name.getText(),Integer.parseInt(balance.getText()),
-                    localHost,holdMyPort);
             create.close();
         });
         create.setResizable(false);
         create.setScene(scene2);
         create.initOwner(stage);
         create.showAndWait();
-        BankProxy bank = new BankProxy(holdHost,holdPort);
-        myRecords = bank.createBankAccount(myRecords);
-        stage.close();
+        System.out.println(name.getText()+" " + balance.getText());
+        myRecords = new IDRecord(IDRecord.RecordType.AGENT,name.getText(),Integer.parseInt(balance.getText()),
+                localHost,holdMyPort);
+        //BankProxy bank = new BankProxy(holdHost,holdPort);
+        //myRecords = bank.createBankAccount(myRecords);
+        display = new Display(stage);
     }
 
 }
