@@ -12,4 +12,7 @@ public class BankProxy {
             e.printStackTrace();
         }
     }
+    public void sendMessage(){
+
+    }
 }

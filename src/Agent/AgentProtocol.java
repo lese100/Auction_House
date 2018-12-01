@@ -29,7 +29,9 @@ public class AgentProtocol implements PublicAuctionProtocol{
                         null);
                 break;
             case UPDATE_AUCTION_ITEMS:
-
+                msgToSend = new Message<>(Message.MessageIdentifier.
+                        ACKNOWLEDGED,
+                        null);
                 break;
             default:
                 msgToSend = new Message<>(Message.MessageIdentifier.
