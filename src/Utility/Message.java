@@ -7,7 +7,8 @@ import java.io.Serializable;
  * communication among the triplet of entities Bank, Auction House,
  * and Agent.
  * created: 11/20/18 by thf
- * last modified: 11/25/18 by thf (adding generics to message structure)
+ * last modified: 12/01/18 by wdc (adding some identifiers)
+ * previously modified: 11/25/18 by thf (adding generics to message structure)
  * previously modified: 11/21/18 by wdc (adapting to Utility package)
  * @author Tyler Fenske (thf)
  * @author Warren D. Craft (wdc)
@@ -17,7 +18,7 @@ public class Message <T> implements Serializable {
 
     /*
     enum comments use A = Agent, B = BANK, AH = Auction House
-    Most recent count is 30 items, defined in the code in alphab order.
+    Most recent count is 32 items, defined in the code in alphab order.
     Organized in comments below by category. "reply" indicates a reply to
     a message initiated by another entity; "send" indicates a message
     initiated by the entity.
@@ -32,6 +33,7 @@ public class Message <T> implements Serializable {
         MAKE_BID                   (send to AH)
         OPEN_AGENT_ACCT            (send to B)
         REQUEST_BALANCE            (send to B)
+        TEST_MESSAGE               (send to B)
         TRANSFER_FUNDS             (send to B)
 
     IDS for AH-Sent Messages:
@@ -50,6 +52,7 @@ public class Message <T> implements Serializable {
         UPDATE_AUCTION_ITEMS        (send to A)
 
     IDS for Bank-Sent Messages:
+        ACCOUNT_DENIED              (reply to A or AH)
         AGENT_ACCT_CONFIRMED        (reply to A)
         AUCTIONHOUSE_ACCT_CONFIRMED (reply to AH)
         BALANCE                     (reply to A)
@@ -64,6 +67,7 @@ public class Message <T> implements Serializable {
     */
 
     public enum MessageIdentifier {
+        ACCOUNT_DENIED,              // B reply to A or AH for account error
         ACKNOWLEDGED,                // A reply to BID_OUTBIDDED or BID_WON
         AGENT_ACCT_CONFIRMED,        // B reply to OPEN_AGENT_ACCT
         AUCTIONHOUSE_ACCT_CONFIRMED, // B reply to OPEN_AUCTIONHOUSE_ACCT
@@ -90,6 +94,7 @@ public class Message <T> implements Serializable {
         OPEN_AUCTIONHOUSE_ACCT,      // AH send to B
         REQUEST_BALANCE,             // A send to B
         SECRET_KEY,                  // B reply to GET_SECRET_KEY
+        TEST_MESSAGE,                // A send to B
         TRANSFER_FUNDS,              // A send to B
         TRANSFER_SUCCESS,            // B reply to TRANSFER_FUNDS
         UNFREEZE_FUNDS,              // AH send to B
