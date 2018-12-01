@@ -11,8 +11,7 @@ import java.io.Serializable;
  * and unfrozen funds are all synchronized to prevent multithread-based
  * interference errors (e.g. to avoid two threads "freezing" the same funds).
  * created: 11/18/18 by wdc
- * last modified: 12/01/18 by wdc (adding generic constructor)
- * previously modified: 12/01/18 by wdc (udpating to Utility package)
+ * last modified: 11/29/18 by wdc (udpating to Utility package)
  * previously modified: 11/18/18 by wdc (creation)
  * @author Liam Brady
  * @author Warren D. Craft (wdc)
@@ -21,7 +20,7 @@ import java.io.Serializable;
 public class BankAccount implements Serializable {
 
     private AccountType accountType;
-    public enum AccountType { AGENT, AUCTION_HOUSE, BANK, OTHER };
+    public enum AccountType { AGENT, AUCTION_HOUSE }
     private String userName;
     private int accountNumber;
     private double totalBalance;
@@ -47,17 +46,8 @@ public class BankAccount implements Serializable {
         this.accountType = accountType;
         this.userName = userName;
         this.accountNumber = accountNumber;
-        this.totalBalance = initialBalance;
-        this.totalUnfrozen = initialBalance;
-    }
-
-    /**
-     * Generic public constructor for a BankAccount, provided for convenience
-     * when a BankAccount needs to be initialized before relevant information
-     * is available.
-     */
-    public BankAccount() {
-        this(AccountType.AGENT, "unknown", -1, 0.00);
+        this.totalBalance = totalBalance;
+        this.totalUnfrozen = totalBalance;
     }
 
     // ****************************** //
