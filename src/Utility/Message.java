@@ -7,7 +7,8 @@ import java.io.Serializable;
  * communication among the triplet of entities Bank, Auction House,
  * and Agent.
  * created: 11/20/18 by thf
- * last modified: 11/25/18 by thf (adding generics to message structure)
+ * last modified: 12/01/18 by wdc (adding some identifiers)
+ * previously modified: 11/25/18 by thf (adding generics to message structure)
  * previously modified: 11/21/18 by wdc (adapting to Utility package)
  * @author Tyler Fenske (thf)
  * @author Warren D. Craft (wdc)
@@ -17,7 +18,7 @@ public class Message <T> implements Serializable {
 
     /*
     enum comments use A = Agent, B = BANK, AH = Auction House
-    Most recent count is 31 items, defined in the code in alphab order.
+    Most recent count is 32 items, defined in the code in alphab order.
     Organized in comments below by category. "reply" indicates a reply to
     a message initiated by another entity; "send" indicates a message
     initiated by the entity.

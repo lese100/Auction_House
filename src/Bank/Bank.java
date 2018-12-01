@@ -9,6 +9,19 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Random;
 
+/**
+ * Provides the structure and functionality of a simulated Bank accessible to
+ * Agents, Auction Houses, and other entities. Keeps track of client accounts
+ * and provides some typical account functionality, such as opening and
+ * closing accounts, funding an account, transferring funds from one account
+ * to another, etc.
+ * created: 11/28/18 by wdc
+ * last modified: 12/01/18 by wdc
+ * previously modified: 11/28/18 by wdc (creation)
+ * @author Liam Brady
+ * @author Warren D. Craft (wdc)
+ * @author Tyler Fenske (thf)
+ */
 public class Bank {
 
     private String location;  // machine location
@@ -38,7 +51,6 @@ public class Bank {
      * Public constructor for a Bank object, allowing the initial specification
      * of the Bank's (machine) location (e.g. localhost or network machine name)
      * and the Bank's port number used for communications.
-     *
      * @param location   String hostname
      * @param portNumber int communication port
      */

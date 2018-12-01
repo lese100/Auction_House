@@ -11,7 +11,8 @@ import java.io.Serializable;
  * and unfrozen funds are all synchronized to prevent multithread-based
  * interference errors (e.g. to avoid two threads "freezing" the same funds).
  * created: 11/18/18 by wdc
- * last modified: 11/29/18 by wdc (udpating to Utility package)
+ * last modified: 12/01/18 by wdc (adding generic constructor)
+ * previously modified: 12/01/18 by wdc (udpating to Utility package)
  * previously modified: 11/18/18 by wdc (creation)
  * @author Liam Brady
  * @author Warren D. Craft (wdc)

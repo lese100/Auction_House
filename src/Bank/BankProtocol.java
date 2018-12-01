@@ -11,8 +11,7 @@ import java.util.Random;
  * Message-handling protocol for messages received by a Bank through
  * a BankClientConnection.
  * created: 11/28/18 by Warren D. Craft (wdc)
- * last modified: 11/28/18 by wdc
- *
+ * last modified: 12/01/18 by wdc
  * @author Liam Brady (lb)
  * @author Warren D Craft (wdc)
  * @author Tyler Fenske (thf)
