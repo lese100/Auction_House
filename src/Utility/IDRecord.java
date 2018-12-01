@@ -13,7 +13,8 @@ import java.io.Serializable;
  * (5) an int for storing a port number (for accessing/contacting
  *     the entity)
  * created: 11/24/18 by wdc
- * last modified: 11/27/18 by wdc (adding initialBalance field)
+ * last modified: 12/01/18 by wdc (adding initialBalance setter)
+ * previously modified: 11/27/18 by wdc (adding initialBalance field)
  * previously modified: 11/24/18 by wdc (creation)
  * @author Liam Brady (lb)
  * @author Warren D. Craft (wdc)
@@ -110,6 +111,16 @@ public class IDRecord implements Serializable {
      */
     public int getPortNumber() {
         return portNumber;
+    }
+
+    /**
+     * Sets the initialBalance field, which is then used by a Bank in setting
+     * up a BankAccount when responding to a request from a client to open an
+     * account.
+     * @param initialBalance double initial account balance
+     */
+    public void setInitialBalance(double initialBalance) {
+        this.initialBalance = initialBalance;
     }
 
     /**
