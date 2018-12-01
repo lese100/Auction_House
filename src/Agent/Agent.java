@@ -1,5 +1,6 @@
 package Agent;
 
+import Bank.Bank;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -43,6 +44,7 @@ public class Agent extends Application {
         Stage inputs = new Stage();
         inputs.setTitle("Connect");
 
+        /*set up host information*/
         GridPane grid = new GridPane();
         Label port = new Label("Port Number:");
         Label host = new Label("Host Name:");
@@ -75,10 +77,13 @@ public class Agent extends Application {
         localHost = null;
         try {
             localHost = InetAddress.getLocalHost().getHostName();
-        }catch(UnknownHostException e){}
+        }catch(UnknownHostException e){
+            e.printStackTrace();
+        }
         Stage create = new Stage();
         create.setTitle("Connect");
 
+        /*establish user info*/
         GridPane grid2 = new GridPane();
         Label user = new Label("UserName:");
         Label deposit = new Label("Initial Deposit:");
@@ -103,7 +108,8 @@ public class Agent extends Application {
         create.initOwner(stage);
         create.showAndWait();
         BankProxy bank = new BankProxy(holdHost,holdPort);
-
+        myRecords = bank.createBankAccount(myRecords);
+        stage.close();
     }
 
 }
