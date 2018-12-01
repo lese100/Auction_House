@@ -20,14 +20,6 @@ public class Agent extends Application {
     private String holdHost, localHost;
     private IDRecord myRecords;
     public Agent(){
-        AgentProtocol protocol = new AgentProtocol(this);
-        try {
-            NotificationServer notificationserver = new NotificationServer(8765, protocol);
-            Thread t = new Thread(notificationserver);
-            t.start();
-        }catch (IOException e){
-            e.printStackTrace();
-        }
     }
     public Agent(int port){
         AgentProtocol protocol = new AgentProtocol(this);
@@ -97,7 +89,7 @@ public class Agent extends Application {
         grid2.add(balance,1,1);
         grid2.add(account,1,2);
 
-        Scene scene2 = new Scene(grid2, 240, 100);
+        Scene scene2 = new Scene(grid2, 240, 75);
         account.setOnAction(event -> {
             myRecords = new IDRecord(IDRecord.RecordType.AGENT,name.getText(),Integer.parseInt(balance.getText()),
                     localHost,holdMyPort);
