@@ -1,6 +1,8 @@
 package Agent;
 
+import Utility.AuctionHouseInventory;
 import Utility.AuctionItem;
+import Utility.Bid;
 import Utility.IDRecord;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -9,12 +11,13 @@ import javafx.scene.control.TabPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class Display {
     private HashMap<Integer,AuctionTab> auctions;
-    private HashMap<String,BankTab> banks;
+    private BankTab bank;
     private Tab currentTab;
     private TabPane tabs;
     private Button bid,leaveAuc,leaveBank,getAuction,getBalance,transfer,join;
@@ -34,13 +37,11 @@ public class Display {
         this.transfer = transfer;
         this.join = join;
         auctions = new HashMap<>();
-        banks = new HashMap<>();
         stage.setTitle("Agent Interface");
         tabs = new TabPane();
         Scene layout = new Scene(tabs,400,600, Color.WHITE);
-        BankTab bank = new BankTab(leaveBank,getAuction,getBalance,transfer,join);
-        banks.put("bank",bank);
-        tabs.getTabs().add(banks.get("bank").getBankTab());
+        bank = new BankTab(leaveBank,getAuction,getBalance,transfer,join);
+        tabs.getTabs().add(bank.getBankTab());
         tabs.getSelectionModel().selectedItemProperty().addListener((ov, oldTab, newTab) -> {
             currentTab = newTab;
         });
@@ -58,4 +59,22 @@ public class Display {
         AuctionTab auction = new AuctionTab(items,auctionHouse,bid,leaveAuc);
         auctions.put(auctionHouse.getNumericalID(),auction);
     }
+    public AuctionItem getBid(){
+        AuctionTab tab = auctions.get(Integer.parseInt(currentTab.getId()));
+        AuctionItem item = tab.getSelectedItem();
+        Bid currentBid = item.getBid();
+        currentBid.setBidState(Bid.BidState.BIDDING);
+        currentBid.setProposedBid(tab.getProposedBid());
+        item.setBid(currentBid);
+        return item;
+    }
+    public void updateAuctionItems(AuctionHouseInventory update){
+        List<AuctionItem> items = update.getAuctions();
+        AuctionTab auction = auctions.get(update.getAccountNumber());
+        auction.updateItems(items);
+    }
+    public void displayAuctionHouses(ArrayList<IDRecord> auctionHouses){
+        bank.setAucHouses(auctionHouses);
+    }
+    public IDRecord getSelectedAuctionHouse(){return bank.getSelectedItem();}
 }

@@ -8,9 +8,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
@@ -40,10 +42,11 @@ public class BankTab {
         bankTab = new Tab();
         bankTab.setText("Bank");
         bankTab.setClosable(false);
+        bankTab.setId("Bank");
 
         VBox auctionInfo = new VBox();
         list = new ListView<>();
-        list.setPrefSize(75,500);
+        list.setPrefSize(50,500);
         list.setOrientation(Orientation.VERTICAL);
         aucDisp = FXCollections.observableArrayList();
         list.setItems(aucDisp);
@@ -58,8 +61,14 @@ public class BankTab {
                     }
                 });
 
+        HBox leaveHold = new HBox();
+        Label leaveSpacing = new Label("                                                                          " +
+                "                                    ");
+        leaveHold.getChildren().addAll(leaveSpacing,leave);
+
         pane = new BorderPane();
         pane.setLeft(auctionInfo);
+        pane.setBottom(leaveHold);
         bankTab.setContent(pane);
     }
 
@@ -77,9 +86,11 @@ public class BankTab {
     }
     public void setAucHouses(ArrayList<IDRecord> houses){
         aucHouses = houses;
+        aucDisp.removeAll();
         displayAucHouses();
     }
     public IDRecord getSelectedItem(){
+        aucDisp.removeAll();
         return selectedItem;
     }
 

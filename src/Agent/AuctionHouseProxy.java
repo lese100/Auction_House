@@ -47,15 +47,12 @@ public class AuctionHouseProxy {
      * sends a message to the auction house telling them to place a bid on a
      * certain item and the bid amount
      * @param item the item im bidding on
-     * @param bid the bid im placing
      * @param secretKey the secret key associated with my account.
      * @return
      */
-    public int makeBid(AuctionItem item, double bid, int secretKey){
+    public int makeBid(AuctionItem item, int secretKey){
         Bid oldBid = item.getBid();
-        oldBid.setBidState(Bid.BidState.BIDDING);
         oldBid.setSecretKey(secretKey);
-        oldBid.setProposedBid(bid);
         item.setBid(oldBid);
         Message<AuctionItem> message = new Message<>(Message.MessageIdentifier.MAKE_BID,item);
         Message<String> reply = sendMSG(message);
