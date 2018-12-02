@@ -7,7 +7,8 @@ import java.io.Serializable;
  * communication among the triplet of entities Bank, Auction House,
  * and Agent.
  * created: 11/20/18 by thf
- * last modified: 12/01/18 by wdc (adding some identifiers)
+ * last modified: 12/02/18 by wdc (adding an identifier)
+ * previously modified: 12/01/18 by wdc (adding some identifiers)
  * previously modified: 11/25/18 by thf (adding generics to message structure)
  * previously modified: 11/21/18 by wdc (adapting to Utility package)
  * @author Tyler Fenske (thf)
@@ -18,13 +19,14 @@ public class Message <T> implements Serializable {
 
     /*
     enum comments use A = Agent, B = BANK, AH = Auction House
-    Most recent count is 32 items, defined in the code in alphab order.
+    Most recent count is 33 items, defined in the code in alphab order.
     Organized in comments below by category. "reply" indicates a reply to
     a message initiated by another entity; "send" indicates a message
     initiated by the entity.
 
     IDs for Agent-Sent Messages:
         ACKNOWLEDGED               (reply to AH)
+        ADD_FUNDS                  (send to B)
         CASE_NOT_FOUND             (reply to B or AH)
         CLOSE_REQUEST              (send to B or AH)
         GET_LIST_OF_AUCTION_HOUSES (send to B)
@@ -69,6 +71,7 @@ public class Message <T> implements Serializable {
     public enum MessageIdentifier {
         ACCOUNT_DENIED,              // B reply to A or AH for account error
         ACKNOWLEDGED,                // A reply to BID_OUTBIDDED or BID_WON
+        ADD_FUNDS,                   // A send to B to increase acct balance
         AGENT_ACCT_CONFIRMED,        // B reply to OPEN_AGENT_ACCT
         AUCTIONHOUSE_ACCT_CONFIRMED, // B reply to OPEN_AUCTIONHOUSE_ACCT
         BALANCE,                     // B reply to REQUEST_BALANCE
