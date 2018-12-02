@@ -59,6 +59,29 @@ public class BankProtocol implements PublicAuctionProtocol {
 
             // cases listed in alphabetical order by Message identifier
 
+            case ADD_FUNDS:
+                System.out.println("BankProtocol.case ADD_FUNDS");
+                int theAcctNum;
+                double amtToAdd;
+                BankAccount updatedBankAccount;
+                if ( msgContent instanceof IDRecord ) {
+                    IDRecord idRecord = (IDRecord) msgContent;
+                    theAcctNum = idRecord.getNumericalID();
+                    amtToAdd = idRecord.getInitialBalance();
+                    updatedBankAccount = bank.addFunds(theAcctNum, amtToAdd);
+                    msgToSend = new Message<>(Message.MessageIdentifier.
+                        ACKNOWLEDGED,
+                        updatedBankAccount);
+                } else {
+                    // no valid IDRecord sent, so create a generic BankAccount
+                    // to send back with an error identifier
+                    updatedBankAccount = new BankAccount();
+                    msgToSend = new Message<>(Message.MessageIdentifier.
+                        REQUEST_FAILED,
+                        updatedBankAccount);
+                }
+                break;
+
             case CLOSE_REQUEST:
                 msgToSend = new Message<>(Message.MessageIdentifier.
                     ACKNOWLEDGED,
@@ -67,9 +90,17 @@ public class BankProtocol implements PublicAuctionProtocol {
 
             case GET_LIST_OF_AUCTION_HOUSES:
                 ArrayList<IDRecord> theList = bank.getListOfAuctionHouses();
+                System.out.println("BankProtocol: case GET_LIST: ");
+                for (IDRecord rec : theList) {
+                    System.out.println("Acct #: " + rec.getNumericalID());
+                }
                 msgToSend = new Message<>(Message.MessageIdentifier.
                     LIST_OF_AUCTION_HOUSES,
                     theList);
+                System.out.println("BankProtocol: msgToSend: ");
+                for (IDRecord rec : (ArrayList<IDRecord>) msgToSend.getMessageContent()) {
+                    System.out.println("Acct #: " + rec.getNumericalID());
+                }
                 break;
 
             case OPEN_AGENT_ACCT:

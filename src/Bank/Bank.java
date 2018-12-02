@@ -129,6 +129,11 @@ public class Bank {
         hashMapOfAllAccts.put(acctNum, newBankAccount);
         if (baType == BankAccount.AccountType.AUCTION_HOUSE) {
             listOfAuctionHouseIDRecords.add(updatedIDRecord);
+            System.out.println("Bank: createAccount(): updated " +
+                "listOfAutionHouseIDRecords: ");
+            for (IDRecord rec : listOfAuctionHouseIDRecords) {
+                System.out.println("Acct #: " + rec.getNumericalID());
+            }
         }
 
         return updatedIDRecord;
@@ -145,24 +150,6 @@ public class Bank {
         BankAccount currentBankAccount;
         int theAcctNum = idRecord.getNumericalID();
         System.out.println("Bank.getBalance(): for acct # " + theAcctNum);
-//        BankAccount.AccountType baType;
-//        switch (idRecord.getRecordType()) {
-//            case AGENT:
-//                baType = BankAccount.AccountType.AGENT;
-//                break;
-//
-//            case AUCTION_HOUSE:
-//                baType = BankAccount.AccountType.AUCTION_HOUSE;
-//                break;
-//
-//            case BANK: // for future generalization
-//                baType = BankAccount.AccountType.BANK;
-//                break;
-//
-//            default: // for other generalizations
-//                baType = BankAccount.AccountType.OTHER;
-//                break;
-//        }
 
         // find BankAccount from account -> BankAccount HashMap
         currentBankAccount = hashMapOfAllAccts.get(theAcctNum);
@@ -185,7 +172,33 @@ public class Bank {
      * @return ArrayList<IDRecord> of Auction House IDRecords
      */
     public ArrayList<IDRecord> getListOfAuctionHouses () {
+        System.out.println("Bank: getListofAHs(): ");
+        for (IDRecord rec : listOfAuctionHouseIDRecords) {
+            System.out.println("Acct #: " + rec.getNumericalID());
+        }
         return listOfAuctionHouseIDRecords;
+    }
+
+    public BankAccount addFunds(int theAcctNum, double amtToAdd) {
+        System.out.println("Bank.addFunds(): " + amtToAdd);
+        BankAccount currentBankAccount;
+        System.out.println("Bank.addFunds(): for acct # " + theAcctNum);
+
+        // find BankAccount from Bank's account -> BankAccount HashMap
+        currentBankAccount = hashMapOfAllAccts.get(theAcctNum);
+
+        if ( currentBankAccount == null) {
+            // if no account was found, generate a generic empty account
+            System.out.println("Bank.addFunds(): no account found!");
+            currentBankAccount = new BankAccount();
+        } else {
+            System.out.println("Bank.addFunds(): account found!");
+            // increase funds by $100
+            currentBankAccount.increaseTotalBalance(amtToAdd);
+        }
+
+        return currentBankAccount;
+
     }
 
     // ****************************** //

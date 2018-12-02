@@ -110,21 +110,63 @@ public class BankProxyForTesting {
         return (BankAccount) message.getMessageContent();
     }
 
+    /**
+     * Returns an ArrayList<IDRecord> of Auction House IDRecords for all
+     * Auction Houses currently having accounts at the Bank.
+     * @return ArrayList<IDRecord>
+     */
     public ArrayList<IDRecord> getListOfAuctionHouses () {
         Message message = null;
+        Message<ArrayList<IDRecord>> reply = null;
         try{
             message =
                 new Message<>(Message.MessageIdentifier.
                     GET_LIST_OF_AUCTION_HOUSES,
                     null);
 
-            message = cs.sendMessage(message);
+            reply = cs.sendMessage(message);
+            ArrayList<IDRecord> theList = reply.getMessageContent();
+            System.out.println("BankProxy: getListOfAHs() try");
+            System.out.println("reply type: " +
+                reply.getMessageIdentifier().toString());
+            for (IDRecord rec : theList) {
+                System.out.println("Acct #: " + rec.getNumericalID());
+            }
 
         } catch(IOException io) {
             io.printStackTrace();
         }
 
-        return (ArrayList<IDRecord>) message.getMessageContent();
+        System.out.println("BankProxy: getListOfAHs(): ");
+        for (IDRecord rec : reply.getMessageContent()) {
+            System.out.println("Acct #: " + rec.getNumericalID());
+        }
+        return reply.getMessageContent();
+    }
+
+
+    public BankAccount addFunds (IDRecord idRecord) {
+
+        System.out.println("BankProxyForTesting.addFunds() ");
+        Message message = null;
+
+        try{
+            message =
+                new Message<>(Message.MessageIdentifier.ADD_FUNDS,
+                    idRecord);
+
+            System.out.println(
+                "BankProxyForTesting.addFunds(): made new message");
+            message = cs.sendMessage(message);
+            System.out.println(
+                "BankProxyForTesting.addFunds(): received reply message");
+
+        } catch(IOException io) {
+            io.printStackTrace();
+        }
+
+        return (BankAccount) message.getMessageContent();
+
     }
 
 }

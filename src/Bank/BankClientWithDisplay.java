@@ -40,7 +40,7 @@ public class BankClientWithDisplay {
     private TextField textFieldAccountNumber = new TextField("unknown");
     private ChoiceBox choiceBoxAccountType =
         new ChoiceBox(FXCollections.observableArrayList(
-            "unknown", "agent", "auction house"));
+            "unknown", "AGENT", "AUCTION_HOUSE", "BANK", "OTHER"));
     private Label textLabelTotalBalance = new Label("unknown");
     private Label textLabelFrozen = new Label("unknown");
     private Label textLabelNonFrozen = new Label("unknown");
@@ -82,7 +82,7 @@ public class BankClientWithDisplay {
         hBoxAccountNumber.setSpacing(10);
         hBoxAccountNumber.setAlignment(Pos.CENTER_LEFT);
         Label textLabelAccountType = new Label("Account Type: ");
-        choiceBoxAccountType.setValue("agent");
+        choiceBoxAccountType.setValue("unknown");
         HBox hBoxAccountType =
             new HBox(textLabelAccountType, choiceBoxAccountType);
         hBoxAccountType.setSpacing(10);
@@ -115,11 +115,11 @@ public class BankClientWithDisplay {
         setButtonHandlers(btnOpenAHAccount);
         Button btnCheckBalance = new Button("Check Balance");
         setButtonHandlers(btnCheckBalance);
-        Button btnAddFunds = new Button("Add Funds");
+        Button btnAddFunds = new Button("Add $100");
         setButtonHandlers(btnAddFunds);
-        Button btnFreezeFunds = new Button("Freeze Funds");
+        Button btnFreezeFunds = new Button("Freeze $100");
         setButtonHandlers(btnFreezeFunds);
-        Button btnUnFreezeFunds = new Button("Un-Freeze Funds");
+        Button btnUnFreezeFunds = new Button("Un-Freeze $100");
         setButtonHandlers(btnUnFreezeFunds);
         Button btnGetListOfAuctionHouses = new Button("Get AH List");
         setButtonHandlers(btnGetListOfAuctionHouses);
@@ -227,11 +227,12 @@ public class BankClientWithDisplay {
                 });
                 break;
 
-            case "Add Funds":
+            case "Add $100":
                 button.setOnAction(new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent event) {
                         System.out.println("Adding Funds");
+                        addFunds();
                     }
                 });
                 break;
@@ -330,17 +331,18 @@ public class BankClientWithDisplay {
                      newAcctType.toString() + ")");
             textFieldAccountNumber.setText(
                 String.format("%d", newAccountNumber));
-            switch(newAcctType) {
-                case AGENT:
-                    choiceBoxAccountType.setValue("agent");
-                    break;
-                case AUCTION_HOUSE:
-                    choiceBoxAccountType.setValue("auction house");
-                    break;
-                default:
-                    choiceBoxAccountType.setValue("unknown");
-                    break;
-            }
+            choiceBoxAccountType.setValue(newAcctType.toString());
+//            switch(newAcctType) {
+//                case AGENT:
+//                    choiceBoxAccountType.setValue("agent");
+//                    break;
+//                case AUCTION_HOUSE:
+//                    choiceBoxAccountType.setValue("auction house");
+//                    break;
+//                default:
+//                    choiceBoxAccountType.setValue("unknown");
+//                    break;
+//            }
         } else {
             System.out.println("Returning object is not an IDRecord.");
         }
@@ -383,6 +385,8 @@ public class BankClientWithDisplay {
             "has type: " + myBankAccount.getAccountType().toString());
         System.out.println("Bank balance is: $" +
                            myBankAccount.getTotalBalance() );
+
+        // update GUI display
         String totalBalanceString =
             String.format("$%.2f", myBankAccount.getTotalBalance());
         String frozenBalanceString =
@@ -392,6 +396,11 @@ public class BankClientWithDisplay {
         textLabelTotalBalance.setText(totalBalanceString);
         textLabelFrozen.setText(frozenBalanceString);
         textLabelNonFrozen.setText(unFrozenBalanceString);
+        System.out.println("Balance checked on acct type: " +
+            myBankAccount.getAccountType().toString());
+        choiceBoxAccountType.setValue(
+            myBankAccount.getAccountType().toString()
+        );
     }
 
     /**
@@ -411,6 +420,59 @@ public class BankClientWithDisplay {
                 ": Acct # " + tempAHAcctNum);
         }
     }
+
+    public void addFunds () {
+
+        // using information from GUI for acct # and acct type
+        // and construct a temporary simulated IDRecord
+        IDRecord tempIDRecord;
+        int tempAcctNumber =
+            Integer.parseInt(textFieldAccountNumber.getText());
+        System.out.println("Attempting to add funds " +
+            "to account # " + tempAcctNumber );
+        String acctTypeString = choiceBoxAccountType.getValue().toString();
+        // construct a temporary simulated IDRecord
+        IDRecord.RecordType tempRecordType;
+        switch(acctTypeString){
+            case "AGENT":
+                tempRecordType = IDRecord.RecordType.AGENT;
+                break;
+            case "AUCTION_HOUSE":
+                tempRecordType = IDRecord.RecordType.AUCTION_HOUSE;
+                break;
+            default:
+                tempRecordType = IDRecord.RecordType.AGENT;
+                break;
+        }
+        tempIDRecord = new IDRecord(tempRecordType, "unknown", 100.00,
+            "unknown", 0);
+        tempIDRecord.setNumericalID(tempAcctNumber);
+        System.out.println("BCWD.addFunds(): tempAcctNumber = " +
+            tempAcctNumber);
+
+        // call bank/bankproxy
+        myBankAccount = bankProxyForTesting.addFunds(tempIDRecord);
+
+        System.out.println("BCWD.addFunds(): myBankAccount " +
+            "has type: " + myBankAccount.getAccountType().toString());
+        System.out.println("Updated Bank balance is: $" +
+            myBankAccount.getTotalBalance() );
+
+        // update GUI display
+        String totalBalanceString =
+            String.format("$%.2f", myBankAccount.getTotalBalance());
+        String frozenBalanceString =
+            String.format("$%.2f", myBankAccount.getTotalFrozen());
+        String unFrozenBalanceString =
+            String.format("$%.2f", myBankAccount.getTotalUnfrozen());
+        textLabelTotalBalance.setText(totalBalanceString);
+        textLabelFrozen.setText(frozenBalanceString);
+        textLabelNonFrozen.setText(unFrozenBalanceString);
+        choiceBoxAccountType.setValue(
+            myBankAccount.getAccountType().toString()
+        );
+    }
+
 
     public void notifyUser() {
         Stage notificationStage = new Stage();
