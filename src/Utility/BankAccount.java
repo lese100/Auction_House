@@ -11,7 +11,8 @@ import java.io.Serializable;
  * and unfrozen funds are all synchronized to prevent multithread-based
  * interference errors (e.g. to avoid two threads "freezing" the same funds).
  * created: 11/18/18 by wdc
- * last modified: 11/29/18 by wdc (udpating to Utility package)
+ * last modified: 12/01/18 by wdc (updating types and constructors)
+ * previously modified: 11/29/18 by wdc (updating to Utility package)
  * previously modified: 11/18/18 by wdc (creation)
  * @author Liam Brady
  * @author Warren D. Craft (wdc)
@@ -20,7 +21,7 @@ import java.io.Serializable;
 public class BankAccount implements Serializable {
 
     private AccountType accountType;
-    public enum AccountType { AGENT, AUCTION_HOUSE }
+    public enum AccountType { AGENT, AUCTION_HOUSE, BANK, OTHER }
     private String userName;
     private int accountNumber;
     private double totalBalance;
@@ -33,7 +34,7 @@ public class BankAccount implements Serializable {
 
     /**
      * Public constructor for a BankAccount, typically kept by a Bank.
-     * @param accountType AccountType enum AGENT or AUCTION_HOUSE
+     * @param accountType AccountType enum AGENT, AUCTION_HOUSE, BANK, or OTHER
      * @param userName String id for account, e.g. "Bob Smith" or "JJ Auctions"
      * @param accountNumber int with no particular internal constraints
      * @param initialBalance double initial balance
@@ -48,6 +49,16 @@ public class BankAccount implements Serializable {
         this.accountNumber = accountNumber;
         this.totalBalance = totalBalance;
         this.totalUnfrozen = totalBalance;
+    }
+
+    /**
+     * Generic public constructor for a BankAccount, used when a BankAccount
+     * structure is needed but when no such account is actually kept by
+     * the Bank (for example, in returning an error when a BankAccount is
+     * expected in a Message content).
+     */
+    public BankAccount () {
+        this(AccountType.OTHER, "unknown", -1, -1);
     }
 
     // ****************************** //
