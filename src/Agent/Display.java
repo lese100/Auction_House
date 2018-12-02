@@ -8,19 +8,28 @@ import javafx.scene.control.TabPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class Display {
+    private HashMap<String,AuctionTab> auctions;
+    private HashMap<String,BankTab> banks;
     private Tab currentTab;
     private TabPane tabs;
+
+    /**
+     * constructs the initial display for the bank.
+     * @param stage the main display stage
+     */
     public Display(Stage stage){
+        auctions = new HashMap<>();
+        banks = new HashMap<>();
         stage.setTitle("Agent Interface");
         tabs = new TabPane();
         Scene layout = new Scene(tabs,400,600, Color.WHITE);
-        Tab bankTab = new Tab();
-        bankTab.setText("Bank");
-        bankTab.setClosable(false);
-        tabs.getTabs().add(bankTab);
+        BankTab bank = new BankTab();
+        banks.put("bank",bank);
+        tabs.getTabs().add(banks.get("bank").getBankTab());
         tabs.getSelectionModel().selectedItemProperty().addListener((ov, oldTab, newTab) -> {
             currentTab = newTab;
         });
@@ -28,6 +37,12 @@ public class Display {
         stage.setResizable(false);
         stage.show();
     }
+
+    /**
+     * creates a new tab for a auction i have connected to.
+     * @param items list of items i need to display in the tab
+     * @param AuctionHouse auction house info
+     */
     public void addAuctionTab(List<AuctionItem> items, IDRecord AuctionHouse){
 
     }

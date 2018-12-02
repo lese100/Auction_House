@@ -9,8 +9,8 @@ public class AgentProtocol implements PublicAuctionProtocol{
     @Override
     /**
      * Provides the handleMessage() method required in implementing the
-     * PublicAuctionProtocol, establishing the appropriate actions and reply
-     * messages for messages coming in from Agent and Auction House clients.
+     * AgentProtocol, establishing the appropriate actions and reply
+     * messages for messages coming in from Bank and Auction House clients.
      */
     public Message handleMessage(Message msgReceived) {
 

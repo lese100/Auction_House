@@ -21,8 +21,18 @@ public class Agent extends Application {
     private IDRecord myRecords;
     private Display display;
     private HashMap<AuctionHouseProxy,IDRecord> auctionHouses;
+
+    /**
+     * initial constructor
+     */
     public Agent(){
     }
+
+    /**
+     * Sets up the user port and makes its protocol and establishes its
+     * notification server to receive update messages.
+     * @param port the port im going to run my client on
+     */
     public Agent(int port){
         AgentProtocol protocol = new AgentProtocol(this);
         auctionHouses = new HashMap<AuctionHouseProxy, IDRecord>();
@@ -34,6 +44,10 @@ public class Agent extends Application {
             e.printStackTrace();
         }
     }
+
+    /**
+     * closes everything when exiting the main menu
+     */
     @Override
     public void stop(){
         System.exit(1);
@@ -106,15 +120,11 @@ public class Agent extends Application {
         create.initOwner(stage);
         create.showAndWait();
 
-
+        /*connect to the bank*/
         myRecords = new IDRecord(IDRecord.RecordType.AGENT,name.getText(),Integer.parseInt(balance.getText()),
                 localHost,holdMyPort);
         //BankProxy bank = new BankProxy(holdHost,holdPort);
         //myRecords = bank.createBankAccount(myRecords);
         display = new Display(stage);
     }
-    private void connectPopup(){
-
-    }
-
 }

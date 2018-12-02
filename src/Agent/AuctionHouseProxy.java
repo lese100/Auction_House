@@ -5,10 +5,14 @@ import Utility.*;
 import java.io.IOException;
 import java.util.List;
 
-import static Utility.Message.MessageIdentifier.*;
-
 public class AuctionHouseProxy {
     private CommunicationService coms;
+
+    /**
+     * establishes a connection with the auction house.
+     * @param hostName the auction houses host name
+     * @param port the auction houses port number
+     */
     public AuctionHouseProxy(String hostName, int port){
         try {
             coms = new CommunicationService(hostName, port);
@@ -16,6 +20,14 @@ public class AuctionHouseProxy {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Joins the auction house with my user information and the secret key linking us. The Auction house
+     * then provides the list of items up for auction.
+     * @param myRecord my user information
+     * @param secretKey the secret key that does in place of my account number.
+     * @return list of items up for auction
+     */
     public List<AuctionItem> joinAH(IDRecord myRecord, int secretKey){
         myRecord.setNumericalID(secretKey);
         Message<IDRecord> message = new Message<>(Message.MessageIdentifier.JOIN_AUCTION_HOUSE,myRecord);
@@ -30,6 +42,15 @@ public class AuctionHouseProxy {
         return null;
 
     }
+
+    /**
+     * sends a message to the auction house telling them to place a bid on a
+     * certain item and the bid amount
+     * @param item the item im bidding on
+     * @param bid the bid im placing
+     * @param secretKey the secret key associated with my account.
+     * @return
+     */
     public int makeBid(AuctionItem item, double bid, int secretKey){
         Bid oldBid = item.getBid();
         oldBid.setBidState(Bid.BidState.BIDDING);
@@ -50,6 +71,11 @@ public class AuctionHouseProxy {
                 return -1;
         }
     }
+    /**
+     * Send a message to the auction house and waits for a reply.
+     * @param message message being sent to the auction house
+     * @return reply received from the auction house
+     */
     private Message sendMSG(Message message){
         Message reply = null;
         try {
