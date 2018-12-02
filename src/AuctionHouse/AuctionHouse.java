@@ -74,6 +74,7 @@ public class AuctionHouse {
     }
 
     public Message.MessageIdentifier makeBid(AuctionItem itemOfInterest){
+
         return null;
     }
 
