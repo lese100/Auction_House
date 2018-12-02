@@ -14,7 +14,7 @@ public class AgentProtocol implements PublicAuctionProtocol{
      */
     public Message handleMessage(Message msgReceived) {
 
-        Message msgToSend = null;
+        Message msgToSend;
         switch( msgReceived.getMessageIdentifier() ) {
 
             case BID_OUTBIDDED:
