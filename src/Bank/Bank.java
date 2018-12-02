@@ -6,8 +6,10 @@ import Utility.IDRecord;
 import Utility.NotificationServer;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * Provides the structure and functionality of a simulated Bank accessible to
@@ -26,9 +28,9 @@ public class Bank {
 
     private String location;  // machine location
     private int portNumber;   // port used for clients
-    private HashMap<Integer, BankAccount> auctionHouseAccts;
-    private HashMap<Integer, BankAccount> agentAccts;
+    private HashMap<Integer, BankAccount> hashMapOfAllAccts;
     private HashMap<Integer, AccountLink> secretKeys;
+    private ArrayList<IDRecord> listOfAuctionHouseIDRecords;
     private BankProtocol bankProtocol;
     private NotificationServer notificationServer;
 
@@ -57,9 +59,11 @@ public class Bank {
     public Bank(String location, int portNumber) {
         this.location = location;
         this.portNumber = portNumber;
-        auctionHouseAccts = new HashMap<>();
-        agentAccts = new HashMap<>();
+//        auctionHouseAccts = new HashMap<>();
+//        agentAccts = new HashMap<>();
+        hashMapOfAllAccts = new HashMap<>();
         secretKeys = new HashMap<>();
+        listOfAuctionHouseIDRecords = new ArrayList<>();
         try {
             bankSetup();
         } catch (IOException e) {
@@ -75,10 +79,12 @@ public class Bank {
     //   Public Methods               //
     // ****************************** //
 
-    public void testMethod() {
-        System.out.println("Bank: testMethod() called.");
-    }
-
+    /**
+     * Creates an account with the Bank, using information in the given
+     * IDRecord to create a BankAccount object of type AGENT or AUCTION_HOUSE.
+     * @param theIDRecord An IDRecord
+     * @return IDRecord An updated IDRecord with new bank account number
+     */
     public IDRecord createAccount(IDRecord theIDRecord) {
         System.out.println("Bank.createAccount() begins");
         IDRecord updatedIDRecord = theIDRecord;
@@ -86,8 +92,8 @@ public class Bank {
         // pull out or generate info for BankAccount
         String userName = updatedIDRecord.getName();
         System.out.println("Bank.createAccount(): userName = " + userName);
-        // generate an account number -- method to be modified
-        int acctNum = rng.nextInt(99999);
+        // generate an account number
+        int acctNum = getUniqueAccountNumber();
         double initBalance = updatedIDRecord.getInitialBalance();
         System.out.println("Bank.createAccount(): initialBalance = " +
             initBalance);
@@ -105,12 +111,12 @@ public class Bank {
                 baType = BankAccount.AccountType.AUCTION_HOUSE;
                 break;
 
-            case BANK: // for future generalization
+            case BANK:
                 baType = BankAccount.AccountType.BANK;
                 break;
 
             default:
-                baType = BankAccount.AccountType.AGENT;
+                baType = BankAccount.AccountType.OTHER;
                 break;
         }
         BankAccount newBankAccount =
@@ -119,50 +125,67 @@ public class Bank {
             " the newBankAccount has balance: $" +
             newBankAccount.getTotalBalance());
 
-        // add account to appropriate list of accounts
-        if ( baType == BankAccount.AccountType.AGENT ) {
-            agentAccts.put(acctNum, newBankAccount);
-        } else if (baType == BankAccount.AccountType.AUCTION_HOUSE ) {
-            auctionHouseAccts.put(acctNum, newBankAccount);
-        } // no list of Bank BankAccounts in current edition
+        // update Bank's list(s) of accounts
+        hashMapOfAllAccts.put(acctNum, newBankAccount);
+        if (baType == BankAccount.AccountType.AUCTION_HOUSE) {
+            listOfAuctionHouseIDRecords.add(updatedIDRecord);
+        }
 
         return updatedIDRecord;
     }
 
+    /**
+     * Gets account balance information for the account whose
+     * account number appears in the given IDRecord.
+     * @param idRecord An IDRecord
+     * @return BankAccount object with account balance information
+     */
     public BankAccount getBalance (IDRecord idRecord) {
-        BankAccount currentBankAccount = new BankAccount();
+        System.out.println("Entering Bank: getBalance()");
+        BankAccount currentBankAccount;
         int theAcctNum = idRecord.getNumericalID();
         System.out.println("Bank.getBalance(): for acct # " + theAcctNum);
-        BankAccount.AccountType baType;
-        switch (idRecord.getRecordType()) {
-            case AGENT:
-                baType = BankAccount.AccountType.AGENT;
-                break;
+//        BankAccount.AccountType baType;
+//        switch (idRecord.getRecordType()) {
+//            case AGENT:
+//                baType = BankAccount.AccountType.AGENT;
+//                break;
+//
+//            case AUCTION_HOUSE:
+//                baType = BankAccount.AccountType.AUCTION_HOUSE;
+//                break;
+//
+//            case BANK: // for future generalization
+//                baType = BankAccount.AccountType.BANK;
+//                break;
+//
+//            default: // for other generalizations
+//                baType = BankAccount.AccountType.OTHER;
+//                break;
+//        }
 
-            case AUCTION_HOUSE:
-                baType = BankAccount.AccountType.AUCTION_HOUSE;
-                break;
+        // find BankAccount from account -> BankAccount HashMap
+        currentBankAccount = hashMapOfAllAccts.get(theAcctNum);
 
-            case BANK: // for future generalization
-                baType = BankAccount.AccountType.BANK;
-                break;
-
-            default: // for other generalizations
-                baType = BankAccount.AccountType.OTHER;
-                break;
+        if ( currentBankAccount == null) {
+            // if no account was found, generate a generic empty account
+            System.out.println("Bank: getBalance(): no account found!");
+            currentBankAccount = new BankAccount();
+        } else {
+            System.out.println("Bank: getBalance(): account found!");
         }
-        // find account from appropriate account list
-        if ( baType == BankAccount.AccountType.AGENT ) {
-            System.out.println("Bank: Acct appears to be for an AGENT");
-            currentBankAccount = agentAccts.get(theAcctNum);
-            System.out.println("Bank: Acct appears to have balance: $" +
-                 currentBankAccount.getTotalBalance());
-        } else if (baType == BankAccount.AccountType.AUCTION_HOUSE ) {
-            System.out.println("Acct appears to be for an AUCTION HOUSE");
-            currentBankAccount = auctionHouseAccts.get(theAcctNum);
-        } // no list of Bank BankAccounts in current edition
 
         return currentBankAccount;
+    }
+
+    /**
+     * Returns an ArrayList<IDRecord> of Auction House IDRecords corresponding
+     * to Auction Houses currently having accounts with the Bank. The ArrayList
+     * might be empty, but should never be null.
+     * @return ArrayList<IDRecord> of Auction House IDRecords
+     */
+    public ArrayList<IDRecord> getListOfAuctionHouses () {
+        return listOfAuctionHouseIDRecords;
     }
 
     // ****************************** //
@@ -176,5 +199,37 @@ public class Bank {
         serverThread.start();
     }
 
+    /**
+     * Private Bank utility function used internally to generate unique
+     * random integer values for account numbers. Should probably be
+     * synchronized at some point.
+     * @return int
+     */
+    private int getUniqueAccountNumber () {
+
+        System.out.println("Entering Bank: getUniqueAccountNumber()");
+        int minInt = 100000;
+        int maxInt = 999999;
+        int candidateNumber = -1;
+        Set<Integer> listOfCurrentAccountNumbers =
+            hashMapOfAllAccts.keySet();
+        boolean numberIsUnique = false;
+        while ( !numberIsUnique ) {
+
+            candidateNumber = rng.nextInt(maxInt+1);
+            // assume unique for a moment
+            numberIsUnique = true;
+            // verify uniqueness assumption
+            for ( int acctNum : listOfCurrentAccountNumbers) {
+                if (candidateNumber == acctNum) {
+                    numberIsUnique = false;
+                    break;
+                }
+            } // end for() loop
+
+        } // end while() loop
+
+        return candidateNumber;
+    }
 
 }

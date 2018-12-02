@@ -3,20 +3,17 @@ package Bank;
 import Utility.BankAccount;
 import Utility.CommunicationService;
 import Utility.IDRecord;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
+
+import java.util.ArrayList;
 
 /**
  * JavaFX-based display class for representing and displaying information
@@ -30,15 +27,20 @@ import javafx.stage.Stage;
 public class BankClientWithDisplay {
 
     private CommunicationService communicationService;
-    private BankProxy bankProxy;
+    private BankProxyForTesting bankProxyForTesting;
     private IDRecord clientIDRecord;
     private BankAccount myBankAccount;
 
     private BorderPane borderPane;
 
+    // mutable components of the GUI display
     private Label textLabelBank = new Label("BANK: My Bank");
     private TextField textFieldBankHost = new TextField("localhost");
     private TextField textFieldBankPort = new TextField("1234");
+    private TextField textFieldAccountNumber = new TextField("unknown");
+    private ChoiceBox choiceBoxAccountType =
+        new ChoiceBox(FXCollections.observableArrayList(
+            "unknown", "agent", "auction house"));
     private Label textLabelTotalBalance = new Label("unknown");
     private Label textLabelFrozen = new Label("unknown");
     private Label textLabelNonFrozen = new Label("unknown");
@@ -74,6 +76,17 @@ public class BankClientWithDisplay {
         HBox hBoxBankPort = new HBox(textLabelBankPort, textFieldBankPort);
         hBoxBankPort.setSpacing(10);
         hBoxBankPort.setAlignment(Pos.CENTER);
+        Label textLabelAccountNumberTitle = new Label("Account #: ");
+        HBox hBoxAccountNumber =
+            new HBox(textLabelAccountNumberTitle, textFieldAccountNumber);
+        hBoxAccountNumber.setSpacing(10);
+        hBoxAccountNumber.setAlignment(Pos.CENTER_LEFT);
+        Label textLabelAccountType = new Label("Account Type: ");
+        choiceBoxAccountType.setValue("agent");
+        HBox hBoxAccountType =
+            new HBox(textLabelAccountType, choiceBoxAccountType);
+        hBoxAccountType.setSpacing(10);
+        hBoxAccountType.setAlignment(Pos.CENTER_LEFT);
         Label textLabelTotalBalanceTitle = new Label("Total Balance: ");
         HBox hBoxTotalBalance =
             new HBox(textLabelTotalBalanceTitle, textLabelTotalBalance);
@@ -84,8 +97,8 @@ public class BankClientWithDisplay {
         HBox hBoxNonFrozen =
             new HBox(textLabelNonFrozenTitle, textLabelNonFrozen);
         vBox.getChildren().addAll(
-            textLabelBank, hBoxBankHost, hBoxBankPort,
-            hBoxTotalBalance, hBoxFrozen, hBoxNonFrozen);
+            textLabelBank, hBoxBankHost, hBoxBankPort, hBoxAccountNumber,
+            hBoxAccountType, hBoxTotalBalance, hBoxFrozen, hBoxNonFrozen);
         vBox.setPadding(new Insets(10, 10, 10, 10));
         vBox.setSpacing(10);
 
@@ -96,8 +109,10 @@ public class BankClientWithDisplay {
         setButtonHandlers(btnConnectToBank);
         Button btnSendTestMsg = new Button("Send Test Msg");
         setButtonHandlers(btnSendTestMsg);
-        Button btnOpenAccount = new Button("Open Account");
-        setButtonHandlers(btnOpenAccount);
+        Button btnOpenAgentAccount = new Button("Open Agent Account");
+        setButtonHandlers(btnOpenAgentAccount);
+        Button btnOpenAHAccount = new Button("Open AH Account");
+        setButtonHandlers(btnOpenAHAccount);
         Button btnCheckBalance = new Button("Check Balance");
         setButtonHandlers(btnCheckBalance);
         Button btnAddFunds = new Button("Add Funds");
@@ -106,12 +121,25 @@ public class BankClientWithDisplay {
         setButtonHandlers(btnFreezeFunds);
         Button btnUnFreezeFunds = new Button("Un-Freeze Funds");
         setButtonHandlers(btnUnFreezeFunds);
-        hBoxBottomButtons.getChildren().addAll(
-            btnConnectToBank, btnSendTestMsg, btnOpenAccount, btnCheckBalance,
-            btnAddFunds, btnFreezeFunds, btnUnFreezeFunds
-        );
-        hBoxBottomButtons.setPadding(new Insets(10, 10, 10, 10));
-        hBoxBottomButtons.setSpacing(10);
+        Button btnGetListOfAuctionHouses = new Button("Get AH List");
+        setButtonHandlers(btnGetListOfAuctionHouses);
+
+        FlowPane flowPaneBottomButtons = new FlowPane();
+        flowPaneBottomButtons.getChildren().addAll(
+            btnConnectToBank, btnSendTestMsg, btnOpenAgentAccount,
+            btnOpenAHAccount, btnCheckBalance,
+            btnAddFunds, btnFreezeFunds, btnUnFreezeFunds,
+            btnGetListOfAuctionHouses);
+        flowPaneBottomButtons.setPadding(new Insets(10, 10, 10, 10));
+        flowPaneBottomButtons.setHgap(10);
+        flowPaneBottomButtons.setVgap(10);
+
+//        hBoxBottomButtons.getChildren().addAll(
+//            btnConnectToBank, btnSendTestMsg, btnOpenAgentAccount, btnCheckBalance,
+//            btnAddFunds, btnFreezeFunds, btnUnFreezeFunds
+//        );
+//        hBoxBottomButtons.setPadding(new Insets(10, 10, 10, 10));
+//        hBoxBottomButtons.setSpacing(10);
         // update for later: setDiabled(true) for all btns except Connect
         // then update those when connection made to Bank
 
@@ -120,7 +148,8 @@ public class BankClientWithDisplay {
         borderPane = new BorderPane();
 
         // put btns/controls in bottom
-        borderPane.setBottom(hBoxBottomButtons);
+        // borderPane.setBottom(hBoxBottomButtons);
+        borderPane.setBottom(flowPaneBottomButtons);
         // put info displays in left
         borderPane.setLeft(vBox);
         // put text area in center for output
@@ -168,12 +197,22 @@ public class BankClientWithDisplay {
                 });
                 break;
 
-            case "Open Account":
+            case "Open Agent Account":
                 button.setOnAction(new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent event) {
                         System.out.println("Opening an account ...");
-                        openAccount();
+                        openAccount(IDRecord.RecordType.AGENT);
+                    }
+                });
+                break;
+
+            case "Open AH Account":
+                button.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                        System.out.println("Opening an account ...");
+                        openAccount(IDRecord.RecordType.AUCTION_HOUSE);
                     }
                 });
                 break;
@@ -215,6 +254,16 @@ public class BankClientWithDisplay {
                 });
                 break;
 
+            case "Get AH List":
+                button.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                        System.out.println("Getting AH List!");
+                        getListOfAuctionHouses();
+                    }
+                });
+                break;
+
             default:
                 break;
 
@@ -236,7 +285,7 @@ public class BankClientWithDisplay {
             try {
                 communicationService =
                     new CommunicationService(hostName, portNumber);
-                bankProxy = new BankProxy(communicationService);
+                bankProxyForTesting = new BankProxyForTesting(communicationService);
                 connectedToBank = true;
                 System.out.println("Now connected to Bank at: " +
                     hostName + " (port " + portNumber + ")");
@@ -255,37 +304,83 @@ public class BankClientWithDisplay {
     private void sendTestMessage () {
 
         String msgReply;
-        msgReply = bankProxy.sendTestMessage();
+        msgReply = bankProxyForTesting.sendTestMessage();
         System.out.println("The reply message was: " + msgReply);
         textAreaOutput.appendText("\nResult from sendTestMessage(): " +
             msgReply);
     }
 
-    private void openAccount () {
-        System.out.println("Attempting to open a Bank Account.");
+    private void openAccount (IDRecord.RecordType recordType) {
+        System.out.println("Attempting to open a Bank Account for: " +
+            recordType.toString());
+        // create a temporary simulated IDRecord for the process
+        IDRecord tempIDRecord = new IDRecord(recordType, "unknown", 0.00,
+            "unknown", 0);
         IDRecord returnedIDRecord;
         System.out.println("Initial Account ID is: " +
-            clientIDRecord.getNumericalID());
-        returnedIDRecord = bankProxy.openBankAccount(clientIDRecord, 1000.00);
+            tempIDRecord.getNumericalID());
+        returnedIDRecord = bankProxyForTesting.openBankAccount(tempIDRecord, 1000.00);
         if ( returnedIDRecord instanceof IDRecord ) {
             int newAccountNumber = returnedIDRecord.getNumericalID();
+            IDRecord.RecordType newAcctType = returnedIDRecord.getRecordType();
             System.out.println("The reply message was an IDRecord with " +
                 "Account # " + newAccountNumber);
             textAreaOutput.appendText("\nResult from openAccount(): " +
-                "Account # " + newAccountNumber);
+                "\nAccount # " + newAccountNumber + " (" +
+                     newAcctType.toString() + ")");
+            textFieldAccountNumber.setText(
+                String.format("%d", newAccountNumber));
+            switch(newAcctType) {
+                case AGENT:
+                    choiceBoxAccountType.setValue("agent");
+                    break;
+                case AUCTION_HOUSE:
+                    choiceBoxAccountType.setValue("auction house");
+                    break;
+                default:
+                    choiceBoxAccountType.setValue("unknown");
+                    break;
+            }
         } else {
             System.out.println("Returning object is not an IDRecord.");
         }
         clientIDRecord = returnedIDRecord;
         // update the displayed account information
+
         // augment display with label for account #
 
     }
 
     private void checkBalance() {
+        // using information from GUI for acct # and acct type
+        // and construct a temporary simulated IDRecord
+        IDRecord tempIDRecord;
+        int tempAcctNumber =
+            Integer.parseInt(textFieldAccountNumber.getText());
         System.out.println("Attempting to check Bank balance(s) " +
-            "for account # " + clientIDRecord.getNumericalID() );
-        myBankAccount = bankProxy.checkBalance(clientIDRecord);
+            "for account # " + tempAcctNumber );
+        String acctTypeString = choiceBoxAccountType.getValue().toString();
+        // construct a temporary simulated IDRecord
+        IDRecord.RecordType tempRecordType;
+        switch(acctTypeString){
+            case "agent":
+                tempRecordType = IDRecord.RecordType.AGENT;
+                break;
+            case "auction house":
+                tempRecordType = IDRecord.RecordType.AUCTION_HOUSE;
+                break;
+            default:
+                tempRecordType = IDRecord.RecordType.AGENT;
+                break;
+        }
+        tempIDRecord = new IDRecord(tempRecordType, "unknown", 0.00,
+            "unknown", 0);
+        tempIDRecord.setNumericalID(tempAcctNumber);
+        System.out.println("BCWD: checkBalance(): tempAcctNumber = " +
+            tempAcctNumber);
+        myBankAccount = bankProxyForTesting.checkBalance(tempIDRecord);
+        System.out.println("BCWD: checkBalance(): myBankAccount " +
+            "has type: " + myBankAccount.getAccountType().toString());
         System.out.println("Bank balance is: $" +
                            myBankAccount.getTotalBalance() );
         String totalBalanceString =
@@ -297,6 +392,24 @@ public class BankClientWithDisplay {
         textLabelTotalBalance.setText(totalBalanceString);
         textLabelFrozen.setText(frozenBalanceString);
         textLabelNonFrozen.setText(unFrozenBalanceString);
+    }
+
+    /**
+     * Gets a list of Auction Houses currently having accounts with
+     * the Bank, and updates client GUI with the information.
+     */
+    public void getListOfAuctionHouses () {
+        ArrayList<IDRecord> listOfAuctionHouses =
+            bankProxyForTesting.getListOfAuctionHouses();
+        textAreaOutput.appendText(
+            "\nActive Auction Houses: "
+        );
+        for (IDRecord idRecord : listOfAuctionHouses) {
+            String tempAHName = idRecord.getName();
+            int tempAHAcctNum = idRecord.getNumericalID();
+            textAreaOutput.appendText("\n" + tempAHName +
+                ": Acct # " + tempAHAcctNum);
+        }
     }
 
     public void notifyUser() {

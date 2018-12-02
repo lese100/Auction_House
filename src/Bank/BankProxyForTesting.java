@@ -6,9 +6,10 @@ import Utility.IDRecord;
 import Utility.Message;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
- * A temporary class for testing the Bank class, a BankProxy is used by a
+ * A temporary class for testing the Bank class, a BankProxyForTesting is used by a
  * BankClient to mediate communications with a Bank.
  * created: 11/30/18 by Warren D. Craft (wdc)
  * last modified: 12/01/18 by wdc
@@ -16,7 +17,7 @@ import java.io.IOException;
  * @author Warren D. Craft (wdc)
  * @author Tyler Fenske (thf)
  */
-public class BankProxy {
+public class BankProxyForTesting {
 
     private CommunicationService cs;
 
@@ -25,11 +26,11 @@ public class BankProxy {
     // ****************************** //
 
     /**
-     * Public constructor for a BankProxy, which is used by a BankClient to
+     * Public constructor for a BankProxyForTesting, which is used by a BankClient to
      * mediate communications with an actual Bank.
      * @param cs CommunicationService
      */
-    public BankProxy(CommunicationService cs){
+    public BankProxyForTesting(CommunicationService cs){
         this.cs = cs;
     }
 
@@ -42,7 +43,7 @@ public class BankProxy {
 
     public IDRecord openBankAccount (IDRecord idRecord, double initialBalance) {
 
-        System.out.println("Entering BankProxy.openBankAccount()");
+        System.out.println("Entering BankProxyForTesting.openBankAccount()");
         idRecord.setInitialBalance( initialBalance );
         System.out.println("openBankAccount(): set initial balance");
         Message message = null;
@@ -88,6 +89,7 @@ public class BankProxy {
 
 
     public BankAccount checkBalance (IDRecord theIDRecord) {
+        System.out.println("BankProxyForTesting: checkBalance() ");
         Message message = null;
 
         try{
@@ -95,13 +97,34 @@ public class BankProxy {
                 new Message<>(Message.MessageIdentifier.REQUEST_BALANCE,
                               theIDRecord);
 
+            System.out.println("BankProxyForTesting: made new message");
+            message = cs.sendMessage(message);
+            System.out.println("BankProxyForTesting: received reply message");
+
+        } catch(IOException io) {
+            io.printStackTrace();
+        }
+
+        System.out.println("BankProxyForTesting: content balance: " +
+            ((BankAccount)message.getMessageContent()).getTotalBalance() );
+        return (BankAccount) message.getMessageContent();
+    }
+
+    public ArrayList<IDRecord> getListOfAuctionHouses () {
+        Message message = null;
+        try{
+            message =
+                new Message<>(Message.MessageIdentifier.
+                    GET_LIST_OF_AUCTION_HOUSES,
+                    null);
+
             message = cs.sendMessage(message);
 
         } catch(IOException io) {
             io.printStackTrace();
         }
 
-        return (BankAccount) message.getMessageContent();
+        return (ArrayList<IDRecord>) message.getMessageContent();
     }
 
 }

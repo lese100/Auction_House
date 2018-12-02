@@ -5,6 +5,7 @@ import Utility.IDRecord;
 import Utility.Message;
 import Utility.PublicAuctionProtocol;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -53,17 +54,54 @@ public class BankProtocol implements PublicAuctionProtocol {
     public Message handleMessage(Message msgReceived) {
 
         Message msgToSend = null;
+        Object msgContent = msgReceived.getMessageContent();
         switch (msgReceived.getMessageIdentifier()) {
 
+            // cases listed in alphabetical order by Message identifier
+
+            case CLOSE_REQUEST:
+                msgToSend = new Message<>(Message.MessageIdentifier.
+                    ACKNOWLEDGED,
+                    null);
+                break;
+
+            case GET_LIST_OF_AUCTION_HOUSES:
+                ArrayList<IDRecord> theList = bank.getListOfAuctionHouses();
+                msgToSend = new Message<>(Message.MessageIdentifier.
+                    LIST_OF_AUCTION_HOUSES,
+                    theList);
+                break;
+
             case OPEN_AGENT_ACCT:
-                Object msgContent = msgReceived.getMessageContent();
                 if (msgContent instanceof IDRecord) {
-                    IDRecord anIDRecord =
+                    // if msg content a valid IDRecord, prepare
+                    // to reply with updated IDRecord
+                    IDRecord updatedIDRecord =
                         bank.createAccount((IDRecord) msgContent);
                     msgToSend = new Message<>(Message.MessageIdentifier.
                         AGENT_ACCT_CONFIRMED,
-                        anIDRecord);
+                        updatedIDRecord);
                 } else {
+                    // if msg content not a valid IDRecord, prepare
+                    // to simply send back original content
+                    msgToSend = new Message<>(Message.MessageIdentifier.
+                        ACCOUNT_DENIED,
+                        msgContent);
+                }
+                break;
+
+            case OPEN_AUCTIONHOUSE_ACCT:
+                if (msgContent instanceof IDRecord) {
+                    // if msg content a valid IDRecord, prepare
+                    // to reply with updated IDRecord
+                    IDRecord updatedIDRecord =
+                        bank.createAccount((IDRecord) msgContent);
+                    msgToSend = new Message<>(Message.MessageIdentifier.
+                        AUCTIONHOUSE_ACCT_CONFIRMED,
+                        updatedIDRecord);
+                } else {
+                    // if msg content not a valid IDRecord, prepare
+                    // to simply send back original content
                     msgToSend = new Message<>(Message.MessageIdentifier.
                         ACCOUNT_DENIED,
                         msgContent);
@@ -71,15 +109,14 @@ public class BankProtocol implements PublicAuctionProtocol {
                 break;
 
             case REQUEST_BALANCE:
+                System.out.println("BankProtocol: case REQUEST_BALANCE");
                 BankAccount theBankAccount;
-                msgContent = msgReceived.getMessageContent();
                 if ( msgContent instanceof IDRecord ) {
-                    System.out.println("BP: request_balance using IDRecord");
-                    // get the BankAccount
+                    // if request supplied an IDRecord, get the BankAccount
                     theBankAccount =
                         bank.getBalance((IDRecord) msgContent);
                 } else {
-                    // send back a generic bank account object
+                    // otherwise, prepare a generic bank account object
                     theBankAccount = new BankAccount();
                 }
                 msgToSend =
@@ -91,18 +128,6 @@ public class BankProtocol implements PublicAuctionProtocol {
                 msgToSend = new Message<>(Message.MessageIdentifier.
                     ACKNOWLEDGED,
                     "Test Message Received");
-                break;
-
-            case CLOSE_REQUEST:
-                msgToSend = new Message<>(Message.MessageIdentifier.
-                    ACKNOWLEDGED,
-                    null);
-                break;
-
-            case GET_LIST_OF_AUCTION_HOUSES:
-                msgToSend = new Message<>(Message.MessageIdentifier.
-                    ACKNOWLEDGED,
-                    null);
                 break;
 
             default:
