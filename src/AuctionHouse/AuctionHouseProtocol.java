@@ -1,5 +1,6 @@
 package AuctionHouse;
 
+import Utility.AuctionHouseInventory;
 import Utility.IDRecord;
 import Utility.Message;
 import Utility.PublicAuctionProtocol;
@@ -27,10 +28,14 @@ public class AuctionHouseProtocol implements PublicAuctionProtocol {
                 case JOIN_AUCTION_HOUSE:
                     auctionHouse.joinAuctionHouse((IDRecord)
                             message.getMessageContent());
+
+                    AuctionHouseInventory ahi = new AuctionHouseInventory
+                            (auctionHouse.getIdRecord().getNumericalID(),
+                                    auctionHouse.getAuctions());
+
                     reply = new Message<>
                             (Message.MessageIdentifier.
-                                    LIST_OF_AUCTION_HOUSE_ITEMS,
-                                    auctionHouse.getAuctions());
+                                    LIST_OF_AUCTION_HOUSE_ITEMS, ahi);
                     break;
                 case MAKE_BID:
                     break;
