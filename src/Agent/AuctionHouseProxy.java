@@ -31,10 +31,10 @@ public class AuctionHouseProxy {
     public List<AuctionItem> joinAH(IDRecord myRecord, int secretKey){
         myRecord.setNumericalID(secretKey);
         Message<IDRecord> message = new Message<>(Message.MessageIdentifier.JOIN_AUCTION_HOUSE,myRecord);
-        Message<List<AuctionItem>> reply = sendMSG(message);
+        Message<AuctionHouseInventory> reply = sendMSG(message);
         if(reply != null){
             if(reply.getMessageIdentifier() == Message.MessageIdentifier.LIST_OF_AUCTION_HOUSE_ITEMS){
-                return reply.getMessageContent();
+                return reply.getMessageContent().getAuctions();
             }else if(reply.getMessageIdentifier() == Message.MessageIdentifier.CASE_NOT_FOUND){
                 System.out.println("AuctionHouse missing list of items");
             }

@@ -21,6 +21,7 @@ public class Agent extends Application {
     private IDRecord myRecords;
     private Display display;
     private HashMap<AuctionHouseProxy,IDRecord> auctionHouses;
+    private Button bid,leaveAuc,leaveBank,getAuction,getBalance,transfer,join;
 
     /**
      * initial constructor
@@ -125,6 +126,36 @@ public class Agent extends Application {
                 localHost,holdMyPort);
         //BankProxy bank = new BankProxy(holdHost,holdPort);
         //myRecords = bank.createBankAccount(myRecords);
-        display = new Display(stage);
+        bid = new Button("Bid");
+        leaveAuc = new Button("Leave");
+        leaveBank = new Button("Leave");
+        getAuction = new Button("Ask for Auctions");
+        getBalance = new Button("Get Balance");
+        transfer = new Button("Transfer Funds");
+        join = new Button("Join");
+        join.setDisable(true);
+        display = new Display(stage,myRecords,bid,leaveAuc,leaveBank,getAuction,getBalance,transfer,join);
+
+        /*event handlers*/
+        bid.setOnAction(event -> {
+
+        });
+        leaveAuc.setOnAction(event -> {
+
+        });
+        leaveBank.setOnAction(event -> {
+
+        });
+        getAuction.setOnAction(event -> {
+            join.setDisable(false);
+        });
+        getBalance.setOnAction(event -> {
+
+        });
+        transfer.setOnAction(event -> {
+        });
+        join.setOnAction(event -> {
+
+        });
     }
 }

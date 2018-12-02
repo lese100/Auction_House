@@ -1,10 +1,14 @@
 package Agent;
 
 import Utility.*;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.BorderPane;
@@ -19,7 +23,8 @@ public class AuctionTab {
     private IDRecord houseInfo;
     private Button bid, leave;
     private BorderPane pane;
-
+    private AuctionItem selectedItem;
+    private Label itemName, itemID, currentPrice;
     /**
      * stores the eahc auction houses tab info.
      * @param items the items available
@@ -29,6 +34,7 @@ public class AuctionTab {
      */
     public AuctionTab(List<AuctionItem> items, IDRecord houseInfo, Button bid, Button leave){
         list = new ListView<>();
+        selectedItem = null;
         list.setPrefSize(50,600);
         list.setOrientation(Orientation.VERTICAL);
         itemDisp = FXCollections.observableArrayList();
@@ -43,6 +49,15 @@ public class AuctionTab {
         auctionHouse.setClosable(false);
         auctionHouse.setText(houseInfo.getName());
         addItems();
+        list.getSelectionModel().selectedIndexProperty().addListener(
+                new ChangeListener<Number>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Number> observable,
+                                        Number oldValue, Number newValue) {
+                        selectedItem = items.get((int)newValue);
+                        DisplayItem();
+                    }
+                });
     }
 
     /**
@@ -54,7 +69,9 @@ public class AuctionTab {
             itemDisp.add(info);
         }
     }
+    private void DisplayItem(){
 
+    }
     /**
      * updates the display with any new items list
      * @param newItems the new items list
@@ -65,6 +82,11 @@ public class AuctionTab {
         addItems();
     }
 
+    /**
+     * gets the selected item and returns it.
+     * @return the selected item.
+     */
+    public AuctionItem getSelectedItem(){return selectedItem;}
     /**
      * allows the display to request the tab inorder to add it to the list of tabs
      * @return the tab
