@@ -47,8 +47,8 @@ public class BankAccount implements Serializable {
         this.accountType = accountType;
         this.userName = userName;
         this.accountNumber = accountNumber;
-        this.totalBalance = totalBalance;
-        this.totalUnfrozen = totalBalance;
+        this.totalBalance = initialBalance;
+        this.totalUnfrozen = initialBalance;
     }
 
     /**
