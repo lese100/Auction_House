@@ -134,15 +134,6 @@ public class BankClientWithDisplay {
         flowPaneBottomButtons.setHgap(10);
         flowPaneBottomButtons.setVgap(10);
 
-//        hBoxBottomButtons.getChildren().addAll(
-//            btnConnectToBank, btnSendTestMsg, btnOpenAgentAccount, btnCheckBalance,
-//            btnAddFunds, btnFreezeFunds, btnUnFreezeFunds
-//        );
-//        hBoxBottomButtons.setPadding(new Insets(10, 10, 10, 10));
-//        hBoxBottomButtons.setSpacing(10);
-        // update for later: setDiabled(true) for all btns except Connect
-        // then update those when connection made to Bank
-
 
         // borderPane to hold entire contents
         borderPane = new BorderPane();
@@ -231,7 +222,7 @@ public class BankClientWithDisplay {
                 button.setOnAction(new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent event) {
-                        System.out.println("Adding Funds");
+                        System.out.println("BankClient.Case: Add $100");
                         addFunds();
                     }
                 });
@@ -447,8 +438,11 @@ public class BankClientWithDisplay {
         tempIDRecord = new IDRecord(tempRecordType, "unknown", 100.00,
             "unknown", 0);
         tempIDRecord.setNumericalID(tempAcctNumber);
-        System.out.println("BCWD.addFunds(): tempAcctNumber = " +
-            tempAcctNumber);
+        System.out.println(
+            "BCWD.addFunds(): tempIDRecord has following details: ");
+        System.out.println("tempAcctNumber = " + tempAcctNumber);
+        System.out.println("additional funds requested: $" +
+            tempIDRecord.getInitialBalance());
 
         // call bank/bankproxy
         myBankAccount = bankProxyForTesting.addFunds(tempIDRecord);

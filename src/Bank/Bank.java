@@ -4,6 +4,7 @@ import Utility.AccountLink;
 import Utility.BankAccount;
 import Utility.IDRecord;
 import Utility.NotificationServer;
+import javafx.application.Platform;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,13 +27,18 @@ import java.util.Set;
  */
 public class Bank {
 
+    private String bankName;
     private String location;  // machine location
     private int portNumber;   // port used for clients
     private HashMap<Integer, BankAccount> hashMapOfAllAccts;
     private HashMap<Integer, AccountLink> secretKeys;
     private ArrayList<IDRecord> listOfAuctionHouseIDRecords;
+    private ArrayList<IDRecord> listOfAgentIDRecords;
+    private String summaryInfoString;
     private BankProtocol bankProtocol;
     private NotificationServer notificationServer;
+
+    private BankDisplay bankDisplay;
 
     private Random rng = new Random();
 
@@ -45,8 +51,8 @@ public class Bank {
      * This then produces a Bank object with default location = localhost
      * and default port number 1234.
      */
-    public Bank() {
-        this("localhost", 1234);
+    public Bank(BankDisplay bankDisplay) {
+        this("bank", "localhost", 1234, bankDisplay);
     }
 
     /**
@@ -56,14 +62,18 @@ public class Bank {
      * @param location   String hostname
      * @param portNumber int communication port
      */
-    public Bank(String location, int portNumber) {
+    public Bank(String bankName,
+                String location,
+                int portNumber,
+                BankDisplay bankDisplay) {
+        this.bankName = bankName;
         this.location = location;
         this.portNumber = portNumber;
-//        auctionHouseAccts = new HashMap<>();
-//        agentAccts = new HashMap<>();
+        this.bankDisplay = bankDisplay;
         hashMapOfAllAccts = new HashMap<>();
         secretKeys = new HashMap<>();
         listOfAuctionHouseIDRecords = new ArrayList<>();
+        listOfAgentIDRecords = new ArrayList<>();
         try {
             bankSetup();
         } catch (IOException e) {
@@ -130,11 +140,20 @@ public class Bank {
         if (baType == BankAccount.AccountType.AUCTION_HOUSE) {
             listOfAuctionHouseIDRecords.add(updatedIDRecord);
             System.out.println("Bank: createAccount(): updated " +
-                "listOfAutionHouseIDRecords: ");
+                "listOfAuctionHouseIDRecords: ");
             for (IDRecord rec : listOfAuctionHouseIDRecords) {
                 System.out.println("Acct #: " + rec.getNumericalID());
             }
+        } else if (baType == BankAccount.AccountType.AGENT) {
+            listOfAgentIDRecords.add(updatedIDRecord);
+            System.out.println("Bank: createAccount(): updated " +
+                "listOfAgentIDRecords: ");
+            for (IDRecord rec : listOfAgentIDRecords) {
+                System.out.println("Acct #: " + rec.getNumericalID());
+            }
         }
+
+        updateBankDisplay();
 
         return updatedIDRecord;
     }
@@ -193,8 +212,14 @@ public class Bank {
             currentBankAccount = new BankAccount();
         } else {
             System.out.println("Bank.addFunds(): account found!");
-            // increase funds by $100
+            System.out.println("Bank.addFunds(): account has balance: $" +
+                currentBankAccount.getTotalBalance());
+            // increase funds by amtToAdd
             currentBankAccount.increaseTotalBalance(amtToAdd);
+            System.out.println("Bank.addFunds(): increased total by: $" +
+                amtToAdd);
+            System.out.println("Bank.addFunds(): account now has " +
+                "balance: $" + currentBankAccount.getTotalBalance());
         }
 
         return currentBankAccount;
@@ -243,6 +268,53 @@ public class Bank {
         } // end while() loop
 
         return candidateNumber;
+    }
+
+    /**
+     * Utility function to update display information when Bank accounts
+     * change — for example, when new accounts are created, old accounts
+     * closed, or existing accounts have funds frozen or unfrozen.
+     * This updates all display information -- later we might break this
+     * into pieces if we regularly need to update just one or two
+     * components.
+     */
+    private void updateBankDisplay () {
+
+        // create string of account info for displaying bankDisplay
+        // first getting Agent accts, then Auction House accts
+        summaryInfoString = "Summary of Account(s): " +
+            "\n\nAcct # \t Type \t Balance \t\t Available \t User Name";
+        for ( IDRecord rec : listOfAgentIDRecords ) {
+            int tempAcctNum = rec.getNumericalID();
+            BankAccount tempBA = hashMapOfAllAccts.get(tempAcctNum);
+            summaryInfoString = summaryInfoString +
+                "\n" + tempAcctNum +
+                "\t" + rec.getRecordType() +
+                "\t$" + tempBA.getTotalBalance() +
+                "\t\t$" + tempBA.getTotalUnfrozen() +
+                "\t\t" + tempBA.getUserName();
+        }
+        for ( IDRecord rec : listOfAuctionHouseIDRecords ) {
+            int tempAcctNum = rec.getNumericalID();
+            BankAccount tempBA = hashMapOfAllAccts.get(tempAcctNum);
+            summaryInfoString = summaryInfoString +
+                "\n" + tempAcctNum +
+                "\tAH" +
+                "\t\t$" + tempBA.getTotalBalance() +
+                "\t\tN/A" +
+                "\t\t\t" + tempBA.getUserName();
+        }
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                bankDisplay.updateNumberOfAccounts(hashMapOfAllAccts.size());
+                bankDisplay.updateNumberOfAgentAccounts(
+                    listOfAgentIDRecords.size());
+                bankDisplay.updateNumberOfAHAccounts(
+                    listOfAuctionHouseIDRecords.size());
+                bankDisplay.updateTextAreaOutput(summaryInfoString);
+            }
+        });
     }
 
 }

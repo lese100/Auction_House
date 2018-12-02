@@ -69,9 +69,12 @@ public class BankProtocol implements PublicAuctionProtocol {
                     theAcctNum = idRecord.getNumericalID();
                     amtToAdd = idRecord.getInitialBalance();
                     updatedBankAccount = bank.addFunds(theAcctNum, amtToAdd);
-                    msgToSend = new Message<>(Message.MessageIdentifier.
-                        ACKNOWLEDGED,
-                        updatedBankAccount);
+                    System.out.println("BankProtocol.case ADD_FUNDS: " +
+                        "updatedBankAccount reports balance of: $" +
+                        updatedBankAccount.getTotalBalance());
+                    msgToSend = new Message<>
+                        (Message.MessageIdentifier.ACKNOWLEDGED,
+                         updatedBankAccount);
                 } else {
                     // no valid IDRecord sent, so create a generic BankAccount
                     // to send back with an error identifier

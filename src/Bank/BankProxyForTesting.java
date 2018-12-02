@@ -26,8 +26,8 @@ public class BankProxyForTesting {
     // ****************************** //
 
     /**
-     * Public constructor for a BankProxyForTesting, which is used by a BankClient to
-     * mediate communications with an actual Bank.
+     * Public constructor for a BankProxyForTesting, which is used by a
+     * BankClient to mediate communications with an actual Bank.
      * @param cs CommunicationService
      */
     public BankProxyForTesting(CommunicationService cs){
@@ -165,6 +165,11 @@ public class BankProxyForTesting {
             io.printStackTrace();
         }
 
+        BankAccount updatedBankAccount =
+            (BankAccount) message.getMessageContent();
+        System.out.println("BankProxyForTesting.addFunds(): " +
+            "updatedBankAccount shows balance of $" +
+            updatedBankAccount.getTotalBalance());
         return (BankAccount) message.getMessageContent();
 
     }
