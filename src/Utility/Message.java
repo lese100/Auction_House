@@ -19,7 +19,7 @@ public class Message <T> implements Serializable {
 
     /*
     enum comments use A = Agent, B = BANK, AH = Auction House
-    Most recent count is 33 items, defined in the code in alphab order.
+    Most recent count is 34 items, defined in the code in alphab order.
     Organized in comments below by category. "reply" indicates a reply to
     a message initiated by another entity; "send" indicates a message
     initiated by the entity.
@@ -64,6 +64,7 @@ public class Message <T> implements Serializable {
         CLOSE_ACCEPTED              (reply to A or AH)
         CLOSE_REJECTED              (reply to A or AH)
         LIST_OF_AUCTION_HOUSES      (reply to A)
+        REQUEST_FAILED              (reply to A or AH)
         SECRET_KEY                  (reply to A)
         TRANSFER_SUCCESS            (reply to A)
     */
@@ -96,6 +97,7 @@ public class Message <T> implements Serializable {
         OPEN_AGENT_ACCT,             // A send to B
         OPEN_AUCTIONHOUSE_ACCT,      // AH send to B
         REQUEST_BALANCE,             // A send to B
+        REQUEST_FAILED,              // B reply to A or AH
         SECRET_KEY,                  // B reply to GET_SECRET_KEY
         TEST_MESSAGE,                // A send to B
         TRANSFER_FUNDS,              // A send to B
