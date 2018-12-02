@@ -90,4 +90,50 @@ public class AuctionItem implements Serializable {
      * @param newBid bid object that is replacing the old one
      */
     public void setBid(Bid newBid){bid = newBid;}
+
+    /**
+     * Provides one of two necessary functions for establishing a comparison
+     * process for AuctionItems. See the .equals method override.
+     * @return int
+     */
+    @Override
+    public int hashCode(){
+        int hash = 5;
+        hash = 31 * hash + itemID;
+        return hash;
+    }
+
+    /**
+     * Provides a method for comparing two AuctionItems equality.
+     * If two AuctionItems share a name, houseID, and itemID, they are
+     * considered equal.
+     * @param obj Object to compared to this AuctionItem
+     * @return true or false
+     */
+    @Override
+    public boolean equals(Object obj){
+
+        //if the object is compared with itself
+        if(obj == this){
+            return true;
+        }
+
+        //check if obj is an instance of AuctionItem
+        if(!(obj instanceof AuctionItem)){
+            return false;
+        }
+
+        //for each AuctionItem, compare it's House ID, Item ID, and name. If
+        //all match, we say the AuctionItem's are equal
+        AuctionItem otherAI = (AuctionItem) obj;
+        AuctionItem thisAI = this;
+
+        if((otherAI.getItemName().equals(thisAI.getItemName())) &&
+                (otherAI.getItemID() == thisAI.getItemID()) &&
+                (otherAI.getHouseID() == thisAI.getHouseID())){
+            return true;
+        }
+
+        return false;
+    }
 }

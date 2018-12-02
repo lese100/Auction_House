@@ -73,6 +73,10 @@ public class AuctionHouse {
         return auctions;
     }
 
+    public IDRecord getIdRecord(){
+        return idRecord;
+    }
+
     public Message.MessageIdentifier makeBid(AuctionItem itemOfInterest){
 
         return null;
