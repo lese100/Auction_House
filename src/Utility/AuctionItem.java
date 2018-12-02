@@ -1,6 +1,9 @@
 package Utility;
 
 import java.io.Serializable;
+
+import AuctionHouse.AgentProxy;
+import AuctionHouse.BidTimer;
 import Utility.Bid.BidState;
 /**
  * Provides a structure for managing and observing an Auction Item which
@@ -23,6 +26,7 @@ public class AuctionItem implements Serializable {
     private int itemID;
     private String itemName;
     private Bid bid;
+    private BidTimer bidTimer;
 
     // ****************************** //
     //   Constructor(s)               //
@@ -45,6 +49,7 @@ public class AuctionItem implements Serializable {
         this.itemID = itemID;
         this.itemName = itemName;
         this.bid = bid;
+        bidTimer = null;
     }
 
     // ****************************** //
@@ -90,6 +95,16 @@ public class AuctionItem implements Serializable {
      * @param newBid bid object that is replacing the old one
      */
     public void setBid(Bid newBid){bid = newBid;}
+
+    public void startTimer(long time, AgentProxy ap){
+        if(bidTimer != null){
+            bidTimer.cancelTimer();
+        }
+
+        bidTimer = new BidTimer(time, ap, this);
+        Thread threadTimer = new Thread(bidTimer);
+        threadTimer.start();
+    }
 
     /**
      * Provides one of two necessary functions for establishing a comparison

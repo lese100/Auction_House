@@ -11,10 +11,11 @@ import java.util.*;
 public class AuctionHouse {
 
     private final int NUM_AUCTION_ITEMS = 15;
+    private final long BID_TIMER = 30000;
 
     private IDRecord idRecord;
-    private CommunicationService cs = null;
     private AuctionDisplay display;
+    private BankProxy bankProxy;
     private List<AuctionItem> auctions;
     private Map<Integer, AgentProxy> connectedAgents;
 
@@ -29,8 +30,9 @@ public class AuctionHouse {
         idRecord = new IDRecord(Utility.IDRecord.RecordType.AUCTION_HOUSE,
                 name, 0.0, hostName, port);
 
-        //cs = new CommunicationService(bankHostName, bankPort);
-        BankProxy bankProxy = new BankProxy(cs);
+        CommunicationService cs = null;
+        //CommunicationService cs = new CommunicationService(bankHostName, bankPort);
+        bankProxy = new BankProxy(cs);
         idRecord = bankProxy.openAccount(idRecord);
 
 
@@ -77,8 +79,87 @@ public class AuctionHouse {
         return idRecord;
     }
 
-    public Message.MessageIdentifier makeBid(AuctionItem itemOfInterest){
+    public Message.MessageIdentifier makeBid
+            (AuctionItem itemOfInterest) throws IOException{
 
+        AuctionItem auctionItem = findMatchingAuctionItem(itemOfInterest);
+        AuctionItem oldAuctionItem = null;
+
+        synchronized(auctionItem){
+            if(itemOfInterest.getBid().getProposedBid() <
+                    auctionItem.getBid().getMinBid()){
+                return Message.MessageIdentifier.BID_REJECTED_INADEQUATE;
+            }
+
+            if(!bankProxy.checkAgentFunds(itemOfInterest.getBid())){
+                return Message.MessageIdentifier.BID_REJECTED_NSF;
+            }else{
+                oldAuctionItem = createCopyAuctionItem(auctionItem);
+
+                //Updates auction item's current bidder
+                auctionItem.getBid().setSecretKey
+                        (itemOfInterest.getBid().getSecretKey());
+                //Updates auction item's current high bid
+                auctionItem.getBid().setCurrentBid
+                        (itemOfInterest.getBid().getProposedBid());
+                //Updates auction item's new min bid
+                auctionItem.getBid().setMinBid
+                        (itemOfInterest.getBid().getProposedBid() + .01);
+                //Updates auction item's bid state
+                auctionItem.getBid().setBidState(Bid.BidState.BIDDING);
+            }
+        }
+
+        //updates the AH server gui
+        display.updateAuctionItemDisplay(auctions);
+
+        updateAgentsAboutChanges();
+
+        auctionItem.startTimer(BID_TIMER,
+                connectedAgents.get(auctionItem.getBid().getSecretKey()));
+
+        //if true, there was a previous bidder, so they are notified about
+        //being outbidded. The bank then unfreezes their funds.
+        if(oldAuctionItem.getBid().getSecretKey() != 0){
+            connectedAgents.get(oldAuctionItem.getBid().getSecretKey()).
+                    notifyOutbidded(oldAuctionItem);
+
+            bankProxy.unfreezeAgentFunds(oldAuctionItem.getBid());
+        }
+
+        return Message.MessageIdentifier.BID_ACCEPTED;
+    }
+
+    private void updateAgentsAboutChanges(){
+        AuctionHouseInventory ahi =
+                new AuctionHouseInventory(idRecord.getNumericalID(), auctions);
+
+        for(AgentProxy ap : connectedAgents.values()){
+            ap.updateAuctions(ahi);
+        }
+    }
+
+    private AuctionItem createCopyAuctionItem(AuctionItem auctionItem){
+        Bid bid = auctionItem.getBid();
+
+        Bid copyBid = new Bid(bid.getMinBid());
+        copyBid.setCurrentBid(bid.getCurrentBid());
+        copyBid.setBidState(bid.getBidState());
+        copyBid.setProposedBid(bid.getProposedBid());
+        copyBid.setSecretKey(bid.getSecretKey());
+
+        AuctionItem copyAuctionItem = new AuctionItem(auctionItem.getHouseID(),
+                auctionItem.getItemID(), auctionItem.getItemName(), copyBid);
+
+        return copyAuctionItem;
+    }
+
+    private AuctionItem findMatchingAuctionItem(AuctionItem itemOfInterest){
+        for(AuctionItem ai : auctions){
+            if(ai.equals(itemOfInterest)){
+                return ai;
+            }
+        }
         return null;
     }
 

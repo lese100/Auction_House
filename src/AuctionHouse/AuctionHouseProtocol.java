@@ -1,9 +1,6 @@
 package AuctionHouse;
 
-import Utility.AuctionHouseInventory;
-import Utility.IDRecord;
-import Utility.Message;
-import Utility.PublicAuctionProtocol;
+import Utility.*;
 
 import java.io.IOException;
 
@@ -38,6 +35,11 @@ public class AuctionHouseProtocol implements PublicAuctionProtocol {
                                     LIST_OF_AUCTION_HOUSE_ITEMS, ahi);
                     break;
                 case MAKE_BID:
+                    AuctionItem ai = (AuctionItem) message.getMessageContent();
+
+                    Message.MessageIdentifier msgID = auctionHouse.makeBid(ai);
+
+                    reply = new Message<>(msgID, null);
                     break;
                 default:
                     reply = new Message<>
