@@ -1,12 +1,18 @@
 package AuctionHouse;
 
+import Utility.AuctionItem;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.text.DecimalFormat;
+import java.util.List;
 
 public class AuctionDisplay {
 
@@ -18,12 +24,22 @@ public class AuctionDisplay {
     private TextField bankHostName;
     private TextField bankPort;
 
+    private TextArea auctionTextArea;
+    private TextArea consoleTextArea;
+    private Label auctionLabel;
+
     private Stage window;
+    private Stage newWindow;
     private Button createAuctionHouse;
+
+    private DecimalFormat df;
 
 
     public AuctionDisplay(Stage window){
         this.window = window;
+
+        df = new DecimalFormat("####0.00");
+
         initializeDisplay();
     }
 
@@ -119,6 +135,47 @@ public class AuctionDisplay {
 
     public void openTerminalWindow(){
         System.out.println("Successful Setup");
+
+        window.close();
+
+        newWindow = new Stage();
+
+        newWindow.setMaxHeight(450);
+        newWindow.setMaxWidth(700);
+        newWindow.setMinHeight(450);
+        newWindow.setMinWidth(700);
+
+        BorderPane auctionPane = new BorderPane();
+        BorderPane consolePane = new BorderPane();
+
+        auctionTextArea = new TextArea("auctions will appear here");
+        consoleTextArea = new TextArea("connection information will appear here");
+
+        auctionTextArea.setMaxSize(700, 325);
+        consoleTextArea.setMaxSize(700, 325);
+
+        auctionTextArea.setEditable(false);
+        consoleTextArea.setEditable(false);
+
+        Label consoleLabel = new Label("Console");
+        auctionLabel = new Label("AuctionHouse");
+
+        auctionPane.setTop(auctionLabel);
+        auctionPane.setBottom(auctionTextArea);
+
+        consolePane.setTop(consoleLabel);
+        consolePane.setCenter(consoleTextArea);
+
+        BorderPane borderPane = new BorderPane();
+
+        borderPane.setTop(auctionPane);
+        borderPane.setBottom(consolePane);
+
+        Scene scene = new Scene(borderPane);
+
+        newWindow.setScene(scene);
+
+        newWindow.show();
     }
 
     public void displayErrorMessage(){
@@ -128,6 +185,25 @@ public class AuctionDisplay {
     public void setupAHInitializeButton(Button createAuctionHouse){
         this.createAuctionHouse = createAuctionHouse;
         vBox.getChildren().add(createAuctionHouse);
+    }
+
+    public void setupAHLabelInfo(String name, int id){
+        auctionLabel.setText(name + " — ID: " + id);
+    }
+
+    public void updateAuctionItemDisplay(List<AuctionItem> auctionItems){
+        String output = "Auction Item Information:";
+
+        for(int i = 0; i < auctionItems.size(); i++){
+            AuctionItem ai = auctionItems.get(i);
+            output = output + "\nITEM ID: " + ai.getItemID() +
+                    "\t BID STATE: " + ai.getBid().getBidState() +
+                    "\t MIN BID: $" + df.format(ai.getBid().getMinBid()) +
+                    "\t CURRENT BID: $" + df.format(ai.getBid().getCurrentBid()) +
+                    "\t ITEM NAME: " + ai.getItemName();
+        }
+
+        auctionTextArea.setText(output);
     }
 
 }

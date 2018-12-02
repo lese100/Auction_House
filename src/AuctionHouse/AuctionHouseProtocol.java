@@ -1,29 +1,52 @@
 package AuctionHouse;
 
+import Utility.IDRecord;
 import Utility.Message;
 import Utility.PublicAuctionProtocol;
 
+import java.io.IOException;
+
 public class AuctionHouseProtocol implements PublicAuctionProtocol {
+
+    private AuctionHouse auctionHouse;
+
+    public AuctionHouseProtocol(AuctionHouse auctionHouse){
+        this.auctionHouse = auctionHouse;
+    }
 
     @Override
     public Message handleMessage(Message message) {
 
-        Message msg = null;
+        Message reply = null;
 
-        switch(message.getMessageIdentifier()){
+        try{
+            switch(message.getMessageIdentifier()){
 
-            case CLOSE_REQUEST:
-                break;
-            case JOIN_AUCTION_HOUSE:
-                break;
-            case MAKE_BID:
-                break;
-            default:
-                msg = new Message<>
-                        (Message.MessageIdentifier.CASE_NOT_FOUND, null);
+                case CLOSE_REQUEST:
+                    break;
+                case JOIN_AUCTION_HOUSE:
+                    auctionHouse.joinAuctionHouse((IDRecord)
+                            message.getMessageContent());
+                    reply = new Message<>
+                            (Message.MessageIdentifier.
+                                    LIST_OF_AUCTION_HOUSE_ITEMS,
+                                    auctionHouse.getAuctions());
+                    break;
+                case MAKE_BID:
+                    break;
+                default:
+                    reply = new Message<>
+                            (Message.MessageIdentifier.CASE_NOT_FOUND, null);
 
+            }
+        }catch(IOException e){
+            e.printStackTrace();
         }
 
-        return msg;
+
+
+
+
+        return reply;
     }
 }

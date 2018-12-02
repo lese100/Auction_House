@@ -141,6 +141,4 @@ public class Bid implements Serializable {
     public void setProposedBid(double proposedBid) {
         this.proposedBid = proposedBid;
     }
-
-
 }

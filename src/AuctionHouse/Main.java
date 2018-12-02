@@ -11,6 +11,8 @@ import java.util.Map;
 
 public class Main extends Application {
 
+    private static AuctionHouse auctionHouse;
+
     public static void main(String[] args){
 
         /*String hostname = "Unknown";
@@ -38,6 +40,8 @@ public class Main extends Application {
 
         createAuctionHouse.setOnAction(event -> {
             if(auctionDisplay.infoFilledOut()){
+                auctionDisplay.openTerminalWindow();
+
                 createAuctionHouse(auctionDisplay,
                         auctionDisplay.getAuctionHouseName(),
                         auctionDisplay.getAuctionHouseHostName(),
@@ -45,7 +49,6 @@ public class Main extends Application {
                         auctionDisplay.getBankHostName(),
                         auctionDisplay.getBankPort());
 
-                auctionDisplay.openTerminalWindow();
             }else{
                 auctionDisplay.displayErrorMessage();
             }
@@ -64,7 +67,7 @@ public class Main extends Application {
                                            int bankPort) {
 
         try{
-            AuctionHouse auctionHouse = new AuctionHouse(display,
+            auctionHouse = new AuctionHouse(display,
                     auctionHouseName, auctionHouseHostName, auctionHousePort,
                     bankHostName, bankPort);
         }catch(IOException e){
@@ -73,12 +76,13 @@ public class Main extends Application {
 
     }
 
-/*    @Override
+    @Override
     public void stop() throws Exception {
         super.stop();
-    }*/
+        System.exit(0);
+    }
 
-    private static String getComputerName()
+/*    private static String getComputerName()
     {
         Map<String, String> env = System.getenv();
         if (env.containsKey("COMPUTERNAME"))
@@ -87,5 +91,5 @@ public class Main extends Application {
             return env.get("HOSTNAME");
         else
             return "Unknown Computer";
-    }
+    }*/
 }
