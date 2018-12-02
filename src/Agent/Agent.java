@@ -13,6 +13,7 @@ import Utility.*;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Agent extends Application {
@@ -20,8 +21,9 @@ public class Agent extends Application {
     private String holdHost, localHost;
     private IDRecord myRecords;
     private Display display;
-    private HashMap<AuctionHouseProxy,IDRecord> auctionHouses;
+    private HashMap<Integer,AuctionHouseLink> auctionHouses;
     private Button bid,leaveAuc,leaveBank,getAuction,getBalance,transfer,join;
+    private BankProxy bankProxy;
 
     /**
      * initial constructor
@@ -36,7 +38,7 @@ public class Agent extends Application {
      */
     public Agent(int port){
         AgentProtocol protocol = new AgentProtocol(this);
-        auctionHouses = new HashMap<AuctionHouseProxy, IDRecord>();
+        auctionHouses = new HashMap<>();
         try {
             NotificationServer notificationserver = new NotificationServer(port, protocol);
             Thread t = new Thread(notificationserver);
@@ -45,7 +47,9 @@ public class Agent extends Application {
             e.printStackTrace();
         }
     }
-
+    public void itemsUpdate(AuctionHouseInventory newInventory){
+        display.updateAuctionItems(newInventory);
+    }
     /**
      * closes everything when exiting the main menu
      */
@@ -124,7 +128,7 @@ public class Agent extends Application {
         /*connect to the bank*/
         myRecords = new IDRecord(IDRecord.RecordType.AGENT,name.getText(),Integer.parseInt(balance.getText()),
                 localHost,holdMyPort);
-        //BankProxy bank = new BankProxy(holdHost,holdPort);
+        //bankProxy = new BankProxy(holdHost,holdPort);
         //myRecords = bank.createBankAccount(myRecords);
         bid = new Button("Bid");
         leaveAuc = new Button("Leave");
@@ -138,7 +142,13 @@ public class Agent extends Application {
 
         /*event handlers*/
         bid.setOnAction(event -> {
-
+            AuctionItem bid = display.getBid();
+            int id = bid.getHouseID();
+            AuctionHouseLink link = auctionHouses.get(id);
+            AuctionHouseProxy proxy = link.getProxy();
+            int secretKey = link.getSecretKey();
+            int response = proxy.makeBid(bid,secretKey);
+            /*display notification*/
         });
         leaveAuc.setOnAction(event -> {
 
@@ -148,14 +158,25 @@ public class Agent extends Application {
         });
         getAuction.setOnAction(event -> {
             join.setDisable(false);
+            ArrayList<IDRecord> auctions = bankProxy.getListOfAutionHouses();
+            display.displayAuctionHouses(auctions);
         });
         getBalance.setOnAction(event -> {
 
         });
         transfer.setOnAction(event -> {
+
         });
         join.setOnAction(event -> {
-
+            IDRecord newAuctionHouse = display.getSelectedAuctionHouse();
+            join.setDisable(true);
+            AuctionHouseProxy proxy = new AuctionHouseProxy(newAuctionHouse.getHostname(),
+                    newAuctionHouse.getPortNumber());
+            AccountLink link = new AccountLink(myRecords.getNumericalID(),newAuctionHouse.getNumericalID());
+            int secretKey = bankProxy.getSecretKey(link);
+            display.addAuctionTab(proxy.joinAH(myRecords,secretKey),newAuctionHouse);
+            AuctionHouseLink auctionInfo = new AuctionHouseLink(newAuctionHouse,secretKey,proxy);
+            auctionHouses.put(newAuctionHouse.getNumericalID(),auctionInfo);
         });
     }
 }

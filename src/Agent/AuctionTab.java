@@ -7,11 +7,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.Tab;
+import javafx.geometry.Pos;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 
 import java.util.List;
 
@@ -24,7 +27,8 @@ public class AuctionTab {
     private Button bid, leave;
     private BorderPane pane;
     private AuctionItem selectedItem;
-    private Label itemName, itemID, currentPrice;
+    private Label itemName, itemID, currentPrice, minBid;
+    private TextField proposedBid;
     /**
      * stores the eahc auction houses tab info.
      * @param items the items available
@@ -35,19 +39,24 @@ public class AuctionTab {
     public AuctionTab(List<AuctionItem> items, IDRecord houseInfo, Button bid, Button leave){
         list = new ListView<>();
         selectedItem = null;
-        list.setPrefSize(50,600);
+        list.setPrefSize(100,600);
         list.setOrientation(Orientation.VERTICAL);
         itemDisp = FXCollections.observableArrayList();
         list.setItems(itemDisp);
         pane = new BorderPane();
-        pane.setRight(list);
+        pane.setLeft(list);
+
         this.items = items;
         this.bid = bid;
         this.leave = leave;
         this.houseInfo = houseInfo;
+
         auctionHouse = new Tab();
         auctionHouse.setClosable(false);
-        auctionHouse.setText(houseInfo.getName());
+        if(houseInfo != null) {
+            auctionHouse.setText(houseInfo.getName());
+            auctionHouse.setId(Integer.toString(houseInfo.getNumericalID()));
+        }
         addItems();
         list.getSelectionModel().selectedIndexProperty().addListener(
                 new ChangeListener<Number>() {
@@ -58,25 +67,73 @@ public class AuctionTab {
                         DisplayItem();
                     }
                 });
+
+        proposedBid = new TextField("0000");
+        itemName = new Label("     Item");
+        itemID = new Label("     ID");
+        currentPrice = new Label("price");
+        minBid = new Label("min");
+        Label spacing = new Label("     My Bid:");
+        VBox auctionLabels = new VBox();
+        HBox biddingArea = new HBox();
+        auctionLabels.getChildren().addAll(itemName,itemID);
+        biddingArea.getChildren().addAll(spacing,proposedBid,bid);
+        biddingArea.setSpacing(10);
+
+        VBox pricing = new VBox();
+        pricing.getChildren().addAll(currentPrice,minBid);
+        HBox finalFormat = new HBox();
+        finalFormat.getChildren().addAll(auctionLabels,pricing);
+        finalFormat.setSpacing(10);
+        finalFormat.setAlignment(Pos.BASELINE_LEFT);
+
+        VBox mergeBoxes = new VBox();
+        mergeBoxes.getChildren().addAll(finalFormat,biddingArea);
+
+        Canvas image = new Canvas(250,275);
+        GraphicsContext gc = image.getGraphicsContext2D();
+        gc.setFill(Color.WHITE);
+        gc.fillRect(0,25,250,250);
+        gc.setFill(Color.BLACK);
+        gc.fillText("No Image Added",75,150);
+
+        VBox hold = new VBox();
+        hold.getChildren().addAll(image,mergeBoxes);
+        hold.setAlignment(Pos.BASELINE_CENTER);
+
+        HBox leaveHold = new HBox();
+        Label leaveSpacing = new Label("                                                                          " +
+                "                                    ");
+        leaveHold.getChildren().addAll(leaveSpacing,leave);
+
+        pane.setCenter(hold);
+        pane.setBottom(leaveHold);
+        auctionHouse.setContent(pane);
+
     }
 
     /**
      * adds the available items to the auction house display
      */
     private void addItems(){
-        for(AuctionItem item : items){
-            String info = item.getItemName() + "\n" + item.getBid();
-            itemDisp.add(info);
+        if(items != null) {
+            for (AuctionItem item : items) {
+                String info = item.getItemName() + "\n" + item.getBid();
+                itemDisp.add(info);
+            }
         }
     }
     private void DisplayItem(){
-
+        itemID.setText("     Item ID: "+Integer.toString(selectedItem.getItemID()));
+        itemName.setText("     Item Name: "+selectedItem.getItemName());
+        currentPrice.setText("Current Bid: " + Double.toString(selectedItem.getBid().getCurrentBid()));
+        minBid.setText("Min Bid: "+Double.toString(selectedItem.getBid().getMinBid()));
     }
     /**
      * updates the display with any new items list
      * @param newItems the new items list
      */
-    private void updateItems(List<AuctionItem> newItems){
+    public void updateItems(List<AuctionItem> newItems){
         items = newItems;
         itemDisp.removeAll();
         addItems();
@@ -92,4 +149,5 @@ public class AuctionTab {
      * @return the tab
      */
     public Tab getTab(){return auctionHouse;}
+    public Double getProposedBid(){return Double.parseDouble(proposedBid.getText());}
 }

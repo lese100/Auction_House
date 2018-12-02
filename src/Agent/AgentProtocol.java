@@ -32,6 +32,8 @@ public class AgentProtocol implements PublicAuctionProtocol{
                 msgToSend = new Message<>(Message.MessageIdentifier.
                         ACKNOWLEDGED,
                         null);
+                Message<AuctionHouseInventory> auction = msgReceived;
+                agent.itemsUpdate(auction.getMessageContent());
                 break;
             default:
                 msgToSend = new Message<>(Message.MessageIdentifier.
