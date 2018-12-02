@@ -41,6 +41,18 @@ public class BankProxy {
         }
         return null;
     }
+    public IDRecord requestBalance(IDRecord myID){
+        Message<IDRecord> message = new Message<>(Message.MessageIdentifier.REQUEST_BALANCE,myID);
+        Message<IDRecord> reply = sendMSG(message);
+        if(reply != null){
+            if(reply.getMessageIdentifier() == Message.MessageIdentifier.BALANCE){
+                return reply.getMessageContent();
+            }else if(reply.getMessageIdentifier() == Message.MessageIdentifier.CASE_NOT_FOUND){
+                System.out.println("Bank missing get balance");
+            }
+        }
+        return myID;
+    }
     public int getSecretKey(AccountLink selection){
         Message<AccountLink> message = new Message<>(Message.MessageIdentifier.GET_SECRET_KEY,selection);
         Message<Integer> reply;

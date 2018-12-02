@@ -72,7 +72,8 @@ public class Agent extends Application {
         holdMyPort = Integer.parseInt(myPortNum.getText());
         holdHost = hostName.getText();
         holdPort = Integer.parseInt(portNum.getText());
-        System.out.println(holdMyPort + " " + holdHost + " " + holdPort);
+
+
         Agent agent = new Agent(holdMyPort);
         localHost = null;
         try {
@@ -82,6 +83,7 @@ public class Agent extends Application {
         }
         Stage create = new Stage();
         create.setTitle("Connect");
+
 
         /*establish user info*/
         GridPane grid2 = new GridPane();
@@ -98,19 +100,21 @@ public class Agent extends Application {
         grid2.add(account,1,2);
 
         Scene scene2 = new Scene(grid2, 240, 75);
-        account.setOnAction(event -> {
-            create.close();
-        });
+        account.setOnAction(event -> create.close());
         create.setResizable(false);
         create.setScene(scene2);
         create.initOwner(stage);
         create.showAndWait();
-        System.out.println(name.getText()+" " + balance.getText());
+
+
         myRecords = new IDRecord(IDRecord.RecordType.AGENT,name.getText(),Integer.parseInt(balance.getText()),
                 localHost,holdMyPort);
         //BankProxy bank = new BankProxy(holdHost,holdPort);
         //myRecords = bank.createBankAccount(myRecords);
         display = new Display(stage);
+    }
+    private void connectPopup(){
+
     }
 
 }

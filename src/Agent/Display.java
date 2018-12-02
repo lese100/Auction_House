@@ -8,7 +8,6 @@ import javafx.scene.control.TabPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import java.util.HashMap;
 import java.util.List;
 
 public class Display {
