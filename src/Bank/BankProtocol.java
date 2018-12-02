@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import java.util.Random;
 
 /**
- * Message-handling protocol for messages received by a Bank through
- * a BankClientConnection.
+ * Message-handling protocol for messages received by a Bank from an Agent
+ * or Auction House.
  * created: 11/28/18 by Warren D. Craft (wdc)
- * last modified: 12/01/18 by wdc
+ * last modified: 12/02/18 by wdc
  * @author Liam Brady (lb)
  * @author Warren D Craft (wdc)
  * @author Tyler Fenske (thf)

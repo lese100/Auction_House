@@ -28,7 +28,7 @@ import java.util.Set;
  *     Bank and use that info to construct a Bank;
  * (2) Phase 2 is then a final window that represents the established,
  *     working bank and displays information about the Bank and its
- *     operations.
+ *     operations and accounts.
  * created: 12/02/2018 by wdc
  * last modified: 12/02/2018 by wdc
  * @author Liam Brady (lb)

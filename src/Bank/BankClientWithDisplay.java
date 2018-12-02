@@ -19,7 +19,8 @@ import java.util.ArrayList;
  * JavaFX-based display class for representing and displaying information
  * about a BankClient (which itself is used for testing a Bank object).
  * created: 11/30/18 by wdc
- * last modified: 12/01/18 by wdc
+ * last modified: 12/02/18 by wdc (adding fxnality to GUI)
+ * previously modified: 12/01/18 by wdc
  * @author Liam Brady (lb)
  * @author Warren D. Craft (wdc)
  * @author Tyler Fenske (thf)

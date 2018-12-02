@@ -19,7 +19,8 @@ import java.util.Set;
  * closing accounts, funding an account, transferring funds from one account
  * to another, etc.
  * created: 11/28/18 by wdc
- * last modified: 12/01/18 by wdc
+ * last modified: 12/02/18 by wdc (coord w/GUI)
+ * previously modified: 12/01/18 by wdc
  * previously modified: 11/28/18 by wdc (creation)
  * @author Liam Brady
  * @author Warren D. Craft (wdc)

@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * A temporary class for testing the Bank class, a BankProxyForTesting is used by a
  * BankClient to mediate communications with a Bank.
  * created: 11/30/18 by Warren D. Craft (wdc)
- * last modified: 12/01/18 by wdc
+ * last modified: 12/02/18 by wdc
  * @author Liam Brady (lb)
  * @author Warren D. Craft (wdc)
  * @author Tyler Fenske (thf)
