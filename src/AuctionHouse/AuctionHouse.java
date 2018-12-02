@@ -6,12 +6,14 @@ import Utility.*;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.ConnectException;
+import java.net.SocketException;
 import java.util.*;
 
 public class AuctionHouse {
 
     private final int NUM_AUCTION_ITEMS = 15;
-    private final long BID_TIMER = 30000;
+    private final long BID_TIMER = 10000;
 
     private IDRecord idRecord;
     private AuctionDisplay display;
@@ -30,8 +32,17 @@ public class AuctionHouse {
         idRecord = new IDRecord(Utility.IDRecord.RecordType.AUCTION_HOUSE,
                 name, 0.0, hostName, port);
 
-        CommunicationService cs = null;
-        //CommunicationService cs = new CommunicationService(bankHostName, bankPort);
+        CommunicationService cs;
+        try{
+            cs = new CommunicationService(bankHostName, bankPort);
+            display.updateConsoleDisplay("Connected to Bank Host: " +
+                    bankHostName + " Port: " + bankPort);
+        }catch(ConnectException e){
+            cs = null;
+            display.updateConsoleDisplay("Connection to Bank failed. " +
+                    "Fake account information supplied.");
+        }
+
         bankProxy = new BankProxy(cs);
         idRecord = bankProxy.openAccount(idRecord);
 
@@ -54,7 +65,7 @@ public class AuctionHouse {
         printAuctionItems();
 
         display.setupAHLabelInfo(name, idRecord.getNumericalID());
-        display.updateAuctionItemDisplay(auctions);
+        updateDisplay();
 
         PublicAuctionProtocol auctionProtocol = new AuctionHouseProtocol(this);
         NotificationServer ns = new NotificationServer(port, auctionProtocol);
@@ -63,8 +74,18 @@ public class AuctionHouse {
     }
 
     public void joinAuctionHouse(IDRecord agentInfo) throws IOException{
+        display.updateConsoleDisplay("Agent \"" + agentInfo.getName() + "\" " +
+                "connected to this Auction House" +
+                " — Host: " + agentInfo.getHostname() + " Port: " +
+                agentInfo.getPortNumber());
+
         CommunicationService cs = new CommunicationService
                 (agentInfo.getHostname(), agentInfo.getPortNumber());
+
+        display.updateConsoleDisplay("Connected to Agent \"" +
+                agentInfo.getName() + "\"'s Notification Server" +
+                " — Host: " + agentInfo.getHostname() + " Port: " +
+                agentInfo.getPortNumber());
 
         AgentProxy ap = new AgentProxy(cs);
 
@@ -79,11 +100,17 @@ public class AuctionHouse {
         return idRecord;
     }
 
+    public void updateDisplay(){
+        display.updateAuctionItemDisplay(auctions);
+        System.out.println("just called");
+    }
+
     public Message.MessageIdentifier makeBid
             (AuctionItem itemOfInterest) throws IOException{
 
         AuctionItem auctionItem = findMatchingAuctionItem(itemOfInterest);
-        AuctionItem oldAuctionItem = null;
+        AuctionItem oldAuctionItem;
+
 
         synchronized(auctionItem){
             if(itemOfInterest.getBid().getProposedBid() <
@@ -92,6 +119,7 @@ public class AuctionHouse {
             }
 
             if(!bankProxy.checkAgentFunds(itemOfInterest.getBid())){
+                System.out.println("Made it here");
                 return Message.MessageIdentifier.BID_REJECTED_NSF;
             }else{
                 oldAuctionItem = createCopyAuctionItem(auctionItem);
@@ -111,12 +139,13 @@ public class AuctionHouse {
         }
 
         //updates the AH server gui
-        display.updateAuctionItemDisplay(auctions);
+        updateDisplay();
 
         updateAgentsAboutChanges();
 
+
         auctionItem.startTimer(BID_TIMER,
-                connectedAgents.get(auctionItem.getBid().getSecretKey()));
+                connectedAgents.get(auctionItem.getBid().getSecretKey()), this);
 
         //if true, there was a previous bidder, so they are notified about
         //being outbidded. The bank then unfreezes their funds.

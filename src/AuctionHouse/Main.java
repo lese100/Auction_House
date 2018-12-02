@@ -49,13 +49,10 @@ public class Main extends Application {
                         auctionDisplay.getBankHostName(),
                         auctionDisplay.getBankPort());
 
-            }else{
-                auctionDisplay.displayErrorMessage();
             }
         });
 
         auctionDisplay.setupAHInitializeButton(createAuctionHouse);
-
 
     }
 

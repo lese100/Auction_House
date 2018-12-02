@@ -22,19 +22,24 @@ public class BankProxy {
     }
 
     public void unfreezeAgentFunds(Bid bidderInfo){
-
-        sendMsg(new Message<Bid>
-                (Message.MessageIdentifier.UNFREEZE_FUNDS, bidderInfo));
+        if(cs != null){
+            sendMsg(new Message<Bid>
+                    (Message.MessageIdentifier.UNFREEZE_FUNDS, bidderInfo));
+        }
     }
 
     public boolean checkAgentFunds(Bid agentBidInfo){
-        Message<Bid> msg = new Message<>
-                (Message.MessageIdentifier.CHECK_FUNDS, agentBidInfo);
+        if(cs == null){
+            return true;
+        }else{
+            Message<Bid> msg = new Message<>
+                    (Message.MessageIdentifier.CHECK_FUNDS, agentBidInfo);
 
-        Message replyMessage = sendMsg(msg);
+            Message replyMessage = sendMsg(msg);
 
-        return replyMessage.getMessageIdentifier().equals
-                (Message.MessageIdentifier.CHECK_SUCCESS);
+            return replyMessage.getMessageIdentifier().equals
+                    (Message.MessageIdentifier.CHECK_SUCCESS);
+        }
     }
 
     private IDRecord openFakeAccount(IDRecord idRecord){

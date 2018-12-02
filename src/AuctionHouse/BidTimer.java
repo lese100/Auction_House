@@ -10,11 +10,13 @@ public class BidTimer implements Runnable{
     private AgentProxy ap;
     private AuctionItem ai;
     private boolean stillValid;
+    private AuctionHouse ah;
 
-    public BidTimer(long time, AgentProxy ap, AuctionItem ai){
+    public BidTimer(long time, AgentProxy ap, AuctionItem ai, AuctionHouse ah){
         this.TIME = time;
         this.ap = ap;
         this.ai = ai;
+        this.ah = ah;
         stillValid = true;
     }
 
@@ -26,6 +28,7 @@ public class BidTimer implements Runnable{
             if(stillValid){
                 ap.notifyWinner(ai);
                 ai.getBid().setBidState(Bid.BidState.SOLD);
+                ah.updateDisplay();
             }
         }catch(InterruptedException e){
             e.printStackTrace();
