@@ -1,6 +1,7 @@
 package Agent;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -11,9 +12,6 @@ import javafx.stage.Stage;
 import Utility.*;
 
 import java.io.IOException;
-import java.net.ConnectException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -55,7 +53,12 @@ public class Agent extends Application {
     }
 
     public void itemsUpdate(AuctionHouseInventory newInventory) {
-        display.updateAuctionItems(newInventory);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                display.updateAuctionItems(newInventory);
+            }
+        });
     }
 
     /**
@@ -107,7 +110,16 @@ public class Agent extends Application {
         holdPort = Integer.parseInt(portNum.getText());
         localHost = myHostName.getText();
 
-        Agent agent = new Agent(holdMyPort);
+        //Agent agent = new Agent(holdMyPort);
+        AgentProtocol protocol = new AgentProtocol(this);
+        auctionHouses = new HashMap<>();
+        try {
+            NotificationServer notificationserver = new NotificationServer(holdMyPort, protocol);
+            Thread t = new Thread(notificationserver);
+            t.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         Stage create = new Stage();
         create.setTitle("Connect");
 

@@ -72,8 +72,11 @@ public class AuctionTab {
                     @Override
                     public void changed(ObservableValue<? extends Number> observable,
                                         Number oldValue, Number newValue) {
-                        selectedItem = items.get((int)newValue);
-                        DisplayItem();
+                        int select = (int) newValue;
+                        if(select < items.size() && select >= 0) {
+                            selectedItem = items.get(select);
+                            DisplayItem();
+                        }
                     }
                 });
 
