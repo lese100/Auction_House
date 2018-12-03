@@ -43,6 +43,7 @@ public class Display {
         tabs = new TabPane();
         Scene layout = new Scene(tabs,420,620, Color.WHITE);
         bank = new BankTab(leaveBank,getAuction,getBalance,transfer,join);
+        currentTab = bank.getBankTab();
         tabs.getTabs().add(bank.getBankTab());
         tabs.getSelectionModel().selectedItemProperty().addListener((ov, oldTab, newTab) -> {
             currentTab = newTab;

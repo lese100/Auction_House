@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BankTab {
-    private Button leave,getAuctions,getBalance,transfer,join;
+    private Button getAuctions,join;
     private Tab bankTab;
     private ListView<String> list,purchases,pending;
     private ObservableList<String> aucDisp,purchasedDisp,pendingDisp;
@@ -39,10 +39,7 @@ public class BankTab {
      * sets up the bank display
      */
     public BankTab(Button leave,Button getAuctions, Button getBalance,Button transfer,Button join){
-        this.leave = leave;
         this.getAuctions = getAuctions;
-        this.getBalance = getBalance;
-        this.transfer = transfer;
         this.join = join;
         aucHouses = null;
         selectedItem = null;
@@ -93,7 +90,10 @@ public class BankTab {
                     @Override
                     public void changed(ObservableValue<? extends Number> observable,
                                         Number oldValue, Number newValue) {
-                        selectedItem = aucHouses.get((int)newValue);
+                        int selected = (int)newValue;
+                        if(selected < aucHouses.size() && selected >= 0) {
+                            selectedItem = aucHouses.get((int) newValue);
+                        }
                     }
                 });
 
@@ -139,15 +139,15 @@ public class BankTab {
     }
     public void setAucHouses(ArrayList<IDRecord> houses){
         aucHouses = houses;
-        aucDisp.removeAll();
+        aucDisp.clear();
         displayAucHouses();
     }
     public IDRecord getSelectedItem(){
-        aucDisp.removeAll();
+        aucDisp.clear();
         return selectedItem;
     }
     private void updatePurchased(){
-        purchasedDisp.removeAll();
+        purchasedDisp.clear();
         for(AuctionItem item : purchased){
             String info = item.getItemName() + "_" + item.getItemID()+"                                      -"+
                     item.getBid();
@@ -155,7 +155,7 @@ public class BankTab {
         }
     }
     private void updatePending(){
-        pendingDisp.removeAll();
+        pendingDisp.clear();
         for(AuctionItem item : pendingTransfer){
             String info = item.getItemName() + "_" + item.getItemID()+"                                      -"+
                     item.getBid();

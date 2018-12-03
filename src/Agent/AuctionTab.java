@@ -40,7 +40,7 @@ public class AuctionTab {
     public AuctionTab(List<AuctionItem> items, IDRecord houseInfo, Button bid, Button leave){
         list = new ListView<>();
         selectedItem = null;
-        list.setPrefSize(100,600);
+        list.setPrefSize(100,575);
         list.setOrientation(Orientation.VERTICAL);
         itemDisp = FXCollections.observableArrayList();
         list.setItems(itemDisp);
@@ -125,7 +125,13 @@ public class AuctionTab {
     private void addItems(){
         if(items != null) {
             for (AuctionItem item : items) {
-                String info = item.getItemName() + "\n" + item.getBid();
+                Double bid;
+                if(item.getBid().getCurrentBid() == 0){
+                    bid = item.getBid().getMinBid();
+                }else{
+                    bid = item.getBid().getCurrentBid();
+                }
+                String info = item.getItemName() + "\n" + bid;
                 itemDisp.add(info);
             }
         }
@@ -146,7 +152,7 @@ public class AuctionTab {
      */
     public void updateItems(List<AuctionItem> newItems){
         items = newItems;
-        itemDisp.removeAll();
+        itemDisp.clear();
         addItems();
     }
 

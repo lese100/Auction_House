@@ -70,6 +70,7 @@ public class Agent extends Application {
     public void start(Stage stage) {
         Stage inputs = new Stage();
         inputs.setTitle("Connect");
+        auctionHouses = new HashMap<>();
 
         /*set up host information*/
         GridPane grid = new GridPane();
@@ -217,8 +218,8 @@ public class Agent extends Application {
                 AccountLink link = new AccountLink(myRecords.getNumericalID(), newAuctionHouse.getNumericalID());
                 int secretKey = bankProxy.getSecretKey(link);
                 display.addAuctionTab(proxy.joinAH(myRecords, secretKey), newAuctionHouse);
-                AuctionHouseLink auctionInfo = new AuctionHouseLink(newAuctionHouse, secretKey, proxy);
-                auctionHouses.put(newAuctionHouse.getNumericalID(), auctionInfo);
+                AuctionHouseLink linkToAuction= new AuctionHouseLink(newAuctionHouse, secretKey, proxy);
+                auctionHouses.put(newAuctionHouse.getNumericalID(), linkToAuction);
             }else{
                 display.addAuctionTab(null,null);
                 System.out.println("can't join auction house");
