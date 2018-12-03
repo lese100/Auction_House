@@ -11,7 +11,8 @@ import java.io.Serializable;
  * and unfrozen funds are all synchronized to prevent multithread-based
  * interference errors (e.g. to avoid two threads "freezing" the same funds).
  * created: 11/18/18 by wdc
- * last modified: 12/01/18 by wdc (updating types and constructors)
+ * last modified: 12/03/18 by wdc (adding unfreeze method)
+ * previously modified: 12/01/18 by wdc (updating types and constructors)
  * previously modified: 11/29/18 by wdc (updating to Utility package)
  * previously modified: 11/18/18 by wdc (creation)
  * @author Liam Brady
@@ -145,6 +146,25 @@ public class BankAccount implements Serializable {
             totalFrozen += freezeIncrease;
             totalUnfrozen = totalUnfrozen - freezeIncrease;
             // and does not change total balance
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Decreases the portion of account's total funds that are frozen (i.e.
+     * committed for some purpose, such as the bidding process). Can only
+     * decrease the frozen funds down to 0. If freeze decrease exceeds frozen
+     * funds, this suggests there was an error somewhere and so the request
+     * fails and method returns false.
+     * @param freezeDecrease double $ to remove from total of frozen funds
+     * @return true if decrease successful; false if not successful
+     */
+    public synchronized boolean decreaseFreeze(double freezeDecrease) {
+        if ( totalFrozen >= freezeDecrease ) {
+            totalFrozen -= freezeDecrease;
+            totalUnfrozen += freezeDecrease;
+            // and this does not change total balance
             return true;
         }
         return false;

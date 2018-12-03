@@ -204,6 +204,32 @@ public class BankProtocol implements PublicAuctionProtocol {
                     "Test Message Received");
                 break;
 
+            case UNFREEZE_FUNDS:
+                System.out.println("BankProtocol.case UNFREEZE_FUNDS");
+                if ( msgContent instanceof Bid) {
+                    Bid theBid = (Bid) msgContent;
+                    int theSecretKey = theBid.getSecretKey();
+                    double amtToUnfreeze = theBid.getCurrentBid();
+                    boolean fundsUnfrozen =
+                        bank.unfreezeFunds(theSecretKey, amtToUnfreeze);
+                    if (fundsUnfrozen) {
+                        msgToSend = new Message<>
+                            (Message.MessageIdentifier.REQUEST_SUCCEEDED,
+                                null);
+                    } else {
+                        msgToSend = new Message<>
+                            (Message.MessageIdentifier.REQUEST_FAILED,
+                                null);
+                    }
+
+
+                } else {
+                    msgToSend = new Message<>
+                        (Message.MessageIdentifier.REQUEST_FAILED,
+                            null);
+                }
+                break;
+
             default:
                 msgToSend = new Message<>(Message.MessageIdentifier.
                     CASE_NOT_FOUND,

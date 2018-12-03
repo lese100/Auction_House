@@ -263,11 +263,12 @@ public class BankClientWithDisplay {
                 });
                 break;
 
-            case "Un-Freeze Funds":
+            case "Un-Freeze $100":
                 button.setOnAction(new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent event) {
                         System.out.println("Un-Freezing Funds");
+                        unfreezeFunds();
                     }
                 });
                 break;
@@ -478,6 +479,26 @@ public class BankClientWithDisplay {
         boolean fundsFrozen = bankProxyForTesting.checkAndFreezeFunds(theBid);
         System.out.println("BCWD.checkAndFreezeFunds(): fundFrozen = " +
              fundsFrozen);
+
+    }
+
+    public void unfreezeFunds() {
+        // use the current secret key field in display to generate
+        // a simulated Bid object
+        double minBid = 10.00;
+        double currentBid = 100.00; // so we desire to unfreeze $100
+        int secretKey =
+            Integer.parseInt(textFieldAccountLinkSecretKey.getText());
+        double proposedBid = 100.00;
+        Bid theBid = new Bid(minBid);
+        theBid.setBidState(Bid.BidState.BIDDING);
+        theBid.setCurrentBid(currentBid);
+        theBid.setSecretKey(secretKey);
+        theBid.setProposedBid(proposedBid);
+
+        boolean fundsUnfrozen = bankProxyForTesting.unfreezeFunds(theBid);
+        System.out.println("BCWD.checkAndFreezeFunds(): fundsUnfrozen = " +
+            fundsUnfrozen);
 
     }
 
