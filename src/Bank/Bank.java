@@ -316,6 +316,7 @@ public class Bank {
         // if funds were able to be taken from source, then add amt to target
         if ( fundsTakenFromSource ) {
             targetBankAccount.increaseTotalBalance(amtToTransfer);
+            updateBankDisplay();
         } else {
             return false; // b/c funds could not be taken from source
         }
