@@ -285,6 +285,66 @@ public class Bank {
         return fundsUnfrozen;
     }
 
+    public boolean transferFunds (int secretKey, double amtToTransfer) {
+
+        int sourceBankAccountNumber;   // account FROM which to transfer
+        int targetBankAccountNumber;   // account TO which to transfer
+
+        // use secretKey to obtain AccountLink, which will contains the
+        // source and target BankAccount numbers
+        AccountLink theAccountLink = hashMapOfSecretKeys.get(secretKey);
+
+        if ( theAccountLink != null ) { // i.e. secretKey was valid
+
+            sourceBankAccountNumber = theAccountLink.getAGENT_ACCOUNT_NUMBER();
+            targetBankAccountNumber = theAccountLink.getAH_ACCOUNT_NUMBER();
+
+        } else { // secretKey appears invalid; no transfer possible
+            return false;
+        }
+
+        // use account numbers to get full BankAccounts
+        BankAccount sourceBankAccount =
+            hashMapOfAllAccts.get(sourceBankAccountNumber);
+        BankAccount targetBankAccount =
+            hashMapOfAllAccts.get(targetBankAccountNumber);
+
+        // ask source BankAccount to delete amtToTransfer (if possible)
+        boolean fundsTakenFromSource =
+            sourceBankAccount.decreaseFrozenAndBalance(amtToTransfer);
+
+        // if funds were able to be taken from source, then add amt to target
+        if ( fundsTakenFromSource ) {
+            targetBankAccount.increaseTotalBalance(amtToTransfer);
+        } else {
+            return false; // b/c funds could not be taken from source
+        }
+
+        return true;
+
+    }
+
+    public BankAccount getBankAccount (int secretKey) {
+        // using a secretKey to obtain a BankAccount means/assumes that
+        // the BankAccount belongs to an Agent that has been involved in
+        // an AuctionHouse-linked transaction
+
+        int theBankAccountNumber;
+        // use the secretKey to get associated AccountLink
+        AccountLink theAccountLink = hashMapOfSecretKeys.get(secretKey);
+
+        if (theAccountLink != null) { // i.e. secret key was valid
+            theBankAccountNumber = theAccountLink.getAGENT_ACCOUNT_NUMBER();
+        } else {
+            // secretKey appears to be invalid, return generic BankAccount
+            return new BankAccount();
+        }
+
+        // return the associated BankAccount
+        return hashMapOfAllAccts.get(theBankAccountNumber);
+
+    }
+
     // ****************************** //
     //   Utility Fxns                 //
     // ****************************** //

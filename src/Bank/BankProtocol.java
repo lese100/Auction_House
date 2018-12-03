@@ -204,6 +204,36 @@ public class BankProtocol implements PublicAuctionProtocol {
                     "Test Message Received");
                 break;
 
+            case TRANSFER_FUNDS:
+                System.out.println("BankProtocol.case TRANSFER_FUNDS");
+                if ( msgContent instanceof AuctionItem) {
+                    AuctionItem theAuctionItem =  (AuctionItem) msgContent;
+                    Bid theBid = theAuctionItem.getBid();
+                    // the Bid has the secret key and the current (winning) Bid
+                    int theSecretKey = theBid.getSecretKey();
+                    double amtToTransfer = theBid.getCurrentBid();
+                    boolean fundsTransferred =
+                        bank.transferFunds(theSecretKey, amtToTransfer);
+                    if (fundsTransferred) {
+                        // get agent's updated BankAccount
+                        BankAccount agentBankAccount =
+                            bank.getBankAccount(theSecretKey);
+                        msgToSend = new Message<>
+                            (Message.MessageIdentifier.TRANSFER_SUCCESS,
+                                agentBankAccount);
+                    } else {
+                        msgToSend = new Message<>
+                            (Message.MessageIdentifier.REQUEST_FAILED,
+                                new BankAccount());
+                    }
+
+                } else {
+                    msgToSend = new Message<>
+                        (Message.MessageIdentifier.REQUEST_FAILED,
+                            new BankAccount());
+                }
+                break;
+
             case UNFREEZE_FUNDS:
                 System.out.println("BankProtocol.case UNFREEZE_FUNDS");
                 if ( msgContent instanceof Bid) {
