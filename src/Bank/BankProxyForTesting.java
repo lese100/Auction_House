@@ -103,9 +103,34 @@ public class BankProxyForTesting {
              Message.MessageIdentifier.CHECK_SUCCESS ) {
 
             return true;
+
         } else {
             return false;
         }
+    }
+
+    public boolean unfreezeFunds(Bid theBid) {
+        Message message = null;
+        Message reply = null;
+        try {
+            message =
+                new Message<>(Message.MessageIdentifier.UNFREEZE_FUNDS,
+                    theBid);
+            reply = cs.sendMessage(message);
+
+        } catch( IOException ioe ) {
+            ioe.printStackTrace();
+        }
+
+        if ( reply.getMessageIdentifier() ==
+            Message.MessageIdentifier.REQUEST_SUCCEEDED ) {
+
+            return true;
+
+        } else {
+            return false;
+        }
+
     }
 
     public String sendTestMessage () {
