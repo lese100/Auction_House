@@ -26,6 +26,8 @@ public class AgentProtocol implements PublicAuctionProtocol{
                         msgToSend = new Message<>(Message.MessageIdentifier.
                                 ACKNOWLEDGED,
                                 null);
+                        Message<AuctionItem> msg = msgReceived;
+                        agent.displayOutbid(msg.getMessageContent());
                         break;
 
                     case BID_WON:

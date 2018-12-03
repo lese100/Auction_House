@@ -23,6 +23,7 @@ public class Agent extends Application {
     private HashMap<Integer, AuctionHouseLink> auctionHouses;
     private Button bid, leaveAuc, leaveBank, getAuction, getBalance, transfer, join;
     private BankProxy bankProxy;
+    private Boolean canIClose;
 
     /**
      * initial constructor
@@ -66,7 +67,9 @@ public class Agent extends Application {
             }
         });
     }
-
+    public void displayOutbid(AuctionItem item){
+        display.displayNotification("Outbid: " + item.getItemName());
+    }
     /**
      * closes everything when exiting the main menu
      */
@@ -77,6 +80,7 @@ public class Agent extends Application {
 
     @Override
     public void start(Stage stage) {
+        canIClose = true;
         Stage inputs = new Stage();
         inputs.setTitle("Connect");
         auctionHouses = new HashMap<>();
@@ -103,7 +107,7 @@ public class Agent extends Application {
         grid.add(myHostName, 1, 1);
         grid.add(submit, 1, 4);
 
-        Scene scene = new Scene(grid, 240, 120);
+        Scene scene = new Scene(grid, 275, 150);
         submit.setOnAction(event -> {
             inputs.close();
         });
@@ -144,7 +148,7 @@ public class Agent extends Application {
         grid2.add(balance, 1, 1);
         grid2.add(account, 1, 2);
 
-        Scene scene2 = new Scene(grid2, 240, 75);
+        Scene scene2 = new Scene(grid2, 275, 100);
         account.setOnAction(event -> create.close());
         create.setResizable(false);
         create.setScene(scene2);
@@ -197,10 +201,21 @@ public class Agent extends Application {
             }
         });
         leaveAuc.setOnAction(event -> {
-
+            AuctionHouseLink link = auctionHouses.get(display.getSelectedAuctionHouse().getNumericalID());
+            if(link.getProxy().closeRequest(myRecords,link.getSecretKey())){
+                auctionHouses.remove(link.getId().getNumericalID());
+                display.removeCurrentTab();
+            }else{
+                display.displayNotification("Cannot leave: Active Bids");
+            }
         });
         leaveBank.setOnAction(event -> {
-
+            if(auctionHouses.isEmpty() && bankProxy.closeRequest(myRecords)){
+                canIClose = true;
+                stop();
+            }else{
+                display.displayNotification("Please transfer all funds and leave all auctions");
+            }
         });
         getAuction.setOnAction(event -> {
             join.setDisable(false);
@@ -238,6 +253,7 @@ public class Agent extends Application {
             join.setDisable(true);
             if(newAuctionHouse != null) {
                 if(!display.doesAuctionExist(newAuctionHouse.getNumericalID())) {
+                    canIClose = false;
                     AuctionHouseProxy proxy = new AuctionHouseProxy(newAuctionHouse.getHostname(),
                             newAuctionHouse.getPortNumber());
                     AccountLink link = new AccountLink(myRecords.getNumericalID(), newAuctionHouse.getNumericalID());

@@ -33,7 +33,7 @@ public class BankTab {
     private IDRecord selectedItem;
     private List<AuctionItem> purchased, pendingTransfer;
     private int selectedToTransfer;
-    private Label name,accuountNum,totalBal,frozenBal;
+    private Label name,accountNum,totalBal,frozenBal;
 
     /**
      * sets up the bank display
@@ -109,12 +109,14 @@ public class BankTab {
         frozenBal = new Label(" (000)");
         frozenBal.setTextFill(Color.GRAY);
         totalBal = new Label("    0000");
-        accuountNum = new Label("    Account");
+        accountNum = new Label("    Account");
 
         VBox userInfo = new VBox();
-        HBox balance = new HBox();
-        balance.getChildren().addAll(totalBal,frozenBal,getBalance);
-        userInfo.getChildren().addAll(name,accuountNum,balance);
+        VBox balance = new VBox();
+        HBox balances = new HBox();
+        balances.getChildren().addAll(totalBal,frozenBal);
+        balance.getChildren().addAll(balances,getBalance);
+        userInfo.getChildren().addAll(name,accountNum,balance);
 
         VBox centerHold = new VBox();
         centerHold.getChildren().addAll(userInfo,transactions);
@@ -151,16 +153,23 @@ public class BankTab {
     private void updatePurchased(){
         purchasedDisp.clear();
         for(AuctionItem item : purchased){
-            String info = item.getItemName() + "_" + item.getItemID()+"                                            -"+
-                    item.getBid().getCurrentBid();
+            String info = item.getItemName() + "_" + item.getItemID()+"   -";
+            info += getSpacing(info) + item.getBid().getCurrentBid();
             purchasedDisp.add(info);
         }
+    }
+    private String getSpacing(String item){
+        String spacing = "";
+        for(int i = item.length(); i < 55; i++){
+            spacing+= " ";
+        }
+        return spacing;
     }
     private void updatePending(){
         pendingDisp.clear();
         for(AuctionItem item : pendingTransfer){
-            String info = item.getItemName() + "_" + item.getItemID()+"                                            -"+
-                    item.getBid().getCurrentBid();
+            String info = item.getItemName() + "_" + item.getItemID();
+            info += getSpacing(info) + "-" + item.getBid().getCurrentBid();
             pendingDisp.add(info);
         }
     }
@@ -181,7 +190,7 @@ public class BankTab {
     }
     public void updateLabels(BankAccount account){
         name.setText("  "+account.getUserName());
-        accuountNum.setText("    Account#: " + Integer.toString(account.getAccountNumber()));
+        accountNum.setText("    Account#: " + Integer.toString(account.getAccountNumber()));
         frozenBal.setText(" (" + Double.toString(account.getTotalUnfrozen()) + ")");
         totalBal.setText("    Balance: " + Double.toString(account.getTotalBalance()));
     }

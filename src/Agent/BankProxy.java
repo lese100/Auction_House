@@ -99,7 +99,18 @@ public class BankProxy {
         }
         return -1;
     }
-
+    public Boolean closeRequest(IDRecord myID) {
+        Message<IDRecord> message = new Message<>(Message.MessageIdentifier.CLOSE_REQUEST, myID);
+        Message <Integer>reply = sendMSG(message);
+        if (reply.getMessageIdentifier() == Message.MessageIdentifier.CLOSE_REJECTED) {
+            return false;
+        } else if (reply.getMessageIdentifier() == Message.MessageIdentifier.CLOSE_ACCEPTED) {
+            return true;
+        } else if (reply.getMessageIdentifier() == Message.MessageIdentifier.CASE_NOT_FOUND) {
+            System.out.println("Bank missing close request");
+        }
+        return true;
+    }
     /**
      * Tells the bank to transfer the funds for the auction item I won.
      * @param purchasedItem The item I purchased from a auction house

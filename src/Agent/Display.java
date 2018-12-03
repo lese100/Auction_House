@@ -41,7 +41,7 @@ public class Display {
         auctions = new HashMap<>();
         stage.setTitle("Agent Interface");
         tabs = new TabPane();
-        Scene layout = new Scene(tabs,420,620, Color.WHITE);
+        Scene layout = new Scene(tabs,450,620, Color.WHITE);
         bank = new BankTab(leaveBank,getAuction,getBalance,transfer,join);
         currentTab = bank.getBankTab();
         tabs.getTabs().add(bank.getBankTab());
@@ -72,6 +72,10 @@ public class Display {
         }else{
             System.out.println("fail");
         }
+    }
+    public void removeCurrentTab(){
+        auctions.remove(Integer.parseInt(currentTab.getId()));
+        tabs.getTabs().remove(currentTab);
     }
     public boolean doesAuctionExist(int ID){
         if(auctions.get(ID) != null) {
@@ -118,7 +122,7 @@ public class Display {
         Stage newTransfer = new Stage();
         Label transfer = new Label(msg);
         transfer.setAlignment(Pos.CENTER);
-        Scene window = new Scene(transfer,150,25);
+        Scene window = new Scene(transfer,250,35);
         newTransfer.setScene(window);
         newTransfer.setResizable(false);
         newTransfer.initOwner(stage);

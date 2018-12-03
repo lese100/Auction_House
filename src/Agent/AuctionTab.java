@@ -180,7 +180,9 @@ public class AuctionTab {
         items = newItems;
         itemDisp.clear();
         addItems();
-        DisplayItem();
+        if(selectedItem >= 0 && selectedItem < items.size()) {
+            DisplayItem();
+        }
     }
 
     /**

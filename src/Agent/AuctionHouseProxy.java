@@ -45,6 +45,23 @@ public class AuctionHouseProxy {
 
     }
 
+    public Boolean closeRequest(IDRecord myRecord, int secretKey){
+        System.out.println(secretKey);
+        IDRecord temp = new IDRecord(myRecord.getRecordType(),myRecord.getName(),myRecord.getInitialBalance(),
+                myRecord.getHostname(),myRecord.getPortNumber());
+        temp.setNumericalID(secretKey);
+        System.out.println(temp.getNumericalID());
+        Message<IDRecord> message = new Message<>(Message.MessageIdentifier.CLOSE_REQUEST, temp);
+        Message <Integer>reply = sendMSG(message);
+        if(reply.getMessageIdentifier() == Message.MessageIdentifier.CLOSE_REJECTED){
+            return false;
+        }else if(reply.getMessageIdentifier() == Message.MessageIdentifier.CLOSE_ACCEPTED) {
+            return true;
+        }else if(reply.getMessageIdentifier() == Message.MessageIdentifier.CASE_NOT_FOUND){
+            System.out.println("Auction missing close request");
+        }
+        return true;
+    }
     /**
      * sends a message to the auction house telling them to place a bid on a
      * certain item and the bid amount
