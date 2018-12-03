@@ -239,6 +239,7 @@ public class Agent extends Application {
             if (item != null) {
                 bankProxy.transferFunds(item);
                 BankAccount info = bankProxy.requestBalance(myRecords);
+                auctionHouses.get(item.getHouseID()).getProxy().transferedFunds(item);
                 if(info != null) {
                     display.updateLabels(info);
                 }else{

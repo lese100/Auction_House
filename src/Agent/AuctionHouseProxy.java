@@ -44,7 +44,21 @@ public class AuctionHouseProxy {
         return null;
 
     }
-
+    /**
+     * Tells the bank to transfer the funds for the auction item I won.
+     * @param purchasedItem The item I purchased from a auction house
+     * @return get returned my updated account information after the transfer
+     */
+    public void transferedFunds(AuctionItem purchasedItem){
+        Message<AuctionItem> message = new Message<>(Message.MessageIdentifier.TRANSFER_FUNDS,purchasedItem);
+        Message<Integer> reply = sendMSG(message);
+        if(reply != null){
+            if(reply.getMessageIdentifier() == Message.MessageIdentifier.TRANSFER_SUCCESS){
+            }else{
+                System.out.println("Bank missing transfer funds");
+            }
+        }
+    }
     public Boolean closeRequest(IDRecord myRecord, int secretKey){
         IDRecord temp = new IDRecord(myRecord.getRecordType(),myRecord.getName(),myRecord.getInitialBalance(),
                 myRecord.getHostname(),myRecord.getPortNumber());
