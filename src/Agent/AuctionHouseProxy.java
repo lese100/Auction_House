@@ -46,11 +46,9 @@ public class AuctionHouseProxy {
     }
 
     public Boolean closeRequest(IDRecord myRecord, int secretKey){
-        System.out.println(secretKey);
         IDRecord temp = new IDRecord(myRecord.getRecordType(),myRecord.getName(),myRecord.getInitialBalance(),
                 myRecord.getHostname(),myRecord.getPortNumber());
         temp.setNumericalID(secretKey);
-        System.out.println(temp.getNumericalID());
         Message<IDRecord> message = new Message<>(Message.MessageIdentifier.CLOSE_REQUEST, temp);
         Message <Integer>reply = sendMSG(message);
         if(reply.getMessageIdentifier() == Message.MessageIdentifier.CLOSE_REJECTED){
@@ -73,9 +71,6 @@ public class AuctionHouseProxy {
         Bid oldBid = item.getBid();
         oldBid.setSecretKey(secretKey);
         item.setBid(oldBid);
-        System.out.println("Proposed:"+oldBid.getProposedBid());
-        System.out.println("min:" + oldBid.getMinBid());
-        System.out.println("current:" + oldBid.getCurrentBid());
         Message<AuctionItem> message = new Message<>(Message.MessageIdentifier.MAKE_BID,item);
         Message<String> reply = sendMSG(message);
         switch( reply.getMessageIdentifier() ) {
