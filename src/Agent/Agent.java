@@ -139,11 +139,6 @@ public class Agent extends Application {
         bankProxy = new BankProxy(holdHost, holdPort);
         myRecords = bankProxy.createBankAccount(myRecords);
         BankAccount me = bankProxy.requestBalance(myRecords);
-        if(me != null) {
-            display.updateLabels(me);
-        }else{
-            System.out.println("can't get balance");
-        }
 
         bid = new Button("Bid");
         leaveAuc = new Button("Leave");
@@ -154,6 +149,11 @@ public class Agent extends Application {
         join = new Button("Join");
         join.setDisable(true);
         display = new Display(stage, myRecords, bid, leaveAuc, leaveBank, getAuction, getBalance, transfer, join);
+        if(me != null) {
+            display.updateLabels(me);
+        }else{
+            System.out.println("can't get balance");
+        }
 
         /*event handlers*/
         bid.setOnAction(event -> {
