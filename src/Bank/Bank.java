@@ -234,7 +234,32 @@ public class Bank {
                 "balance: $" + currentBankAccount.getTotalBalance());
         }
 
+        updateBankDisplay();
         return currentBankAccount;
+
+    }
+
+    public boolean checkAndFreezeFunds (int secretKey, double proposedFreeze) {
+
+        int theBankAccountNumber;
+        // use AccountLink and secret key to get actual Bank Account number
+        AccountLink theAccountLink = hashMapOfSecretKeys.get(secretKey);
+        if ( theAccountLink != null ) {
+            theBankAccountNumber = theAccountLink.getAGENT_ACCOUNT_NUMBER();
+        } else {
+            return false;
+        }
+        // use account number to get full BankAccount
+        BankAccount theBankAccount =
+            hashMapOfAllAccts.get(theBankAccountNumber);
+
+        // ask BankAccount to check and (if possible) freeze the amount
+        boolean fundsFrozen = theBankAccount.checkAndFreeze(proposedFreeze);
+
+        updateBankDisplay();
+
+        return fundsFrozen;
+
 
     }
 

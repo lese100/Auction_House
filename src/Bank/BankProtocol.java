@@ -82,6 +82,33 @@ public class BankProtocol implements PublicAuctionProtocol {
                 }
                 break;
 
+            case CHECK_FUNDS:
+                System.out.println("BankProtocol.case CHECK_FUNDS");
+                if ( msgContent instanceof Bid) {
+                    Bid theBid = (Bid) msgContent;
+                    int theSecretKey = theBid.getSecretKey();
+                    double proposedFreeze = theBid.getProposedBid();
+                    boolean fundsFrozen =
+                        bank.checkAndFreezeFunds(theSecretKey, proposedFreeze);
+                    if (fundsFrozen) {
+                        msgToSend = new Message<>
+                            (Message.MessageIdentifier.CHECK_SUCCESS,
+                                null);
+                    } else {
+                        msgToSend = new Message<>
+                            (Message.MessageIdentifier.CHECK_FAILURE,
+                                null);
+                    }
+
+
+                } else {
+                    msgToSend = new Message<>
+                        (Message.MessageIdentifier.CHECK_FAILURE,
+                            null);
+                }
+
+                break;
+
             case CLOSE_REQUEST:
                 msgToSend = new Message<>(Message.MessageIdentifier.
                     ACKNOWLEDGED,
@@ -90,7 +117,7 @@ public class BankProtocol implements PublicAuctionProtocol {
 
             case GET_LIST_OF_AUCTION_HOUSES:
                 ArrayList<IDRecord> theList = bank.getListOfAuctionHouses();
-                System.out.println("BankProtocol: case GET_LIST: ");
+                System.out.println("BankProtocol: case GET_LIST_OF_AHs: ");
                 for (IDRecord rec : theList) {
                     System.out.println("Acct #: " + rec.getNumericalID());
                 }
