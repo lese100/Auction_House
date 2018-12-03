@@ -29,8 +29,10 @@ public class AuctionHouseProxy {
      * @return list of items up for auction
      */
     public List<AuctionItem> joinAH(IDRecord myRecord, int secretKey){
-        myRecord.setNumericalID(secretKey);
-        Message<IDRecord> message = new Message<>(Message.MessageIdentifier.JOIN_AUCTION_HOUSE,myRecord);
+        IDRecord temp = new IDRecord(myRecord.getRecordType(),myRecord.getName(),myRecord.getInitialBalance(),
+                myRecord.getHostname(),myRecord.getPortNumber());
+        temp.setNumericalID(secretKey);
+        Message<IDRecord> message = new Message<>(Message.MessageIdentifier.JOIN_AUCTION_HOUSE,temp);
         Message<AuctionHouseInventory> reply = sendMSG(message);
         if(reply != null){
             if(reply.getMessageIdentifier() == Message.MessageIdentifier.LIST_OF_AUCTION_HOUSE_ITEMS){

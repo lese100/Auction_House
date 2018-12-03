@@ -50,6 +50,12 @@ public class Agent extends Application {
 
     public void addTransferItem(AuctionItem item) {
         display.addTransferItem(item);
+        BankAccount info = bankProxy.requestBalance(myRecords);
+        if(info != null) {
+            display.updateLabels(info);
+        }else{
+            System.out.println("can't get balance");
+        }
     }
 
     public void itemsUpdate(AuctionHouseInventory newInventory) {
@@ -217,6 +223,12 @@ public class Agent extends Application {
             AuctionItem item = display.getSelectedTransfer();
             if (item != null) {
                 bankProxy.transferFunds(item);
+                BankAccount info = bankProxy.requestBalance(myRecords);
+                if(info != null) {
+                    display.updateLabels(info);
+                }else{
+                    System.out.println("can't get balance");
+                }
             }else{
                 System.out.println("can't Transfer Funds");
             }

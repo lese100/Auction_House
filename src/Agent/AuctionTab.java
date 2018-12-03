@@ -27,7 +27,7 @@ public class AuctionTab {
     private IDRecord houseInfo;
     private Button bid, leave;
     private BorderPane pane;
-    private AuctionItem selectedItem;
+    private int selectedItem;
     private Label itemName, itemID, currentPrice, minBid;
     private TextField proposedBid;
     private HBox leaveHold, biddingArea;
@@ -40,7 +40,6 @@ public class AuctionTab {
      */
     public AuctionTab(List<AuctionItem> items, IDRecord houseInfo, Button bid, Button leave){
         list = new ListView<>();
-        selectedItem = null;
         list.setPrefSize(100,575);
         list.setOrientation(Orientation.VERTICAL);
         itemDisp = FXCollections.observableArrayList();
@@ -48,7 +47,7 @@ public class AuctionTab {
         pane = new BorderPane();
         pane.setLeft(list);
 
-        selectedItem = null;
+        selectedItem = -1;
         this.items = items;
         this.bid = bid;
         this.leave = leave;
@@ -74,7 +73,7 @@ public class AuctionTab {
                                         Number oldValue, Number newValue) {
                         int select = (int) newValue;
                         if(select < items.size() && select >= 0) {
-                            selectedItem = items.get(select);
+                            selectedItem = select;
                             DisplayItem();
                         }
                     }
@@ -145,17 +144,30 @@ public class AuctionTab {
                 }else{
                     bid = item.getBid().getCurrentBid();
                 }
-                String info = item.getItemName() + "\n" + bid;
+                String info;
+                if(item.getBid().getBidState() == Bid.BidState.SOLD){
+                    info = item.getItemName() + "\nSOLD";
+                }else {
+                    info = item.getItemName() + "\n" + bid;
+                }
                 itemDisp.add(info);
             }
         }
     }
-    private void DisplayItem(){
-        if(selectedItem != null) {
-            itemID.setText("     Item ID: " + Integer.toString(selectedItem.getItemID()));
-            itemName.setText("     Item Name: " + selectedItem.getItemName());
-            currentPrice.setText("Current Bid: " + Double.toString(selectedItem.getBid().getCurrentBid()));
-            minBid.setText("Min Bid: " + Double.toString(selectedItem.getBid().getMinBid()));
+    public void DisplayItem(){
+        AuctionItem hold = items.get(selectedItem);
+        if(hold != null) {
+            if(hold.getBid().getBidState() == Bid.BidState.SOLD) {
+                currentPrice.setText("Current Bid: SOLD");
+                minBid.setText("Min Bid: SOLD");
+                bid.setDisable(true);
+            }else{
+                currentPrice.setText("Current Bid: " + Double.toString(hold.getBid().getCurrentBid()));
+                minBid.setText("Min Bid: " + Double.toString(hold.getBid().getMinBid()));
+                bid.setDisable(false);
+            }
+            itemID.setText("     Item ID: " + Integer.toString(hold.getItemID()));
+            itemName.setText("     Item Name: " + hold.getItemName());
         }else{
             System.out.println("no selected item");
         }
@@ -168,17 +180,23 @@ public class AuctionTab {
         items = newItems;
         itemDisp.clear();
         addItems();
+        DisplayItem();
     }
 
     /**
      * gets the selected item and returns it.
      * @return the selected item.
      */
-    public AuctionItem getSelectedItem(){return selectedItem;}
+    public AuctionItem getSelectedItem(){return items.get(selectedItem);}
     /**
      * allows the display to request the tab inorder to add it to the list of tabs
      * @return the tab
      */
     public Tab getTab(){return auctionHouse;}
-    public Double getProposedBid(){return Double.parseDouble(proposedBid.getText());}
+    public double getProposedBid(){
+        double bid = Double.parseDouble(proposedBid.getText())*100;
+        int holdBid = (int)bid;
+        bid = ((double) holdBid)/100;
+        proposedBid.setText(Double.toString(bid));
+        return bid;}
 }

@@ -56,6 +56,8 @@ public class BankTab {
         pending.setOrientation(Orientation.VERTICAL);
         purchases.setPrefSize(250,200);
         pending.setPrefSize(200,150);
+        pending.setItems(pendingDisp);
+        purchases.setItems(purchasedDisp);
         VBox transactions = new VBox();
         VBox transferHold = new VBox();
         transferHold.getChildren().addAll(pendingTransactions,pending,transfer);
@@ -149,16 +151,16 @@ public class BankTab {
     private void updatePurchased(){
         purchasedDisp.clear();
         for(AuctionItem item : purchased){
-            String info = item.getItemName() + "_" + item.getItemID()+"                                      -"+
-                    item.getBid();
+            String info = item.getItemName() + "_" + item.getItemID()+"                                            -"+
+                    item.getBid().getCurrentBid();
             purchasedDisp.add(info);
         }
     }
     private void updatePending(){
         pendingDisp.clear();
         for(AuctionItem item : pendingTransfer){
-            String info = item.getItemName() + "_" + item.getItemID()+"                                      -"+
-                    item.getBid();
+            String info = item.getItemName() + "_" + item.getItemID()+"                                            -"+
+                    item.getBid().getCurrentBid();
             pendingDisp.add(info);
         }
     }
