@@ -126,13 +126,15 @@ public class AuctionHouse {
 
 
         synchronized(auctionItem){
+
+
+
             if(itemOfInterest.getBid().getProposedBid() <
                     auctionItem.getBid().getMinBid()){
                 return Message.MessageIdentifier.BID_REJECTED_INADEQUATE;
             }
 
             if(!bankProxy.checkAgentFunds(itemOfInterest.getBid())){
-                System.out.println("Made it here");
                 return Message.MessageIdentifier.BID_REJECTED_NSF;
             }else{
                 oldAuctionItem = createCopyAuctionItem(auctionItem);
