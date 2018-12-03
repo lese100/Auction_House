@@ -53,7 +53,7 @@ public class BankProxy {
         Message<ArrayList<IDRecord>> reply;
         reply = sendMSG(message);
         if(reply != null){
-            if(reply.getMessageIdentifier() == Message.MessageIdentifier.AGENT_ACCT_CONFIRMED){
+            if(reply.getMessageIdentifier() == Message.MessageIdentifier.LIST_OF_AUCTION_HOUSES){
                 return reply.getMessageContent();
             }else if(reply.getMessageIdentifier() == Message.MessageIdentifier.CASE_NOT_FOUND){
                 System.out.println("bank missing list of Auction Houses");
