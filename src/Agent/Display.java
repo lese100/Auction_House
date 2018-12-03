@@ -37,6 +37,7 @@ public class Display {
         this.getBalance = getBalance;
         this.transfer = transfer;
         this.join = join;
+        currentTab = null;
         auctions = new HashMap<>();
         stage.setTitle("Agent Interface");
         tabs = new TabPane();
@@ -58,15 +59,23 @@ public class Display {
      */
     public void addAuctionTab(List<AuctionItem> items, IDRecord auctionHouse){
         AuctionTab auction = new AuctionTab(items,auctionHouse,bid,leaveAuc);
-        auctions.put(auctionHouse.getNumericalID(),auction);
+        tabs.getTabs().add(auction.getTab());
+        if(auctionHouse != null) {
+            auctions.put(auctionHouse.getNumericalID(), auction);
+        }
     }
     public AuctionItem getBid(){
-        AuctionTab tab = auctions.get(Integer.parseInt(currentTab.getId()));
-        AuctionItem item = tab.getSelectedItem();
-        Bid currentBid = item.getBid();
-        currentBid.setBidState(Bid.BidState.BIDDING);
-        currentBid.setProposedBid(tab.getProposedBid());
-        item.setBid(currentBid);
+        AuctionItem item = null;
+        if(currentTab.getId() != null) {
+            AuctionTab tab = auctions.get(Integer.parseInt(currentTab.getId()));
+            item = tab.getSelectedItem();
+            Bid currentBid = item.getBid();
+            currentBid.setBidState(Bid.BidState.BIDDING);
+            currentBid.setProposedBid(tab.getProposedBid());
+            item.setBid(currentBid);
+        }else{
+            System.out.println("Nothing to bid on");
+        }
         return item;
     }
     public void updateAuctionItems(AuctionHouseInventory update){

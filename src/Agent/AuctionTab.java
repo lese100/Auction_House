@@ -54,6 +54,11 @@ public class AuctionTab {
 
         auctionHouse = new Tab();
         auctionHouse.setClosable(false);
+        if(houseInfo == null){
+            auctionHouse.setId(null);
+        }else {
+            auctionHouse.setId(Integer.toString(houseInfo.getNumericalID()));
+        }
         if(houseInfo != null) {
             auctionHouse.setText(houseInfo.getName());
             auctionHouse.setId(Integer.toString(houseInfo.getNumericalID()));
@@ -126,10 +131,14 @@ public class AuctionTab {
         }
     }
     private void DisplayItem(){
-        itemID.setText("     Item ID: "+Integer.toString(selectedItem.getItemID()));
-        itemName.setText("     Item Name: "+selectedItem.getItemName());
-        currentPrice.setText("Current Bid: " + Double.toString(selectedItem.getBid().getCurrentBid()));
-        minBid.setText("Min Bid: "+Double.toString(selectedItem.getBid().getMinBid()));
+        if(selectedItem != null) {
+            itemID.setText("     Item ID: " + Integer.toString(selectedItem.getItemID()));
+            itemName.setText("     Item Name: " + selectedItem.getItemName());
+            currentPrice.setText("Current Bid: " + Double.toString(selectedItem.getBid().getCurrentBid()));
+            minBid.setText("Min Bid: " + Double.toString(selectedItem.getBid().getMinBid()));
+        }else{
+            System.out.println("no selected item");
+        }
     }
     /**
      * updates the display with any new items list

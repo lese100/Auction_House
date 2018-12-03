@@ -16,6 +16,9 @@ public class BankProxy {
     public BankProxy(String hostName, int port){
         try {
             coms = new CommunicationService(hostName, port);
+        }catch (ConnectException e){
+            System.out.println("connection to bank failed");
+            coms = null;
         }catch (IOException e){
             e.printStackTrace();
         }
@@ -35,18 +38,17 @@ public class BankProxy {
                 return reply.getMessageContent();
             }else if(reply.getMessageIdentifier() == Message.MessageIdentifier.CASE_NOT_FOUND){
                 System.out.println("bank missing create account");
-                myInfo.setNumericalID(11111);
-                return myInfo;
             }
         }
-        return null;
+        myInfo.setNumericalID(11111);
+        return myInfo;
     }
 
     /**
      * requests a list of auction houses available from the bank
      * @return List of auction houses and their info provided by the bank
      */
-    public ArrayList<IDRecord> getListOfAutionHouses(){
+    public ArrayList<IDRecord> getListOfAuctionHouses(){
         Message<ArrayList<IDRecord>> message = new Message(Message.MessageIdentifier.GET_LIST_OF_AUCTION_HOUSES, null);
         Message<ArrayList<IDRecord>> reply;
         reply = sendMSG(message);
@@ -123,10 +125,13 @@ public class BankProxy {
      */
     private Message sendMSG(Message message){
         Message reply = null;
-        try {
-            reply = coms.sendMessage(message);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(coms != null) {
+
+            try {
+                reply = coms.sendMessage(message);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return reply;
     }

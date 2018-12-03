@@ -138,7 +138,12 @@ public class Agent extends Application {
 
         bankProxy = new BankProxy(holdHost, holdPort);
         myRecords = bankProxy.createBankAccount(myRecords);
-        display.updateLabels(bankProxy.requestBalance(myRecords));
+        BankAccount me = bankProxy.requestBalance(myRecords);
+        if(me != null) {
+            display.updateLabels(me);
+        }else{
+            System.out.println("can't get balance");
+        }
 
         bid = new Button("Bid");
         leaveAuc = new Button("Leave");
@@ -153,19 +158,23 @@ public class Agent extends Application {
         /*event handlers*/
         bid.setOnAction(event -> {
             AuctionItem bid = display.getBid();
-            int id = bid.getHouseID();
-            AuctionHouseLink link = auctionHouses.get(id);
-            AuctionHouseProxy proxy = link.getProxy();
-            int secretKey = link.getSecretKey();
-            int response = proxy.makeBid(bid, secretKey);
-            if (response == 0) {
-                display.displayNotification("Bid Failed: Bid was to low");
-            } else if (response == 1) {
-                display.displayNotification("Bid Failed: Insufficient funds");
-            } else if (response == 2) {
-                display.displayNotification("Bid Accepted");
-            } else {
-                System.out.println("case not found for bid");
+            if(bid != null) {
+                int id = bid.getHouseID();
+                AuctionHouseLink link = auctionHouses.get(id);
+                AuctionHouseProxy proxy = link.getProxy();
+                int secretKey = link.getSecretKey();
+                int response = proxy.makeBid(bid, secretKey);
+                if (response == 0) {
+                    display.displayNotification("Bid Failed: Bid was to low");
+                } else if (response == 1) {
+                    display.displayNotification("Bid Failed: Insufficient funds");
+                } else if (response == 2) {
+                    display.displayNotification("Bid Accepted");
+                } else {
+                    System.out.println("case not found for bid");
+                }
+            }else{
+                System.out.println("Can't Bid");
             }
         });
         leaveAuc.setOnAction(event -> {
@@ -176,29 +185,44 @@ public class Agent extends Application {
         });
         getAuction.setOnAction(event -> {
             join.setDisable(false);
-            ArrayList<IDRecord> auctions = bankProxy.getListOfAutionHouses();
-            display.displayAuctionHouses(auctions);
+            ArrayList<IDRecord> auctions = bankProxy.getListOfAuctionHouses();
+            if(auctions != null) {
+                display.displayAuctionHouses(auctions);
+            }else{
+                System.out.println("can't get Auction");
+            }
         });
         getBalance.setOnAction(event -> {
             BankAccount info = bankProxy.requestBalance(myRecords);
-            display.updateLabels(info);
+            if(info != null) {
+                display.updateLabels(info);
+            }else{
+                System.out.println("can't get balance");
+            }
         });
         transfer.setOnAction(event -> {
             AuctionItem item = display.getSelectedTransfer();
             if (item != null) {
                 bankProxy.transferFunds(item);
+            }else{
+                System.out.println("can't Transfer Funds");
             }
         });
         join.setOnAction(event -> {
             IDRecord newAuctionHouse = display.getSelectedAuctionHouse();
             join.setDisable(true);
-            AuctionHouseProxy proxy = new AuctionHouseProxy(newAuctionHouse.getHostname(),
-                    newAuctionHouse.getPortNumber());
-            AccountLink link = new AccountLink(myRecords.getNumericalID(), newAuctionHouse.getNumericalID());
-            int secretKey = bankProxy.getSecretKey(link);
-            display.addAuctionTab(proxy.joinAH(myRecords, secretKey), newAuctionHouse);
-            AuctionHouseLink auctionInfo = new AuctionHouseLink(newAuctionHouse, secretKey, proxy);
-            auctionHouses.put(newAuctionHouse.getNumericalID(), auctionInfo);
+            if(newAuctionHouse != null) {
+                AuctionHouseProxy proxy = new AuctionHouseProxy(newAuctionHouse.getHostname(),
+                        newAuctionHouse.getPortNumber());
+                AccountLink link = new AccountLink(myRecords.getNumericalID(), newAuctionHouse.getNumericalID());
+                int secretKey = bankProxy.getSecretKey(link);
+                display.addAuctionTab(proxy.joinAH(myRecords, secretKey), newAuctionHouse);
+                AuctionHouseLink auctionInfo = new AuctionHouseLink(newAuctionHouse, secretKey, proxy);
+                auctionHouses.put(newAuctionHouse.getNumericalID(), auctionInfo);
+            }else{
+                display.addAuctionTab(null,null);
+                System.out.println("can't join auction house");
+            }
         });
     }
 }
