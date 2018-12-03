@@ -1,9 +1,6 @@
 package Bank;
 
-import Utility.AccountLink;
-import Utility.BankAccount;
-import Utility.CommunicationService;
-import Utility.IDRecord;
+import Utility.*;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -48,6 +45,7 @@ public class BankClientWithDisplay {
     private Label textLabelNonFrozen = new Label("unknown");
     private TextField textFieldAccountLinkAgent = new TextField("unknown");
     private TextField textFieldAccountLinkAH = new TextField("unknown");
+    private TextField textFieldAccountLinkSecretKey = new TextField("unknown");
     private TextArea textAreaOutput = new TextArea("Output Area");
 
     private boolean connectedToBank = false;
@@ -111,11 +109,19 @@ public class BankClientWithDisplay {
             new HBox(textLabelAccountLinkAH, textFieldAccountLinkAH);
         hBoxAccountLinkAH.setSpacing(10);
         hBoxAccountLinkAH.setAlignment(Pos.CENTER_LEFT);
+        Label textLabelAccountLinkSecretKey = new Label("AL secret key: ");
+        HBox hBoxAccountLinkSecretKey =
+            new HBox(textLabelAccountLinkSecretKey,
+                     textFieldAccountLinkSecretKey);
+        hBoxAccountLinkSecretKey.setSpacing(10);
+        hBoxAccountLinkSecretKey.setAlignment(Pos.CENTER_LEFT);
+
 
         vBox.getChildren().addAll(
             textLabelBank, hBoxBankHost, hBoxBankPort, hBoxAccountNumber,
             hBoxAccountType, hBoxTotalBalance, hBoxFrozen, hBoxNonFrozen,
-            textLabelAccountLink, hBoxAccountLinkAgent, hBoxAccountLinkAH);
+            textLabelAccountLink, hBoxAccountLinkAgent, hBoxAccountLinkAH,
+            hBoxAccountLinkSecretKey);
         vBox.setPadding(new Insets(10, 10, 10, 10));
         vBox.setSpacing(10);
 
@@ -247,11 +253,12 @@ public class BankClientWithDisplay {
                 });
                 break;
 
-            case "Freeze Funds":
+            case "Freeze $100":
                 button.setOnAction(new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent event) {
-                        System.out.println("Freezing Funds");
+                        System.out.println("Checking & Freezing Funds");
+                        checkAndFreezeFunds();
                     }
                 });
                 break;
@@ -451,6 +458,27 @@ public class BankClientWithDisplay {
         int aSecretKey = bankProxyForTesting.getSecretKey(theAccountLink);
         System.out.println("BCWD.getSecretKey(): The secret key is: " +
             aSecretKey);
+        textFieldAccountLinkSecretKey.setText("" + aSecretKey);
+    }
+
+    public void checkAndFreezeFunds() {
+        // use the current secret key field in display to generate
+        // a simulated Bid object
+        double minBid = 10.00;
+        double currentBid = 9.99;
+        int secretKey =
+            Integer.parseInt(textFieldAccountLinkSecretKey.getText());
+        double proposedBid = 100.00; // so we desire to freeze $100
+        Bid theBid = new Bid(minBid);
+        theBid.setBidState(Bid.BidState.BIDDING);
+        theBid.setCurrentBid(currentBid);
+        theBid.setSecretKey(secretKey);
+        theBid.setProposedBid(proposedBid);
+
+        boolean fundsFrozen = bankProxyForTesting.checkAndFreezeFunds(theBid);
+        System.out.println("BCWD.checkAndFreezeFunds(): fundFrozen = " +
+             fundsFrozen);
+
     }
 
     public void addFunds () {
