@@ -86,6 +86,28 @@ public class BankProxyForTesting {
         return reply.getMessageContent();
     }
 
+    public boolean checkAndFreezeFunds(Bid theBid) {
+        Message message = null;
+        Message reply = null;
+        try {
+            message =
+                new Message<>(Message.MessageIdentifier.CHECK_FUNDS,
+                    theBid);
+            reply = cs.sendMessage(message);
+
+        } catch( IOException ioe ) {
+            ioe.printStackTrace();
+        }
+
+        if ( reply.getMessageIdentifier() ==
+             Message.MessageIdentifier.CHECK_SUCCESS ) {
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public String sendTestMessage () {
         Message message = null;
         try {
