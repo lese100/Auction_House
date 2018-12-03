@@ -16,9 +16,33 @@ public class AgentProxy {
 
     private CommunicationService cs;
 
+    // ****************************** //
+    //   Constructor(s)               //
+    // ****************************** //
+
     public AgentProxy(CommunicationService cs){
         this.cs = cs;
     }
+
+    // ****************************** //
+    //   Private Methods              //
+    // ****************************** //
+
+    private Message sendMsg(Message message){
+        Message<IDRecord> returnMessage = null;
+
+        try{
+            returnMessage = cs.sendMessage(message);
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+
+        return returnMessage;
+    }
+
+    // ****************************** //
+    //   Public Methods               //
+    // ****************************** //
 
     public void notifyOutbidded(AuctionItem ai){
 
@@ -33,28 +57,9 @@ public class AgentProxy {
 
     }
 
-    public void testFoo(){
-        System.out.println("FOOOOOO");
-    }
-
     public void notifyWinner(AuctionItem ai) {
 
         sendMsg(new Message<AuctionItem>
                 (Message.MessageIdentifier.BID_WON, ai));
     }
-
-    private Message sendMsg(Message message){
-        Message<IDRecord> returnMessage = null;
-
-        try{
-            returnMessage = cs.sendMessage(message);
-        }catch(IOException e){
-            e.printStackTrace();
-        }
-
-        return returnMessage;
-    }
-
-
-
 }

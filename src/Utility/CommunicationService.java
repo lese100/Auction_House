@@ -59,6 +59,7 @@ public class CommunicationService {
         Message msg = null;
         out.writeObject(message);
         out.flush();
+        out.reset();
 
         try {
             msg =  (Message) in.readObject();

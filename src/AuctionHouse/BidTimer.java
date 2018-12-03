@@ -20,6 +20,10 @@ public class BidTimer implements Runnable{
     private boolean stillValid;
     private AuctionHouse ah;
 
+    // ****************************** //
+    //   Constructor(s)               //
+    // ****************************** //
+
     public BidTimer(long time, AgentProxy ap, AuctionItem ai, AuctionHouse ah){
         this.TIME = time;
         this.ap = ap;
@@ -27,13 +31,25 @@ public class BidTimer implements Runnable{
         this.ah = ah;
         stillValid = true;
     }
+    // ****************************** //
+    //   Public Methods               //
+    // ****************************** //
 
+    public void cancelTimer(){
+        stillValid = false;
+    }
+
+    // ****************************** //
+    //   Override Methods             //
+    // ****************************** //
 
     @Override
     public void run() {
         try{
             Thread.sleep(TIME);
+            System.out.println("Bid timer done:");
             if(stillValid){
+                System.out.println("Bid timer actions");
                 ap.notifyWinner(ai);
                 ai.getBid().setBidState(Bid.BidState.SOLD);
                 ah.updateDisplay();
@@ -41,13 +57,5 @@ public class BidTimer implements Runnable{
         }catch(InterruptedException e){
             e.printStackTrace();
         }
-
-
     }
-
-    public void cancelTimer(){
-        stillValid = false;
-    }
-
-
 }

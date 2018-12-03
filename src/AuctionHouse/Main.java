@@ -23,6 +23,10 @@ public class Main extends Application {
 
     private static AuctionHouse auctionHouse;
 
+    // ****************************** //
+    //   Main Method                  //
+    // ****************************** //
+
     public static void main(String[] args){
 
         /*String hostname = "Unknown";
@@ -40,6 +44,47 @@ public class Main extends Application {
         }*/
         launch(args);
 
+    }
+
+    // ****************************** //
+    //   Private Methods              //
+    // ****************************** //
+
+    private static void createAuctionHouse(AuctionDisplay display,
+                                           String auctionHouseName,
+                                           String auctionHouseHostName,
+                                           int auctionHousePort,
+                                           String bankHostName,
+                                           int bankPort) {
+
+        try{
+            auctionHouse = new AuctionHouse(display,
+                    auctionHouseName, auctionHouseHostName, auctionHousePort,
+                    bankHostName, bankPort);
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    /*    private static String getComputerName()
+    {
+        Map<String, String> env = System.getenv();
+        if (env.containsKey("COMPUTERNAME"))
+            return env.get("COMPUTERNAME");
+        else if (env.containsKey("HOSTNAME"))
+            return env.get("HOSTNAME");
+        else
+            return "Unknown Computer";
+    }*/
+
+    // ****************************** //
+    //   Override Methods             //
+    // ****************************** //
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        System.exit(0);
     }
 
     @Override
@@ -65,38 +110,4 @@ public class Main extends Application {
         auctionDisplay.setupAHInitializeButton(createAuctionHouse);
 
     }
-
-    private static void createAuctionHouse(AuctionDisplay display,
-                                           String auctionHouseName,
-                                           String auctionHouseHostName,
-                                           int auctionHousePort,
-                                           String bankHostName,
-                                           int bankPort) {
-
-        try{
-            auctionHouse = new AuctionHouse(display,
-                    auctionHouseName, auctionHouseHostName, auctionHousePort,
-                    bankHostName, bankPort);
-        }catch(IOException e){
-            e.printStackTrace();
-        }
-
-    }
-
-    @Override
-    public void stop() throws Exception {
-        super.stop();
-        System.exit(0);
-    }
-
-/*    private static String getComputerName()
-    {
-        Map<String, String> env = System.getenv();
-        if (env.containsKey("COMPUTERNAME"))
-            return env.get("COMPUTERNAME");
-        else if (env.containsKey("HOSTNAME"))
-            return env.get("HOSTNAME");
-        else
-            return "Unknown Computer";
-    }*/
 }

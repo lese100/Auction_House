@@ -48,6 +48,10 @@ public class AuctionDisplay {
     private DecimalFormat df;
 
 
+    // ****************************** //
+    //   Constructor(s)               //
+    // ****************************** //
+
     public AuctionDisplay(Stage window){
         this.window = window;
 
@@ -55,6 +59,11 @@ public class AuctionDisplay {
 
         initializeDisplay();
     }
+
+
+    // ****************************** //
+    //   Private Methods              //
+    // ****************************** //
 
     private void initializeDisplay(){
         window.setMinHeight(200);
@@ -123,25 +132,16 @@ public class AuctionDisplay {
 
     }
 
-    public String getAuctionHouseName() {
-        return auctionHouseName.getText().trim();
+    private void displayErrorMessage(String errorMessage){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setContentText(errorMessage);
+        alert.show();
     }
 
-    public String getAuctionHouseHostName() {
-        return auctionHouseHostName.getText().trim();
-    }
 
-    public int getAuctionHousePort() {
-        return Integer.parseInt(auctionHousePort.getText());
-    }
-
-    public String getBankHostName() {
-        return bankHostName.getText().trim();
-    }
-
-    public int getBankPort() {
-        return Integer.parseInt(bankPort.getText().trim());
-    }
+    // ****************************** //
+    //   Public Methods               //
+    // ****************************** //
 
     public boolean infoFilledOut(){
         boolean infoFilledOut = true;
@@ -159,8 +159,8 @@ public class AuctionDisplay {
         }*/
 
         try{
-           Integer.parseInt(auctionHousePort.getText().trim());
-           Integer.parseInt(bankPort.getText().trim());
+            Integer.parseInt(auctionHousePort.getText().trim());
+            Integer.parseInt(bankPort.getText().trim());
         }catch(NumberFormatException e){
             displayErrorMessage("Number Expected in Port Number Fields");
             infoFilledOut = false;
@@ -218,12 +218,6 @@ public class AuctionDisplay {
         newWindow.show();
     }
 
-    private void displayErrorMessage(String errorMessage){
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setContentText(errorMessage);
-        alert.show();
-    }
-
     public void setupAHInitializeButton(Button createAuctionHouse){
         gridPane.add(createAuctionHouse, 1, 5);
     }
@@ -250,6 +244,31 @@ public class AuctionDisplay {
     public void updateConsoleDisplay(String message){
         consoleText += "\n" + message;
         consoleTextArea.setText(consoleText);
+    }
+
+
+    // ****************************** //
+    //   Getter(s) & Setter(s)        //
+    // ****************************** //
+
+    public String getAuctionHouseName() {
+        return auctionHouseName.getText().trim();
+    }
+
+    public String getAuctionHouseHostName() {
+        return auctionHouseHostName.getText().trim();
+    }
+
+    public int getAuctionHousePort() {
+        return Integer.parseInt(auctionHousePort.getText());
+    }
+
+    public String getBankHostName() {
+        return bankHostName.getText().trim();
+    }
+
+    public int getBankPort() {
+        return Integer.parseInt(bankPort.getText().trim());
     }
 
 }

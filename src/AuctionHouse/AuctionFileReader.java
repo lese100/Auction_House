@@ -47,6 +47,10 @@ public class AuctionFileReader {
         openFile(file);
     }
 
+    // ****************************** //
+    //   Private Methods              //
+    // ****************************** //
+
     /**
      * Opens a file as a stream, then passes that stream to a buffered reader
      * to allow for future string parsing.
@@ -81,6 +85,10 @@ public class AuctionFileReader {
         }
 
     }
+
+    // ****************************** //
+    //   Public Methods               //
+    // ****************************** //
 
     /**
      * Returns whether or not the input stream was able to find a file with

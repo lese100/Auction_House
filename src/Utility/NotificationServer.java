@@ -122,6 +122,7 @@ public class NotificationServer implements Runnable {
 
                     out.writeObject(replyMessage);
                     out.flush();
+                    out.reset();
 
                 }catch(ClassNotFoundException cnf){
                     cnf.printStackTrace();

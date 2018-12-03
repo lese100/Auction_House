@@ -34,6 +34,10 @@ public class AuctionHouse {
     private List<AuctionItem> auctions;
     private Map<Integer, AgentProxy> connectedAgents;
 
+    // ****************************** //
+    //   Constructor(s)               //
+    // ****************************** //
+
     public AuctionHouse(AuctionDisplay display, String name, String hostName,
                         int port, String bankHostName, int bankPort)
             throws IOException {
@@ -86,93 +90,9 @@ public class AuctionHouse {
         notificationServer.start();
     }
 
-    public void joinAuctionHouse(IDRecord agentInfo) throws IOException{
-        display.updateConsoleDisplay("Agent \"" + agentInfo.getName() + "\" " +
-                "connected to this Auction House" +
-                " — Host: " + agentInfo.getHostname() + " Port: " +
-                agentInfo.getPortNumber());
-
-        CommunicationService cs = new CommunicationService
-                (agentInfo.getHostname(), agentInfo.getPortNumber());
-
-        display.updateConsoleDisplay("Connected to Agent \"" +
-                agentInfo.getName() + "\"'s Notification Server" +
-                " — Host: " + agentInfo.getHostname() + " Port: " +
-                agentInfo.getPortNumber());
-
-        AgentProxy ap = new AgentProxy(cs);
-
-        connectedAgents.put(agentInfo.getNumericalID(), ap);
-    }
-
-    public List<AuctionItem> getAuctions(){
-        return auctions;
-    }
-
-    public IDRecord getIdRecord(){
-        return idRecord;
-    }
-
-    public void updateDisplay(){
-        display.updateAuctionItemDisplay(auctions);
-        System.out.println("just called");
-    }
-
-    public Message.MessageIdentifier makeBid
-            (AuctionItem itemOfInterest) throws IOException{
-
-        AuctionItem auctionItem = findMatchingAuctionItem(itemOfInterest);
-        AuctionItem oldAuctionItem;
-
-
-        synchronized(auctionItem){
-
-
-
-            if(itemOfInterest.getBid().getProposedBid() <
-                    auctionItem.getBid().getMinBid()){
-                return Message.MessageIdentifier.BID_REJECTED_INADEQUATE;
-            }
-
-            if(!bankProxy.checkAgentFunds(itemOfInterest.getBid())){
-                return Message.MessageIdentifier.BID_REJECTED_NSF;
-            }else{
-                oldAuctionItem = createCopyAuctionItem(auctionItem);
-
-                //Updates auction item's current bidder
-                auctionItem.getBid().setSecretKey
-                        (itemOfInterest.getBid().getSecretKey());
-                //Updates auction item's current high bid
-                auctionItem.getBid().setCurrentBid
-                        (itemOfInterest.getBid().getProposedBid());
-                //Updates auction item's new min bid
-                auctionItem.getBid().setMinBid
-                        (itemOfInterest.getBid().getProposedBid() + .01);
-                //Updates auction item's bid state
-                auctionItem.getBid().setBidState(Bid.BidState.BIDDING);
-            }
-        }
-
-        //updates the AH server gui
-        updateDisplay();
-
-        updateAgentsAboutChanges();
-
-
-        auctionItem.startTimer(BID_TIMER,
-                connectedAgents.get(auctionItem.getBid().getSecretKey()), this);
-
-        //if true, there was a previous bidder, so they are notified about
-        //being outbidded. The bank then unfreezes their funds.
-        if(oldAuctionItem.getBid().getSecretKey() != 0){
-            connectedAgents.get(oldAuctionItem.getBid().getSecretKey()).
-                    notifyOutbidded(oldAuctionItem);
-
-            bankProxy.unfreezeAgentFunds(oldAuctionItem.getBid());
-        }
-
-        return Message.MessageIdentifier.BID_ACCEPTED;
-    }
+    // ****************************** //
+    //   Private Methods              //
+    // ****************************** //
 
     private void updateAgentsAboutChanges(){
         AuctionHouseInventory ahi =
@@ -298,4 +218,101 @@ public class AuctionHouse {
                     "\t ITEM NAME: " + ai.getItemName());
         }
     }
+
+    // ****************************** //
+    //   Public Methods               //
+    // ****************************** //
+
+    public void joinAuctionHouse(IDRecord agentInfo) throws IOException{
+        display.updateConsoleDisplay("Agent \"" + agentInfo.getName() + "\" " +
+                "connected to this Auction House" +
+                " — Host: " + agentInfo.getHostname() + " Port: " +
+                agentInfo.getPortNumber());
+
+        CommunicationService cs = new CommunicationService
+                (agentInfo.getHostname(), agentInfo.getPortNumber());
+
+        display.updateConsoleDisplay("Connected to Agent \"" +
+                agentInfo.getName() + "\"'s Notification Server" +
+                " — Host: " + agentInfo.getHostname() + " Port: " +
+                agentInfo.getPortNumber());
+
+        AgentProxy ap = new AgentProxy(cs);
+
+        connectedAgents.put(agentInfo.getNumericalID(), ap);
+    }
+
+
+    public void updateDisplay(){
+        display.updateAuctionItemDisplay(auctions);
+    }
+
+    public Message.MessageIdentifier makeBid
+            (AuctionItem itemOfInterest) throws IOException{
+
+        AuctionItem auctionItem = findMatchingAuctionItem(itemOfInterest);
+        AuctionItem oldAuctionItem;
+
+
+        synchronized(auctionItem){
+
+
+
+            if(itemOfInterest.getBid().getProposedBid() <
+                    auctionItem.getBid().getMinBid()){
+                return Message.MessageIdentifier.BID_REJECTED_INADEQUATE;
+            }
+
+            if(!bankProxy.checkAgentFunds(itemOfInterest.getBid())){
+                return Message.MessageIdentifier.BID_REJECTED_NSF;
+            }else{
+                oldAuctionItem = createCopyAuctionItem(auctionItem);
+
+                //Updates auction item's current bidder
+                auctionItem.getBid().setSecretKey
+                        (itemOfInterest.getBid().getSecretKey());
+                //Updates auction item's current high bid
+                auctionItem.getBid().setCurrentBid
+                        (itemOfInterest.getBid().getProposedBid());
+                //Updates auction item's new min bid
+                auctionItem.getBid().setMinBid
+                        (itemOfInterest.getBid().getProposedBid() + .01);
+                //Updates auction item's bid state
+                auctionItem.getBid().setBidState(Bid.BidState.BIDDING);
+            }
+        }
+
+        //updates the AH server gui
+        updateDisplay();
+
+        updateAgentsAboutChanges();
+
+        auctionItem.startTimer(BID_TIMER,
+                connectedAgents.get(auctionItem.getBid().getSecretKey()), this);
+
+        //if true, there was a previous bidder, so they are notified about
+        //being outbidded. The bank then unfreezes their funds.
+        if(oldAuctionItem.getBid().getSecretKey() != 0){
+            connectedAgents.get(oldAuctionItem.getBid().getSecretKey()).
+                    notifyOutbidded(oldAuctionItem);
+
+            bankProxy.unfreezeAgentFunds(oldAuctionItem.getBid());
+        }
+
+        return Message.MessageIdentifier.BID_ACCEPTED;
+    }
+
+
+    // ****************************** //
+    //   Getter(s) & Setter(s)        //
+    // ****************************** //
+
+    public List<AuctionItem> getAuctions(){
+        return auctions;
+    }
+
+    public IDRecord getIdRecord(){
+        return idRecord;
+    }
+
 }

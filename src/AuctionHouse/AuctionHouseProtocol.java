@@ -16,9 +16,17 @@ public class AuctionHouseProtocol implements PublicAuctionProtocol {
 
     private AuctionHouse auctionHouse;
 
+    // ****************************** //
+    //   Constructor(s)               //
+    // ****************************** //
+
     public AuctionHouseProtocol(AuctionHouse auctionHouse){
         this.auctionHouse = auctionHouse;
     }
+
+    // ****************************** //
+    //   Override Methods             //
+    // ****************************** //
 
     @Override
     public Message handleMessage(Message message) {
@@ -45,6 +53,8 @@ public class AuctionHouseProtocol implements PublicAuctionProtocol {
                 case MAKE_BID:
                     AuctionItem ai = (AuctionItem) message.getMessageContent();
 
+                    System.out.println("PROPOSED BID: " + ai.getBid().getProposedBid());
+
                     Message.MessageIdentifier msgID = auctionHouse.makeBid(ai);
 
                     reply = new Message<>(msgID, null);
@@ -57,10 +67,6 @@ public class AuctionHouseProtocol implements PublicAuctionProtocol {
         }catch(IOException e){
             e.printStackTrace();
         }
-
-
-
-
 
         return reply;
     }

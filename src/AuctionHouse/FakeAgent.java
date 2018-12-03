@@ -65,8 +65,23 @@ public class FakeAgent {
 
         System.out.println(reply1.getMessageIdentifier());
 
+        ai.getBid().setProposedBid(999.99);
 
-        AuctionItem ai1 = ahi.getAuctions().get(1);
+        System.out.println(ai.getBid().getProposedBid());
+
+        makeBidMessage = new Message<>(Message.MessageIdentifier.MAKE_BID, ai);
+
+        reply1 = null;
+        try{
+            reply1 = cs.sendMessage(makeBidMessage);
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+
+        System.out.println(reply1.getMessageIdentifier());
+
+
+        /*AuctionItem ai1 = ahi.getAuctions().get(1);
         ai1.getBid().setSecretKey(334);
         ai1.getBid().setProposedBid(999.99);
 
@@ -79,7 +94,7 @@ public class FakeAgent {
             e.printStackTrace();
         }
 
-        System.out.println(reply2.getMessageIdentifier());
+        System.out.println(reply2.getMessageIdentifier());*/
 
     }
 }
