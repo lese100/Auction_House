@@ -50,10 +50,16 @@ public class Main extends Application {
         theBankDisplay.setupBankInitializeButton(btnCreateBank);
     }
 
-    private static void createBank( String bankName,
-                                    String hostName,
-                                    int portNumber,
-                                    BankDisplay theBankDisplay) {
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        System.exit(0);
+    }
+
+    private static void createBank(String bankName,
+                                   String hostName,
+                                   int portNumber,
+                                   BankDisplay theBankDisplay) {
         theBank = new Bank( bankName, hostName, portNumber,
             theBankDisplay);
 

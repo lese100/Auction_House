@@ -1,5 +1,7 @@
 package Utility;
 
+import java.io.Serializable;
+
 /**
  * Provides a simple structure for linking two integer account numbers,
  * originally intended to allow the linking of an Agent's Bank account number
@@ -8,12 +10,12 @@ package Utility;
  * integer values. This simple structure is useful when needing a pair of
  * accounts to both be values for an associated key value in a HashMap.
  * created: 11/29/18 by wdc
- * last modified: 11/29/18 by wdc
+ * last modified: 12/02/18 by wdc (making Serializable)
  * @author Liam Brady (lb)
  * @author Warren D. Craft
  * @author Tyler Fenske (thf)
  */
-public class AccountLink {
+public class AccountLink implements Serializable {
 
     private final int AGENT_ACCOUNT_NUMBER;
     private final int AH_ACCOUNT_NUMBER;
