@@ -11,53 +11,61 @@ import javafx.stage.Stage;
 import Utility.*;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Agent extends Application {
-    private int holdPort,holdMyPort;
+    private int holdPort, holdMyPort;
     private String holdHost, localHost;
     private IDRecord myRecords;
     private Display display;
-    private HashMap<Integer,AuctionHouseLink> auctionHouses;
-    private Button bid,leaveAuc,leaveBank,getAuction,getBalance,transfer,join;
+    private HashMap<Integer, AuctionHouseLink> auctionHouses;
+    private Button bid, leaveAuc, leaveBank, getAuction, getBalance, transfer, join;
     private BankProxy bankProxy;
 
     /**
      * initial constructor
      */
-    public Agent(){
+    public Agent() {
     }
 
     /**
      * Sets up the user port and makes its protocol and establishes its
      * notification server to receive update messages.
+     *
      * @param port the port im going to run my client on
      */
-    public Agent(int port){
+    public Agent(int port) {
         AgentProtocol protocol = new AgentProtocol(this);
         auctionHouses = new HashMap<>();
         try {
             NotificationServer notificationserver = new NotificationServer(port, protocol);
             Thread t = new Thread(notificationserver);
             t.start();
-        }catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    public void addTransferItem(AuctionItem item){display.addTransferItem(item);}
-    public void itemsUpdate(AuctionHouseInventory newInventory){
+
+    public void addTransferItem(AuctionItem item) {
+        display.addTransferItem(item);
+    }
+
+    public void itemsUpdate(AuctionHouseInventory newInventory) {
         display.updateAuctionItems(newInventory);
     }
+
     /**
      * closes everything when exiting the main menu
      */
     @Override
-    public void stop(){
+    public void stop() {
         System.exit(1);
     }
+
     @Override
     public void start(Stage stage) {
         Stage inputs = new Stage();
@@ -75,15 +83,15 @@ public class Agent extends Application {
         final TextField myHostName = new TextField("localhost");
         Button submit = new Button("Submit");
 
-        grid.add(myPort,0,0);
-        grid.add(myPortNum,1,0);
-        grid.add(host,0,1);
-        grid.add(port,0,2);
-        grid.add(hostName,1,1);
-        grid.add(portNum,1,2);
-        grid.add(myHost,0,3);
-        grid.add(myHostName,1,3);
-        grid.add(submit,1,4);
+        grid.add(myPort, 0, 0);
+        grid.add(myPortNum, 1, 0);
+        grid.add(host, 0, 2);
+        grid.add(port, 0, 3);
+        grid.add(hostName, 1, 2);
+        grid.add(portNum, 1, 3);
+        grid.add(myHost, 0, 1);
+        grid.add(myHostName, 1, 1);
+        grid.add(submit, 1, 4);
 
         Scene scene = new Scene(grid, 240, 120);
         submit.setOnAction(event -> {
@@ -98,7 +106,6 @@ public class Agent extends Application {
         holdPort = Integer.parseInt(portNum.getText());
         localHost = myHostName.getText();
 
-
         Agent agent = new Agent(holdMyPort);
         Stage create = new Stage();
         create.setTitle("Connect");
@@ -112,11 +119,11 @@ public class Agent extends Application {
         final TextField balance = new TextField("2500");
         Button account = new Button("Create Account");
 
-        grid2.add(user,0,0);
-        grid2.add(name,1,0);
-        grid2.add(deposit,0,1);
-        grid2.add(balance,1,1);
-        grid2.add(account,1,2);
+        grid2.add(user, 0, 0);
+        grid2.add(name, 1, 0);
+        grid2.add(deposit, 0, 1);
+        grid2.add(balance, 1, 1);
+        grid2.add(account, 1, 2);
 
         Scene scene2 = new Scene(grid2, 240, 75);
         account.setOnAction(event -> create.close());
@@ -126,10 +133,13 @@ public class Agent extends Application {
         create.showAndWait();
 
         /*connect to the bank*/
-        myRecords = new IDRecord(IDRecord.RecordType.AGENT,name.getText(),Integer.parseInt(balance.getText()),
-                localHost,holdMyPort);
-        //bankProxy = new BankProxy(holdHost,holdPort);
-        //myRecords = bank.createBankAccount(myRecords);
+        myRecords = new IDRecord(IDRecord.RecordType.AGENT, name.getText(), Integer.parseInt(balance.getText()),
+                localHost, holdMyPort);
+
+        bankProxy = new BankProxy(holdHost, holdPort);
+        myRecords = bankProxy.createBankAccount(myRecords);
+        display.updateLabels(bankProxy.requestBalance(myRecords));
+
         bid = new Button("Bid");
         leaveAuc = new Button("Leave");
         leaveBank = new Button("Leave");
@@ -138,7 +148,7 @@ public class Agent extends Application {
         transfer = new Button("Transfer Funds");
         join = new Button("Join");
         join.setDisable(true);
-        display = new Display(stage,myRecords,bid,leaveAuc,leaveBank,getAuction,getBalance,transfer,join);
+        display = new Display(stage, myRecords, bid, leaveAuc, leaveBank, getAuction, getBalance, transfer, join);
 
         /*event handlers*/
         bid.setOnAction(event -> {
@@ -147,14 +157,14 @@ public class Agent extends Application {
             AuctionHouseLink link = auctionHouses.get(id);
             AuctionHouseProxy proxy = link.getProxy();
             int secretKey = link.getSecretKey();
-            int response = proxy.makeBid(bid,secretKey);
-            if(response == 0){
+            int response = proxy.makeBid(bid, secretKey);
+            if (response == 0) {
                 display.displayNotification("Bid Failed: Bid was to low");
-            }else if(response == 1){
+            } else if (response == 1) {
                 display.displayNotification("Bid Failed: Insufficient funds");
-            }else if(response == 2){
+            } else if (response == 2) {
                 display.displayNotification("Bid Accepted");
-            }else{
+            } else {
                 System.out.println("case not found for bid");
             }
         });
@@ -175,7 +185,7 @@ public class Agent extends Application {
         });
         transfer.setOnAction(event -> {
             AuctionItem item = display.getSelectedTransfer();
-            if(item != null) {
+            if (item != null) {
                 bankProxy.transferFunds(item);
             }
         });
@@ -184,11 +194,11 @@ public class Agent extends Application {
             join.setDisable(true);
             AuctionHouseProxy proxy = new AuctionHouseProxy(newAuctionHouse.getHostname(),
                     newAuctionHouse.getPortNumber());
-            AccountLink link = new AccountLink(myRecords.getNumericalID(),newAuctionHouse.getNumericalID());
+            AccountLink link = new AccountLink(myRecords.getNumericalID(), newAuctionHouse.getNumericalID());
             int secretKey = bankProxy.getSecretKey(link);
-            display.addAuctionTab(proxy.joinAH(myRecords,secretKey),newAuctionHouse);
-            AuctionHouseLink auctionInfo = new AuctionHouseLink(newAuctionHouse,secretKey,proxy);
-            auctionHouses.put(newAuctionHouse.getNumericalID(),auctionInfo);
+            display.addAuctionTab(proxy.joinAH(myRecords, secretKey), newAuctionHouse);
+            AuctionHouseLink auctionInfo = new AuctionHouseLink(newAuctionHouse, secretKey, proxy);
+            auctionHouses.put(newAuctionHouse.getNumericalID(), auctionInfo);
         });
     }
 }

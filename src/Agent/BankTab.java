@@ -111,7 +111,7 @@ public class BankTab {
 
         VBox userInfo = new VBox();
         HBox balance = new HBox();
-        balance.getChildren().addAll(totalBal,frozenBal);
+        balance.getChildren().addAll(totalBal,frozenBal,getBalance);
         userInfo.getChildren().addAll(name,accuountNum,balance);
 
         VBox centerHold = new VBox();

@@ -2,6 +2,7 @@ package Agent;
 import Utility.*;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.util.ArrayList;
 
 public class BankProxy {
