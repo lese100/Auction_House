@@ -47,6 +47,7 @@ public class AuctionTab {
         pane = new BorderPane();
         pane.setLeft(list);
 
+        selectedItem = null;
         this.items = items;
         this.bid = bid;
         this.leave = leave;

@@ -54,6 +54,9 @@ public class AuctionHouseProxy {
         Bid oldBid = item.getBid();
         oldBid.setSecretKey(secretKey);
         item.setBid(oldBid);
+        System.out.println("Proposed:"+oldBid.getProposedBid());
+        System.out.println("min:" + oldBid.getMinBid());
+        System.out.println("current:" + oldBid.getCurrentBid());
         Message<AuctionItem> message = new Message<>(Message.MessageIdentifier.MAKE_BID,item);
         Message<String> reply = sendMSG(message);
         switch( reply.getMessageIdentifier() ) {

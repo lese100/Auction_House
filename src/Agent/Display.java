@@ -70,10 +70,14 @@ public class Display {
         if(currentTab.getId() != null) {
             AuctionTab tab = auctions.get(Integer.parseInt(currentTab.getId()));
             item = tab.getSelectedItem();
-            Bid currentBid = item.getBid();
-            currentBid.setBidState(Bid.BidState.BIDDING);
-            currentBid.setProposedBid(tab.getProposedBid());
-            item.setBid(currentBid);
+            if(item != null) {
+                Bid currentBid = item.getBid();
+                currentBid.setBidState(Bid.BidState.BIDDING);
+                currentBid.setProposedBid(tab.getProposedBid());
+                item.setBid(currentBid);
+            }else{
+                System.out.println("Nothing to bid on");
+            }
         }else{
             System.out.println("Nothing to bid on");
         }
