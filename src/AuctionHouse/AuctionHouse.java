@@ -2,7 +2,6 @@ package AuctionHouse;
 
 import Utility.*;
 
-
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -10,6 +9,20 @@ import java.net.ConnectException;
 import java.net.SocketException;
 import java.util.*;
 
+/**
+ * Provides the structure and functionality of a simulated AuctionHouse
+ * accessible to Agents. Creates, then keeps track of AuctionItems and their
+ * associated Bid objects. An AuctionHouse connects with a Bank to establish
+ * a BankAccount, where it stores it's funds from selling AuctionItems to
+ * Agents. Connected Agents can bid on AuctionItems if they have sufficient
+ * funds to do so.
+ * created: 11/30/18 by thf
+ * last modified: 12/02/18 by thf
+ * previously modified: 12/02/18 by thf
+ * @author Liam Brady
+ * @author Warren D. Craft (wdc)
+ * @author Tyler Fenske (thf)
+ */
 public class AuctionHouse {
 
     private final int NUM_AUCTION_ITEMS = 15;

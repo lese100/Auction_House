@@ -4,6 +4,14 @@ import Utility.*;
 
 import java.io.IOException;
 
+/**
+ * Message-handling protocol for messages received by a AuctionHouse from an
+ * Agent or Bank.
+ * created: 11/30/18 by thf
+ * last modified: 12/02/18 by thf
+ * @author Liam Brady (lb)
+ * @author Warren D Craft (wdc)
+ * @author Tyler Fenske (thf)*/
 public class AuctionHouseProtocol implements PublicAuctionProtocol {
 
     private AuctionHouse auctionHouse;

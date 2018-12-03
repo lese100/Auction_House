@@ -2,6 +2,16 @@ package AuctionHouse;
 
 import java.io.*;
 
+/**
+ * Provides a class that can read in txt files (even when the program is run
+ * from a jar) from the resource folder, and allows for line by line access
+ * of each file. Does this by opening a BufferedReader on the file.
+ * created: 12/01/2018 by thf
+ * last modified: 12/02/2018 by thf
+ * @author Liam Brady (lb)
+ * @author Warren D. Craft
+ * @author Tyler Fenske (thf)
+ */
 public class AuctionFileReader {
 
     //BufferedReader object allows reading over a file character by

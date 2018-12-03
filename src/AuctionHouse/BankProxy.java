@@ -5,6 +5,15 @@ import Utility.*;
 import java.io.IOException;
 import java.util.Random;
 
+/**
+ * A Bank Client to mediate communications with a Bank. Communicates with the
+ * Bank by sending serialized messages through a CommunicationService.
+ * created: 11/30/18 by thf
+ * last modified: 12/02/18 by thf
+ * @author Liam Brady (lb)
+ * @author Warren D. Craft (wdc)
+ * @author Tyler Fenske (thf)
+ */
 public class BankProxy {
 
     private CommunicationService cs;
