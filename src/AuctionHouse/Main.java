@@ -3,12 +3,22 @@ package AuctionHouse;
 import javafx.application.Application;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Map;
 
+/**
+ * The Main class within the AuctionHouse package, providing the construction
+ * of an AuctionHouse object. Run this to set up an AuctionHouse and
+ * open it for business.
+ * created: 11/30/18 by thf
+ * last modified: 12/02/18 by thf
+ * previously modified: 12/02/18 by thf
+ * @author Liam Brady (lb)
+ * @author Warren D. Craft (wdc)
+ * @author Tyler Fenske (thf)
+ */
 public class Main extends Application {
 
     private static AuctionHouse auctionHouse;

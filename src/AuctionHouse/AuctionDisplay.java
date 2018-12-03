@@ -12,6 +12,20 @@ import javafx.stage.Stage;
 import java.text.DecimalFormat;
 import java.util.List;
 
+/**
+ * Provides a 2-phase GUI display for an AuctionHouse.
+ * (1) Phase 1 is a window in which the user can specify info about the
+ *     AuctionHouse and use that info to construct a AuctionHouse as well
+ *     as connect to the Bank.
+ * (2) Phase 2 is then a final window that represents the established,
+ *     working AuctionHouse and displays information about the AuctionHouse
+ *     and contained AuctionItems.
+ * created: 11/30/2018 by thf
+ * last modified: 12/02/2018 by thf
+ * @author Liam Brady (lb)
+ * @author Warren D. Craft
+ * @author Tyler Fenske (thf)
+ */
 public class AuctionDisplay {
 
 

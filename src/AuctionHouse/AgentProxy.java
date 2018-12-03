@@ -3,6 +3,15 @@ import Utility.*;
 
 import java.io.IOException;
 
+/**
+ * An Agent Client to mediate communications with an Agent. Communicates with
+ * the Agent by sending serialized messages through a CommunicationService.
+ * created: 11/30/18 by thf
+ * last modified: 12/02/18 by thf
+ * @author Liam Brady (lb)
+ * @author Warren D. Craft (wdc)
+ * @author Tyler Fenske (thf)
+ */
 public class AgentProxy {
 
     private CommunicationService cs;
