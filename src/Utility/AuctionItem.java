@@ -3,6 +3,7 @@ package Utility;
 import java.io.Serializable;
 
 import AuctionHouse.AgentProxy;
+import AuctionHouse.AuctionHouse;
 import AuctionHouse.BidTimer;
 import Utility.Bid.BidState;
 /**
@@ -96,12 +97,12 @@ public class AuctionItem implements Serializable {
      */
     public void setBid(Bid newBid){bid = newBid;}
 
-    public void startTimer(long time, AgentProxy ap){
+    public void startTimer(long time, AgentProxy ap, AuctionHouse ah){
         if(bidTimer != null){
             bidTimer.cancelTimer();
         }
 
-        bidTimer = new BidTimer(time, ap, this);
+        bidTimer = new BidTimer(time, ap, this, ah);
         Thread threadTimer = new Thread(bidTimer);
         threadTimer.start();
     }

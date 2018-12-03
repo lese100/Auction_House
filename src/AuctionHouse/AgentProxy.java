@@ -24,6 +24,10 @@ public class AgentProxy {
 
     }
 
+    public void testFoo(){
+        System.out.println("FOOOOOO");
+    }
+
     public void notifyWinner(AuctionItem ai) {
 
         sendMsg(new Message<AuctionItem>
