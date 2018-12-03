@@ -1,11 +1,10 @@
 package Agent;
 
-import Utility.AuctionHouseInventory;
-import Utility.AuctionItem;
-import Utility.Bid;
-import Utility.IDRecord;
+import Utility.*;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.paint.Color;
@@ -22,6 +21,7 @@ public class Display {
     private TabPane tabs;
     private Button bid,leaveAuc,leaveBank,getAuction,getBalance,transfer,join;
     private IDRecord myInfo;
+    private Stage stage;
     /**
      * constructs the initial display for the bank.
      * @param stage the main display stage
@@ -30,6 +30,7 @@ public class Display {
                    Button transfer,Button join){
         this.myInfo = myInfo;
         this.bid = bid;
+        this.stage = stage;
         this.leaveAuc = leaveAuc;
         this.leaveBank = leaveBank;
         this.getAuction = getAuction;
@@ -39,7 +40,7 @@ public class Display {
         auctions = new HashMap<>();
         stage.setTitle("Agent Interface");
         tabs = new TabPane();
-        Scene layout = new Scene(tabs,400,600, Color.WHITE);
+        Scene layout = new Scene(tabs,420,620, Color.WHITE);
         bank = new BankTab(leaveBank,getAuction,getBalance,transfer,join);
         tabs.getTabs().add(bank.getBankTab());
         tabs.getSelectionModel().selectedItemProperty().addListener((ov, oldTab, newTab) -> {
@@ -77,4 +78,21 @@ public class Display {
         bank.setAucHouses(auctionHouses);
     }
     public IDRecord getSelectedAuctionHouse(){return bank.getSelectedItem();}
+    public AuctionItem getSelectedTransfer(){return bank.getSelectedToTransfer();}
+    public void addTransferItem(AuctionItem wonItem){
+        bank.addTransferItem(wonItem);
+        displayNotification("New Transfer Request");
+
+    }
+    public void updateLabels(BankAccount account){bank.updateLabels(account);}
+    public void displayNotification(String msg){
+        Stage newTransfer = new Stage();
+        Label transfer = new Label(msg);
+        transfer.setAlignment(Pos.CENTER);
+        Scene window = new Scene(transfer,150,25);
+        newTransfer.setScene(window);
+        newTransfer.setResizable(false);
+        newTransfer.initOwner(stage);
+        newTransfer.show();
+    }
 }

@@ -6,6 +6,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
@@ -102,10 +103,11 @@ public class AuctionTab {
         hold.setAlignment(Pos.BASELINE_CENTER);
 
         HBox leaveHold = new HBox();
-        Label leaveSpacing = new Label("                                                                          " +
-                "                                    ");
+        Label leaveSpacing = new Label("                                                                       " +
+                "                                       ");
         leaveHold.getChildren().addAll(leaveSpacing,leave);
 
+        pane.setPadding(new Insets(10,10,10,10));
         pane.setCenter(hold);
         pane.setBottom(leaveHold);
         auctionHouse.setContent(pane);

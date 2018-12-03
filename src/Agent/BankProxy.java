@@ -64,9 +64,9 @@ public class BankProxy {
      * @param myID My current information
      * @return and updated version of my information containing the correct balance.
      */
-    public IDRecord requestBalance(IDRecord myID){
+    public BankAccount requestBalance(IDRecord myID){
         Message<IDRecord> message = new Message<>(Message.MessageIdentifier.REQUEST_BALANCE,myID);
-        Message<IDRecord> reply = sendMSG(message);
+        Message<BankAccount> reply = sendMSG(message);
         if(reply != null){
             if(reply.getMessageIdentifier() == Message.MessageIdentifier.BALANCE){
                 return reply.getMessageContent();
@@ -74,7 +74,7 @@ public class BankProxy {
                 System.out.println("Bank missing get balance");
             }
         }
-        return myID;
+        return null;
     }
 
     /**

@@ -47,6 +47,7 @@ public class Agent extends Application {
             e.printStackTrace();
         }
     }
+    public void addTransferItem(AuctionItem item){display.addTransferItem(item);}
     public void itemsUpdate(AuctionHouseInventory newInventory){
         display.updateAuctionItems(newInventory);
     }
@@ -67,9 +68,11 @@ public class Agent extends Application {
         Label port = new Label("Port Number:");
         Label host = new Label("Host Name:");
         Label myPort = new Label("My Port Number:");
+        Label myHost = new Label("My Host Name:");
         final TextField myPortNum = new TextField("8765");
         final TextField portNum = new TextField("1234");
         final TextField hostName = new TextField("localhost");
+        final TextField myHostName = new TextField("localhost");
         Button submit = new Button("Submit");
 
         grid.add(myPort,0,0);
@@ -78,9 +81,11 @@ public class Agent extends Application {
         grid.add(port,0,2);
         grid.add(hostName,1,1);
         grid.add(portNum,1,2);
-        grid.add(submit,1,3);
+        grid.add(myHost,0,3);
+        grid.add(myHostName,1,3);
+        grid.add(submit,1,4);
 
-        Scene scene = new Scene(grid, 240, 100);
+        Scene scene = new Scene(grid, 240, 120);
         submit.setOnAction(event -> {
             inputs.close();
         });
@@ -91,15 +96,10 @@ public class Agent extends Application {
         holdMyPort = Integer.parseInt(myPortNum.getText());
         holdHost = hostName.getText();
         holdPort = Integer.parseInt(portNum.getText());
+        localHost = myHostName.getText();
 
 
         Agent agent = new Agent(holdMyPort);
-        localHost = null;
-        try {
-            localHost = InetAddress.getLocalHost().getHostName();
-        }catch(UnknownHostException e){
-            e.printStackTrace();
-        }
         Stage create = new Stage();
         create.setTitle("Connect");
 
@@ -148,7 +148,15 @@ public class Agent extends Application {
             AuctionHouseProxy proxy = link.getProxy();
             int secretKey = link.getSecretKey();
             int response = proxy.makeBid(bid,secretKey);
-            /*display notification*/
+            if(response == 0){
+                display.displayNotification("Bid Failed: Bid was to low");
+            }else if(response == 1){
+                display.displayNotification("Bid Failed: Insufficient funds");
+            }else if(response == 2){
+                display.displayNotification("Bid Accepted");
+            }else{
+                System.out.println("case not found for bid");
+            }
         });
         leaveAuc.setOnAction(event -> {
 
@@ -162,10 +170,14 @@ public class Agent extends Application {
             display.displayAuctionHouses(auctions);
         });
         getBalance.setOnAction(event -> {
-
+            BankAccount info = bankProxy.requestBalance(myRecords);
+            display.updateLabels(info);
         });
         transfer.setOnAction(event -> {
-
+            AuctionItem item = display.getSelectedTransfer();
+            if(item != null) {
+                bankProxy.transferFunds(item);
+            }
         });
         join.setOnAction(event -> {
             IDRecord newAuctionHouse = display.getSelectedAuctionHouse();

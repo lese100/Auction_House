@@ -1,12 +1,16 @@
 package Agent;
 
 import Utility.AuctionItem;
+import Utility.BankAccount;
 import Utility.IDRecord;
+import javafx.beans.binding.ListBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -14,17 +18,22 @@ import javafx.scene.control.Tab;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class BankTab {
     private Button leave,getAuctions,getBalance,transfer,join;
     private Tab bankTab;
-    private ListView<String> list;
-    private ObservableList<String> aucDisp;
+    private ListView<String> list,purchases,pending;
+    private ObservableList<String> aucDisp,purchasedDisp,pendingDisp;
     private BorderPane pane;
     private ArrayList<IDRecord> aucHouses;
     private IDRecord selectedItem;
+    private List<AuctionItem> purchased, pendingTransfer;
+    private int selectedToTransfer;
+    private Label name,accuountNum,totalBal,frozenBal;
 
     /**
      * sets up the bank display
@@ -38,6 +47,33 @@ public class BankTab {
         aucHouses = null;
         selectedItem = null;
 
+        Label pendingTransactions = new Label("Pending Transactions:");
+        Label purchaseHistory = new Label("Purchase History:");
+        pendingTransfer = new ArrayList<>();
+        purchased = new ArrayList<>();
+        purchases = new ListView<>();
+        pending = new ListView<>();
+        purchasedDisp = FXCollections.observableArrayList();
+        pendingDisp = FXCollections.observableArrayList();
+        purchases.setOrientation(Orientation.VERTICAL);
+        pending.setOrientation(Orientation.VERTICAL);
+        purchases.setPrefSize(250,200);
+        pending.setPrefSize(200,150);
+        VBox transactions = new VBox();
+        VBox transferHold = new VBox();
+        transferHold.getChildren().addAll(pendingTransactions,pending,transfer);
+        transactions.getChildren().addAll(transferHold,purchaseHistory,purchases);
+        transactions.setSpacing(10);
+
+        pending.getSelectionModel().selectedIndexProperty().addListener(
+                new ChangeListener<Number>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Number> observable,
+                                        Number oldValue, Number newValue) {
+                        selectedToTransfer = (int)newValue;
+                    }
+                });
+
 
         bankTab = new Tab();
         bankTab.setText("Bank");
@@ -46,7 +82,7 @@ public class BankTab {
 
         VBox auctionInfo = new VBox();
         list = new ListView<>();
-        list.setPrefSize(50,500);
+        list.setPrefSize(100,500);
         list.setOrientation(Orientation.VERTICAL);
         aucDisp = FXCollections.observableArrayList();
         list.setItems(aucDisp);
@@ -62,12 +98,29 @@ public class BankTab {
                 });
 
         HBox leaveHold = new HBox();
-        Label leaveSpacing = new Label("                                                                          " +
-                "                                    ");
+        Label leaveSpacing = new Label("                                                                       " +
+                "                                       ");
         leaveHold.getChildren().addAll(leaveSpacing,leave);
 
+        name = new Label("  name");
+        name.setStyle("-fx-font: 24 arial;");
+        frozenBal = new Label(" (000)");
+        frozenBal.setTextFill(Color.GRAY);
+        totalBal = new Label("    0000");
+        accuountNum = new Label("    Account");
+
+        VBox userInfo = new VBox();
+        HBox balance = new HBox();
+        balance.getChildren().addAll(totalBal,frozenBal);
+        userInfo.getChildren().addAll(name,accuountNum,balance);
+
+        VBox centerHold = new VBox();
+        centerHold.getChildren().addAll(userInfo,transactions);
+        centerHold.setSpacing(50);
         pane = new BorderPane();
         pane.setLeft(auctionInfo);
+        pane.setPadding(new Insets(10,10,10,10));
+        pane.setCenter(centerHold);
         pane.setBottom(leaveHold);
         bankTab.setContent(pane);
     }
@@ -93,5 +146,41 @@ public class BankTab {
         aucDisp.removeAll();
         return selectedItem;
     }
-
+    private void updatePurchased(){
+        purchasedDisp.removeAll();
+        for(AuctionItem item : purchased){
+            String info = item.getItemName() + "_" + item.getItemID()+"                                      -"+
+                    item.getBid();
+            purchasedDisp.add(info);
+        }
+    }
+    private void updatePending(){
+        pendingDisp.removeAll();
+        for(AuctionItem item : pendingTransfer){
+            String info = item.getItemName() + "_" + item.getItemID()+"                                      -"+
+                    item.getBid();
+            pendingDisp.add(info);
+        }
+    }
+    public AuctionItem getSelectedToTransfer(){
+        if(pendingTransfer.isEmpty()){
+            return null;
+        }
+        AuctionItem hold = pendingTransfer.get(selectedToTransfer);
+        pendingTransfer.remove(selectedToTransfer);
+        purchased.add(hold);
+        updatePending();
+        updatePurchased();
+        return hold;
+    }
+    public void addTransferItem(AuctionItem item){
+        pendingTransfer.add(item);
+        updatePending();
+    }
+    public void updateLabels(BankAccount account){
+        name.setText("  "+account.getUserName());
+        accuountNum.setText("    Account#: " + Integer.toString(account.getAccountNumber()));
+        frozenBal.setText(" (" + Double.toString(account.getTotalUnfrozen()) + ")");
+        totalBal.setText("    Balance: " + Double.toString(account.getTotalBalance()));
+    }
 }
