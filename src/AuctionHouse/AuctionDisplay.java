@@ -1,6 +1,7 @@
 package AuctionHouse;
 
 import Utility.AuctionItem;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
@@ -131,16 +132,16 @@ public class AuctionDisplay {
 
     }
 
-    private void displayErrorMessage(String errorMessage){
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setContentText(errorMessage);
-        alert.show();
-    }
-
 
     // ****************************** //
     //   Public Methods               //
     // ****************************** //
+
+    public void displayErrorMessage(String errorMessage){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setContentText(errorMessage);
+        alert.show();
+    }
 
     public boolean infoFilledOut(){
         boolean infoFilledOut = true;
@@ -169,11 +170,7 @@ public class AuctionDisplay {
     }
 
     public void openTerminalWindow(){
-        System.out.println("Successful Setup");
-
         window.close();
-
-        newWindow = new Stage();
 
         newWindow.setTitle("Auction House");
 
@@ -217,8 +214,9 @@ public class AuctionDisplay {
         newWindow.show();
     }
 
-    public void setupAHInitializeButton(Button createAuctionHouse){
+    public void setupAHInitializers(Button createAuctionHouse, Stage newWindow){
         gridPane.add(createAuctionHouse, 1, 5);
+        this.newWindow = newWindow;
     }
 
     public void setupAHLabelInfo(String name, int id){
@@ -265,6 +263,7 @@ public class AuctionDisplay {
     public String getBankHostName() {
         return bankHostName.getText().trim();
     }
+
 
     public int getBankPort() {
         return Integer.parseInt(bankPort.getText().trim());

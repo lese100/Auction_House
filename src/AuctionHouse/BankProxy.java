@@ -96,8 +96,6 @@ public class BankProxy {
 
             Message replyMessage = sendMsg(msg);
 
-            System.out.println(replyMessage.getMessageIdentifier());
-
             return replyMessage.getMessageIdentifier().equals
                     (Message.MessageIdentifier.CHECK_SUCCESS);
         }

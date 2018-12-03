@@ -94,15 +94,6 @@ public class AuctionHouse {
     //   Private Methods              //
     // ****************************** //
 
-    private void updateAgentsAboutChanges(){
-        AuctionHouseInventory ahi =
-                new AuctionHouseInventory(idRecord.getNumericalID(), auctions);
-
-        for(AgentProxy ap : connectedAgents.values()){
-            ap.updateAuctions(ahi);
-        }
-    }
-
     private AuctionItem createCopyAuctionItem(AuctionItem auctionItem){
         Bid bid = auctionItem.getBid();
 
@@ -242,6 +233,14 @@ public class AuctionHouse {
         connectedAgents.put(agentInfo.getNumericalID(), ap);
     }
 
+    public void updateAgentsAboutChanges(){
+        AuctionHouseInventory ahi =
+                new AuctionHouseInventory(idRecord.getNumericalID(), auctions);
+
+        for(AgentProxy ap : connectedAgents.values()){
+            ap.updateAuctions(ahi);
+        }
+    }
 
     public void updateDisplay(){
         display.updateAuctionItemDisplay(auctions);
@@ -302,6 +301,29 @@ public class AuctionHouse {
         return Message.MessageIdentifier.BID_ACCEPTED;
     }
 
+    public boolean requestToLeaveAuctionHouse(IDRecord idRecord){
+        boolean canLeave = true;
+
+        for(AuctionItem ai : auctions){
+            if(ai.getBid().getSecretKey() == idRecord.getNumericalID() &&
+                    ai.getBid().getBidState() == Bid.BidState.BIDDING){
+                canLeave = false;
+            }
+        }
+
+        connectedAgents.remove(idRecord.getNumericalID());
+        display.updateConsoleDisplay("Agent \"" + idRecord.getName() +
+                "\" has disconnected.");
+
+        return canLeave;
+    }
+
+    public boolean safeToClose(){
+        if(connectedAgents.isEmpty()){
+            return true;
+        }
+        return false;
+    }
 
     // ****************************** //
     //   Getter(s) & Setter(s)        //

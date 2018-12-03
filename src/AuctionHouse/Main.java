@@ -1,8 +1,11 @@
 package AuctionHouse;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
+
+import java.beans.EventHandler;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -83,12 +86,12 @@ public class Main extends Application {
 
     @Override
     public void stop() throws Exception {
-        super.stop();
         System.exit(0);
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+
         AuctionDisplay auctionDisplay = new AuctionDisplay(primaryStage);
 
         Button createAuctionHouse = new Button("Create Auction House");
@@ -107,7 +110,24 @@ public class Main extends Application {
             }
         });
 
-        auctionDisplay.setupAHInitializeButton(createAuctionHouse);
+        Stage newWindow = new Stage();
+
+        newWindow.setOnCloseRequest(event -> {
+            try{
+                if(auctionHouse.safeToClose()){
+                    stop();
+                }else{
+                    auctionDisplay.displayErrorMessage("ALL AGENTS MUST BE " +
+                            "DISCONNECTED IN ORDER TO " +
+                            "CLOSE DOWN THIS AUCTION HOUSE!");
+                    event.consume();
+                }
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        });
+
+        auctionDisplay.setupAHInitializers(createAuctionHouse, newWindow);
 
     }
 }

@@ -37,6 +37,16 @@ public class AuctionHouseProtocol implements PublicAuctionProtocol {
             switch(message.getMessageIdentifier()){
 
                 case CLOSE_REQUEST:
+                    if(auctionHouse.requestToLeaveAuctionHouse
+                            ((IDRecord) message.getMessageContent())){
+                        reply = new Message<>
+                                (Message.MessageIdentifier.
+                                        CLOSE_ACCEPTED, null);
+                    }else{
+                        reply = new Message<>
+                                (Message.MessageIdentifier.
+                                        CLOSE_REJECTED, null);
+                    }
                     break;
                 case JOIN_AUCTION_HOUSE:
                     auctionHouse.joinAuctionHouse((IDRecord)

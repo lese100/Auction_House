@@ -53,6 +53,7 @@ public class BidTimer implements Runnable, Serializable {
                 ap.notifyWinner(ai);
                 ai.getBid().setBidState(Bid.BidState.SOLD);
                 ah.updateDisplay();
+                ah.updateAgentsAboutChanges();
             }
         }catch(InterruptedException e){
             e.printStackTrace();
