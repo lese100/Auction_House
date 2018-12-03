@@ -16,7 +16,8 @@ import Utility.Bid.BidState;
  * see Bid class for more details.
  *
  * created: 11/25/18 by thf
- * last modified: 11/25/18 by thf
+ * last modified: 12/02/18 by thf (adding transient modifier)
+ * previously modified: 11/25/18 by thf
  * @author Liam Brady (lb)
  * @author Warren D. Craft (wdc)
  * @author Tyler Fenske (thf)
@@ -27,7 +28,10 @@ public class AuctionItem implements Serializable {
     private int itemID;
     private String itemName;
     private Bid bid;
-    private BidTimer bidTimer;
+    //transient variables are ignored during serialization. BidTimer is
+    //irrelevant when passing an AuctionItem between Public Auction
+    //components, and need not be serialized.
+    private transient BidTimer bidTimer;
 
     // ****************************** //
     //   Constructor(s)               //

@@ -12,7 +12,6 @@ public class FakeAgentMain extends Application {
 
     public static void main(String[] args){
         fa = new FakeAgent();
-
     }
 
     @Override

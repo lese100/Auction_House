@@ -3,6 +3,8 @@ package AuctionHouse;
 import Utility.AuctionItem;
 import Utility.Bid;
 
+import java.io.Serializable;
+
 /**
  * A runnable Timer class, used for measuring how long it has been since an
  * agent has bid on an AuctionItem of interest. BidTimers are contained inside
@@ -12,7 +14,7 @@ import Utility.Bid;
  * @author Liam Brady (lb)
  * @author Warren D Craft (wdc)
  * @author Tyler Fenske (thf)*/
-public class BidTimer implements Runnable{
+public class BidTimer implements Runnable, Serializable {
 
     private final long TIME;
     private AgentProxy ap;
@@ -47,9 +49,7 @@ public class BidTimer implements Runnable{
     public void run() {
         try{
             Thread.sleep(TIME);
-            System.out.println("Bid timer done:");
             if(stillValid){
-                System.out.println("Bid timer actions");
                 ap.notifyWinner(ai);
                 ai.getBid().setBidState(Bid.BidState.SOLD);
                 ah.updateDisplay();

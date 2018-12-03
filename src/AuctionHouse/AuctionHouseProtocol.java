@@ -53,8 +53,6 @@ public class AuctionHouseProtocol implements PublicAuctionProtocol {
                 case MAKE_BID:
                     AuctionItem ai = (AuctionItem) message.getMessageContent();
 
-                    System.out.println("PROPOSED BID: " + ai.getBid().getProposedBid());
-
                     Message.MessageIdentifier msgID = auctionHouse.makeBid(ai);
 
                     reply = new Message<>(msgID, null);
