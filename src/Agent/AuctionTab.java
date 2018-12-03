@@ -30,6 +30,7 @@ public class AuctionTab {
     private AuctionItem selectedItem;
     private Label itemName, itemID, currentPrice, minBid;
     private TextField proposedBid;
+    private HBox leaveHold, biddingArea;
     /**
      * stores the eahc auction houses tab info.
      * @param items the items available
@@ -54,6 +55,7 @@ public class AuctionTab {
         this.houseInfo = houseInfo;
 
         auctionHouse = new Tab();
+        auctionHouse.setId(Integer.toString(houseInfo.getNumericalID()));
         auctionHouse.setClosable(false);
         if(houseInfo == null){
             auctionHouse.setId(null);
@@ -82,9 +84,9 @@ public class AuctionTab {
         minBid = new Label("min");
         Label spacing = new Label("     My Bid:");
         VBox auctionLabels = new VBox();
-        HBox biddingArea = new HBox();
+        biddingArea = new HBox();
         auctionLabels.getChildren().addAll(itemName,itemID);
-        biddingArea.getChildren().addAll(spacing,proposedBid,bid);
+        biddingArea.getChildren().addAll(spacing,proposedBid,this.bid);
         biddingArea.setSpacing(10);
 
         VBox pricing = new VBox();
@@ -108,10 +110,10 @@ public class AuctionTab {
         hold.getChildren().addAll(image,mergeBoxes);
         hold.setAlignment(Pos.BASELINE_CENTER);
 
-        HBox leaveHold = new HBox();
+        leaveHold = new HBox();
         Label leaveSpacing = new Label("                                                                       " +
                 "                                       ");
-        leaveHold.getChildren().addAll(leaveSpacing,leave);
+        leaveHold.getChildren().addAll(leaveSpacing,this.leave);
 
         pane.setPadding(new Insets(10,10,10,10));
         pane.setCenter(hold);
@@ -120,6 +122,14 @@ public class AuctionTab {
 
     }
 
+    public void replaceButtons(Button leave, Button bid){
+        leaveHold.getChildren().remove(this.leave);
+        leaveHold.getChildren().add(leave);
+        biddingArea.getChildren().remove(this.bid);
+        biddingArea.getChildren().add(bid);
+        this.leave = leave;
+        this.bid = bid;
+    }
     /**
      * adds the available items to the auction house display
      */

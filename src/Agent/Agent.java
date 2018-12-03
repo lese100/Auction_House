@@ -213,13 +213,15 @@ public class Agent extends Application {
             IDRecord newAuctionHouse = display.getSelectedAuctionHouse();
             join.setDisable(true);
             if(newAuctionHouse != null) {
-                AuctionHouseProxy proxy = new AuctionHouseProxy(newAuctionHouse.getHostname(),
-                        newAuctionHouse.getPortNumber());
-                AccountLink link = new AccountLink(myRecords.getNumericalID(), newAuctionHouse.getNumericalID());
-                int secretKey = bankProxy.getSecretKey(link);
-                display.addAuctionTab(proxy.joinAH(myRecords, secretKey), newAuctionHouse);
-                AuctionHouseLink linkToAuction= new AuctionHouseLink(newAuctionHouse, secretKey, proxy);
-                auctionHouses.put(newAuctionHouse.getNumericalID(), linkToAuction);
+                if(!display.doesAuctionExist(newAuctionHouse.getNumericalID())) {
+                    AuctionHouseProxy proxy = new AuctionHouseProxy(newAuctionHouse.getHostname(),
+                            newAuctionHouse.getPortNumber());
+                    AccountLink link = new AccountLink(myRecords.getNumericalID(), newAuctionHouse.getNumericalID());
+                    int secretKey = bankProxy.getSecretKey(link);
+                    display.addAuctionTab(proxy.joinAH(myRecords, secretKey), newAuctionHouse);
+                    AuctionHouseLink linkToAuction = new AuctionHouseLink(newAuctionHouse, secretKey, proxy);
+                    auctionHouses.put(newAuctionHouse.getNumericalID(), linkToAuction);
+                }
             }else{
                 display.addAuctionTab(null,null);
                 System.out.println("can't join auction house");

@@ -47,6 +47,10 @@ public class Display {
         tabs.getTabs().add(bank.getBankTab());
         tabs.getSelectionModel().selectedItemProperty().addListener((ov, oldTab, newTab) -> {
             currentTab = newTab;
+            if(currentTab.getId() != "Bank" && oldTab.getId() !="Bank"){
+                AuctionTab hold = auctions.get(Integer.parseInt(currentTab.getId()));
+                hold.replaceButtons(leaveAuc,bid);
+            }
         });
         stage.setScene(layout);
         stage.setResizable(false);
@@ -59,11 +63,22 @@ public class Display {
      * @param auctionHouse auction house info
      */
     public void addAuctionTab(List<AuctionItem> items, IDRecord auctionHouse){
-        AuctionTab auction = new AuctionTab(items,auctionHouse,bid,leaveAuc);
-        tabs.getTabs().add(auction.getTab());
-        if(auctionHouse != null) {
-            auctions.put(auctionHouse.getNumericalID(), auction);
+        if(auctions.get(auctionHouse.getNumericalID()) == null) {
+            AuctionTab auction = new AuctionTab(items, auctionHouse, bid, leaveAuc);
+            tabs.getTabs().add(auction.getTab());
+            if (auctionHouse != null) {
+                auctions.put(auctionHouse.getNumericalID(), auction);
+            }
+        }else{
+            System.out.println("fail");
         }
+    }
+    public boolean doesAuctionExist(int ID){
+        if(auctions.get(ID) != null) {
+            displayNotification("Already in this auction house");
+            return true;
+        }
+        return false;
     }
     public AuctionItem getBid(){
         AuctionItem item = null;
