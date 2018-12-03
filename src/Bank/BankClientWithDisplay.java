@@ -1,5 +1,6 @@
 package Bank;
 
+import Utility.AccountLink;
 import Utility.BankAccount;
 import Utility.CommunicationService;
 import Utility.IDRecord;
@@ -45,6 +46,8 @@ public class BankClientWithDisplay {
     private Label textLabelTotalBalance = new Label("unknown");
     private Label textLabelFrozen = new Label("unknown");
     private Label textLabelNonFrozen = new Label("unknown");
+    private TextField textFieldAccountLinkAgent = new TextField("unknown");
+    private TextField textFieldAccountLinkAH = new TextField("unknown");
     private TextArea textAreaOutput = new TextArea("Output Area");
 
     private boolean connectedToBank = false;
@@ -62,9 +65,9 @@ public class BankClientWithDisplay {
 
     private void initDisplay(Stage stage) {
         stage.setMinWidth(400);
-        stage.setMinHeight(400);
+        stage.setMinHeight(500);
         // stage.setMaxWidth(400);
-        stage.setMaxHeight(400);
+        stage.setMaxHeight(500);
 
         // VBox to hold contents for left side
         VBox vBox = new VBox();
@@ -97,9 +100,22 @@ public class BankClientWithDisplay {
         Label textLabelNonFrozenTitle = new Label("Non-Frozen: ");
         HBox hBoxNonFrozen =
             new HBox(textLabelNonFrozenTitle, textLabelNonFrozen);
+        Label textLabelAccountLink = new Label("For Account Links: ");
+        Label textLabelAccountLinkAgent = new Label("Agent acct #: ");
+        HBox hBoxAccountLinkAgent =
+            new HBox(textLabelAccountLinkAgent, textFieldAccountLinkAgent);
+        hBoxAccountLinkAgent.setSpacing(10);
+        hBoxAccountLinkAgent.setAlignment(Pos.CENTER_LEFT);
+        Label textLabelAccountLinkAH = new Label("AH acct #: ");
+        HBox hBoxAccountLinkAH =
+            new HBox(textLabelAccountLinkAH, textFieldAccountLinkAH);
+        hBoxAccountLinkAH.setSpacing(10);
+        hBoxAccountLinkAH.setAlignment(Pos.CENTER_LEFT);
+
         vBox.getChildren().addAll(
             textLabelBank, hBoxBankHost, hBoxBankPort, hBoxAccountNumber,
-            hBoxAccountType, hBoxTotalBalance, hBoxFrozen, hBoxNonFrozen);
+            hBoxAccountType, hBoxTotalBalance, hBoxFrozen, hBoxNonFrozen,
+            textLabelAccountLink, hBoxAccountLinkAgent, hBoxAccountLinkAH);
         vBox.setPadding(new Insets(10, 10, 10, 10));
         vBox.setSpacing(10);
 
@@ -124,13 +140,15 @@ public class BankClientWithDisplay {
         setButtonHandlers(btnUnFreezeFunds);
         Button btnGetListOfAuctionHouses = new Button("Get AH List");
         setButtonHandlers(btnGetListOfAuctionHouses);
+        Button btnGetSecretKey = new Button("Get Secret Key");
+        setButtonHandlers(btnGetSecretKey);
 
         FlowPane flowPaneBottomButtons = new FlowPane();
         flowPaneBottomButtons.getChildren().addAll(
             btnConnectToBank, btnSendTestMsg, btnOpenAgentAccount,
             btnOpenAHAccount, btnCheckBalance,
             btnAddFunds, btnFreezeFunds, btnUnFreezeFunds,
-            btnGetListOfAuctionHouses);
+            btnGetListOfAuctionHouses, btnGetSecretKey);
         flowPaneBottomButtons.setPadding(new Insets(10, 10, 10, 10));
         flowPaneBottomButtons.setHgap(10);
         flowPaneBottomButtons.setVgap(10);
@@ -253,6 +271,16 @@ public class BankClientWithDisplay {
                     public void handle(ActionEvent event) {
                         System.out.println("Getting AH List!");
                         getListOfAuctionHouses();
+                    }
+                });
+                break;
+
+            case "Get Secret Key":
+                button.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                        System.out.println("Getting a Secret Key!");
+                        getSecretKey();
                     }
                 });
                 break;
@@ -411,6 +439,18 @@ public class BankClientWithDisplay {
             textAreaOutput.appendText("\n" + tempAHName +
                 ": Acct # " + tempAHAcctNum);
         }
+    }
+
+    public void getSecretKey() {
+
+        // use the agent and ah fields in display to generate a
+        // AccountLink
+        int agentAcct = Integer.parseInt(textFieldAccountLinkAgent.getText());
+        int ahAcct = Integer.parseInt(textFieldAccountLinkAH.getText());
+        AccountLink theAccountLink = new AccountLink(agentAcct, ahAcct);
+        int aSecretKey = bankProxyForTesting.getSecretKey(theAccountLink);
+        System.out.println("BCWD.getSecretKey(): The secret key is: " +
+            aSecretKey);
     }
 
     public void addFunds () {

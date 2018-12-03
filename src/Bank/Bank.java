@@ -32,7 +32,7 @@ public class Bank {
     private String location;  // machine location
     private int portNumber;   // port used for clients
     private HashMap<Integer, BankAccount> hashMapOfAllAccts;
-    private HashMap<Integer, AccountLink> secretKeys;
+    private HashMap<Integer, AccountLink> hashMapOfSecretKeys;
     private ArrayList<IDRecord> listOfAuctionHouseIDRecords;
     private ArrayList<IDRecord> listOfAgentIDRecords;
     private String summaryInfoString;
@@ -72,7 +72,7 @@ public class Bank {
         this.portNumber = portNumber;
         this.bankDisplay = bankDisplay;
         hashMapOfAllAccts = new HashMap<>();
-        secretKeys = new HashMap<>();
+        hashMapOfSecretKeys = new HashMap<>();
         listOfAuctionHouseIDRecords = new ArrayList<>();
         listOfAgentIDRecords = new ArrayList<>();
         try {
@@ -157,6 +157,17 @@ public class Bank {
         updateBankDisplay();
 
         return updatedIDRecord;
+    }
+
+    public int createSecretKey (AccountLink theAccountLink) {
+        // should verify that the accountlink contains valid account #s
+        // generate a unique secret key
+        int aSecretKey = getUniqueSecretKey();
+        // store away that secret key in HashMap with theAccountLink
+        hashMapOfSecretKeys.put(aSecretKey, theAccountLink);
+        System.out.println("Bank.createSecretKey(): aSecretKey = " +
+            aSecretKey);
+        return aSecretKey;
     }
 
     /**
@@ -261,6 +272,43 @@ public class Bank {
             // verify uniqueness assumption
             for ( int acctNum : listOfCurrentAccountNumbers) {
                 if (candidateNumber == acctNum) {
+                    numberIsUnique = false;
+                    break;
+                }
+            } // end for() loop
+
+        } // end while() loop
+
+        return candidateNumber;
+    }
+
+    /**
+     * Private Bank utility function used internally to generate unique
+     * random integer values for so-called secret keys. Should probably be
+     * synchronized at some point.
+     * Note: at the time of this writing, this method uses the same process
+     * as the one for generating unique bank account numbers, but I wanted
+     * to keep it separate so we have the option for the two processes to
+     * produce different types of values.
+     * @return int
+     */
+    private int getUniqueSecretKey () {
+
+        System.out.println("Entering Bank: getUniqueSecretKey()");
+        int minInt = 100000;
+        int maxInt = 999999;
+        int candidateNumber = -1;
+        Set<Integer> listOfCurrentSecretKeys =
+            hashMapOfSecretKeys.keySet();
+        boolean numberIsUnique = false;
+        while ( !numberIsUnique ) {
+
+            candidateNumber = rng.nextInt(maxInt+1);
+            // assume unique for a moment
+            numberIsUnique = true;
+            // verify uniqueness assumption
+            for ( int theNum : listOfCurrentSecretKeys) {
+                if (candidateNumber == theNum) {
                     numberIsUnique = false;
                     break;
                 }

@@ -1,9 +1,6 @@
 package Bank;
 
-import Utility.BankAccount;
-import Utility.IDRecord;
-import Utility.Message;
-import Utility.PublicAuctionProtocol;
+import Utility.*;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -104,6 +101,22 @@ public class BankProtocol implements PublicAuctionProtocol {
                 for (IDRecord rec : (ArrayList<IDRecord>) msgToSend.getMessageContent()) {
                     System.out.println("Acct #: " + rec.getNumericalID());
                 }
+                break;
+
+            case GET_SECRET_KEY:
+                int aSecretKey;
+                if (msgContent instanceof AccountLink) {
+                    AccountLink theAccountLink = (AccountLink) msgContent;
+                    aSecretKey = bank.createSecretKey(theAccountLink);
+                } else {
+                    // use -1 to indicate some error in the process
+                    aSecretKey = -1;
+                }
+                System.out.println("BankProtocol.case GET_SECRET_KEY: " +
+                    "aSecretKey = " + aSecretKey);
+                msgToSend = new Message<>(Message.MessageIdentifier.
+                    SECRET_KEY,
+                    aSecretKey);
                 break;
 
             case OPEN_AGENT_ACCT:

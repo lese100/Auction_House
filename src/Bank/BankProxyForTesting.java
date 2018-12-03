@@ -1,9 +1,6 @@
 package Bank;
 
-import Utility.BankAccount;
-import Utility.CommunicationService;
-import Utility.IDRecord;
-import Utility.Message;
+import Utility.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -70,6 +67,23 @@ public class BankProxyForTesting {
         System.out.println("openBankAccount(): DENIED");
         return idRecord;
 
+    }
+
+    public int getSecretKey(AccountLink theAccountLink) {
+        System.out.println("BankProxyForTesting.getSecretKey() ");
+        Message message = null;
+        Message<Integer> reply = null;
+        try {
+            message =
+                new Message<>(Message.MessageIdentifier.GET_SECRET_KEY,
+                    theAccountLink);
+            reply = cs.sendMessage(message);
+
+        } catch( IOException ioe ) {
+            ioe.printStackTrace();
+        }
+
+        return reply.getMessageContent();
     }
 
     public String sendTestMessage () {
