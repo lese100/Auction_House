@@ -101,4 +101,22 @@ public class BankProxy {
         }
     }
 
+    public void closeAccount(IDRecord idRecord) {
+        if (cs != null) {
+            Message<IDRecord> msg = new Message<>
+                    (Message.MessageIdentifier.CLOSE_REQUEST, idRecord);
+
+            sendMsg(msg);
+        }
+    }
+
+    public BankAccount checkFunds(IDRecord idRecord){
+        if(cs != null){
+            Message<IDRecord> msg = new Message<>
+                    (Message.MessageIdentifier.REQUEST_BALANCE, idRecord);
+
+            return (BankAccount) sendMsg(msg).getMessageContent();
+        }
+        return null;
+    }
 }

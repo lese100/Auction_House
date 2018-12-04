@@ -34,6 +34,9 @@ public class AuctionHouse {
     private List<AuctionItem> auctions;
     private Map<Integer, AgentProxy> connectedAgents;
 
+    private double amountOwed;
+    private double bankBalance;
+
     // ****************************** //
     //   Constructor(s)               //
     // ****************************** //
@@ -187,7 +190,7 @@ public class AuctionHouse {
      * https://stackoverflow.com/questions/2808535
      * /round-a-double-to-2-decimal-places
      *
-     * Rounds a decimal value to two decimal places.
+     * Rounds a decimal value to "places" decimal places.
      * @param value value to be rounded
      * @param places number of places to round to:
      *               Example - value = 2.3423 places = 2
@@ -255,8 +258,6 @@ public class AuctionHouse {
 
         synchronized(auctionItem){
 
-
-
             if(itemOfInterest.getBid().getProposedBid() <
                     auctionItem.getBid().getMinBid()){
                 return Message.MessageIdentifier.BID_REJECTED_INADEQUATE;
@@ -272,10 +273,11 @@ public class AuctionHouse {
                         (itemOfInterest.getBid().getSecretKey());
                 //Updates auction item's current high bid
                 auctionItem.getBid().setCurrentBid
-                        (itemOfInterest.getBid().getProposedBid());
+                        (round(itemOfInterest.getBid().getProposedBid(), 2));
                 //Updates auction item's new min bid
                 auctionItem.getBid().setMinBid
-                        (itemOfInterest.getBid().getProposedBid() + .01);
+                        (round(itemOfInterest.getBid().
+                                getProposedBid() + .01,  2));
                 //Updates auction item's bid state
                 auctionItem.getBid().setBidState(Bid.BidState.BIDDING);
             }
@@ -302,12 +304,11 @@ public class AuctionHouse {
     }
 
     public boolean requestToLeaveAuctionHouse(IDRecord idRecord){
-        boolean canLeave = true;
 
         for(AuctionItem ai : auctions){
             if(ai.getBid().getSecretKey() == idRecord.getNumericalID() &&
                     ai.getBid().getBidState() == Bid.BidState.BIDDING){
-                canLeave = false;
+                return false;
             }
         }
 
@@ -315,14 +316,33 @@ public class AuctionHouse {
         display.updateConsoleDisplay("Agent \"" + idRecord.getName() +
                 "\" has disconnected.");
 
-        return canLeave;
+        return true;
     }
 
     public boolean safeToClose(){
         if(connectedAgents.isEmpty()){
+            bankProxy.closeAccount(idRecord);
             return true;
         }
         return false;
+    }
+
+    public void updateAmountOwed(double owed){
+        amountOwed += owed;
+
+        display.updateAmountOwed(amountOwed);
+    }
+
+    public void updateBankBalance(){
+        double currentBalance = bankProxy.
+                checkFunds(idRecord).getTotalBalance();
+        double newFunds = currentBalance - bankBalance;
+
+        bankBalance = currentBalance;
+
+        display.updateBankBalance(currentBalance);
+
+        updateAmountOwed(-newFunds);
     }
 
     // ****************************** //

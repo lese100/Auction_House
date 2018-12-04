@@ -28,7 +28,6 @@ import java.util.List;
  */
 public class AuctionDisplay {
 
-
     private GridPane gridPane;
 
     private TextField auctionHouseName;
@@ -41,6 +40,9 @@ public class AuctionDisplay {
     private TextArea consoleTextArea;
     private String consoleText;
     private Label auctionLabel;
+
+    private Label amountOwed;
+    private Label bankBalance;
 
     private Stage window;
     private Stage newWindow;
@@ -100,36 +102,25 @@ public class AuctionDisplay {
         bankHostNameLabel.setMaxSize(175, 25);
         bankPortLabel.setMaxSize(175, 25);
 
-       /* createAuctionHouse = new Button("Press me");
 
-        createAuctionHouse.setOnAction(event -> {
-            System.out.println(auctionHouseName.getText().trim());
-            System.out.println(auctionHouseHostName.getText().trim());
-            System.out.println(auctionHousePort.getText().trim());
-            System.out.println(bankHostName.getText().trim());
-            System.out.println(bankPort.getText().trim());
-        });*/
+        gridPane = new GridPane();
 
-       gridPane = new GridPane();
-
-       gridPane.add(auctionHouseNameLabel, 0, 0);
-       gridPane.add(auctionHouseName, 1, 0);
-       gridPane.add(auctionHouseHostNameLabel, 0, 1);
-       gridPane.add(auctionHouseHostName, 1, 1);
-       gridPane.add(auctionHousePortLabel, 0, 2);
-       gridPane.add(auctionHousePort, 1, 2);
-       gridPane.add(bankHostNameLabel, 0, 3);
-       gridPane.add(bankHostName, 1, 3);
-       gridPane.add(bankPortLabel, 0, 4);
-       gridPane.add(bankPort, 1, 4);
-
+        gridPane.add(auctionHouseNameLabel, 0, 0);
+        gridPane.add(auctionHouseName, 1, 0);
+        gridPane.add(auctionHouseHostNameLabel, 0, 1);
+        gridPane.add(auctionHouseHostName, 1, 1);
+        gridPane.add(auctionHousePortLabel, 0, 2);
+        gridPane.add(auctionHousePort, 1, 2);
+        gridPane.add(bankHostNameLabel, 0, 3);
+        gridPane.add(bankHostName, 1, 3);
+        gridPane.add(bankPortLabel, 0, 4);
+        gridPane.add(bankPort, 1, 4);
 
         Scene scene = new Scene(gridPane);
 
         window.setScene(scene);
 
         window.show();
-
     }
 
 
@@ -146,17 +137,6 @@ public class AuctionDisplay {
     public boolean infoFilledOut(){
         boolean infoFilledOut = true;
 
-        /*if(auctionHouseName.getText().trim().equals("AuctionHouse Name") ||
-                auctionHouseHostName.getText().trim()
-                        .equals("AuctionHouse Host Name") ||
-                auctionHousePort.getText().trim()
-                        .equals("AuctionHouse Port Number") ||
-                bankHostName.getText().trim().equals("Bank Host Name") ||
-                bankPort.getText().trim().equals("Bank Port Number")){
-
-            displayErrorMessage("All Fields Must Be Changed From Default");
-            infoFilledOut = false;
-        }*/
 
         try{
             Integer.parseInt(auctionHousePort.getText().trim());
@@ -195,8 +175,14 @@ public class AuctionDisplay {
 
         Label consoleLabel = new Label("Console");
         auctionLabel = new Label("AuctionHouse");
+        bankBalance = new Label("\tBank Balance: $0.00\t");
+        amountOwed = new Label("\tAmount Owed: $0.00");
 
-        auctionPane.setTop(auctionLabel);
+        HBox hbox = new HBox();
+
+        hbox.getChildren().addAll(auctionLabel, bankBalance, amountOwed);
+
+        auctionPane.setTop(hbox);
         auctionPane.setBottom(auctionTextArea);
 
         consolePane.setTop(consoleLabel);
@@ -231,7 +217,8 @@ public class AuctionDisplay {
             output = output + "\nITEM ID: " + ai.getItemID() +
                     "\t BID STATE: " + ai.getBid().getBidState() +
                     "\t MIN BID: $" + df.format(ai.getBid().getMinBid()) +
-                    "\t CURRENT BID: $" + df.format(ai.getBid().getCurrentBid()) +
+                    "\t CURRENT BID: $" + df.format(ai.getBid().
+                    getCurrentBid()) +
                     "\t ITEM NAME: " + ai.getItemName();
         }
 
@@ -241,6 +228,14 @@ public class AuctionDisplay {
     public void updateConsoleDisplay(String message){
         consoleText += "\n" + message;
         consoleTextArea.setText(consoleText);
+    }
+
+    public void updateBankBalance(double balance){
+        bankBalance.setText("\tBank Balance: $" + df.format(balance) + "\t");
+    }
+
+    public void updateAmountOwed(double owed){
+        amountOwed.setText("\tAmount Owed: $" + df.format(owed) + "\t");
     }
 
 
@@ -263,7 +258,6 @@ public class AuctionDisplay {
     public String getBankHostName() {
         return bankHostName.getText().trim();
     }
-
 
     public int getBankPort() {
         return Integer.parseInt(bankPort.getText().trim());

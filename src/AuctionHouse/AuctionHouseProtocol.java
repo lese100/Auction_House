@@ -1,6 +1,7 @@
 package AuctionHouse;
 
 import Utility.*;
+import javafx.application.Platform;
 
 import java.io.IOException;
 
@@ -66,6 +67,20 @@ public class AuctionHouseProtocol implements PublicAuctionProtocol {
                     Message.MessageIdentifier msgID = auctionHouse.makeBid(ai);
 
                     reply = new Message<>(msgID, null);
+                    break;
+                case TRANSFER_FUNDS:
+                    AuctionItem auctionItem =
+                            (AuctionItem) message.getMessageContent();
+
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            auctionHouse.updateBankBalance();
+                        }
+                    });
+
+                    reply = new Message<>
+                            (Message.MessageIdentifier.TRANSFER_SUCCESS, null);
                     break;
                 default:
                     reply = new Message<>

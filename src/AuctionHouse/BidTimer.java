@@ -2,6 +2,7 @@ package AuctionHouse;
 
 import Utility.AuctionItem;
 import Utility.Bid;
+import javafx.application.Platform;
 
 import java.io.Serializable;
 
@@ -54,6 +55,12 @@ public class BidTimer implements Runnable, Serializable {
                 ai.getBid().setBidState(Bid.BidState.SOLD);
                 ah.updateDisplay();
                 ah.updateAgentsAboutChanges();
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        ah.updateAmountOwed(ai.getBid().getCurrentBid());
+                    }
+                });
             }
         }catch(InterruptedException e){
             e.printStackTrace();
