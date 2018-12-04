@@ -1,6 +1,8 @@
 package Utility;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * Provides the structure for account information for a client of a Bank.
@@ -181,6 +183,7 @@ public class BankAccount implements Serializable {
     public synchronized boolean decreaseFrozenAndBalance (double decrease) {
         // used when transferring previously blocked funds
         // over to an auction house
+        totalFrozen = round(totalFrozen, 2);
         if ( totalFrozen >= decrease ) {
             totalFrozen -= decrease;
             totalBalance -= decrease;
@@ -213,5 +216,24 @@ public class BankAccount implements Serializable {
     // ****************************** //
     //   Utility Fxns                 //
     // ****************************** //
+
+    /**
+     * Adapted from an answer found on StackOverflow:
+     *
+     * https://stackoverflow.com/questions/2808535
+     * /round-a-double-to-2-decimal-places
+     *
+     * Rounds a decimal value to "places" decimal places.
+     * @param value value to be rounded
+     * @param places number of places to round to:
+     *               Example - value = 2.3423 places = 2
+     *                         result = 2.34
+     * @return newly rounded double
+     */
+    private double round(double value, int places){
+        BigDecimal bd = new BigDecimal(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
+    }
 
 }
