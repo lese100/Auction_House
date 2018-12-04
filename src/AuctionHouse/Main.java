@@ -32,19 +32,6 @@ public class Main extends Application {
 
     public static void main(String[] args){
 
-        /*String hostname = "Unknown";
-
-        try
-        {
-            InetAddress addr;
-            addr = InetAddress.getLocalHost();
-            hostname = addr.getHostName();
-            System.out.println(hostname);
-        }
-        catch (UnknownHostException ex)
-        {
-            System.out.println("Hostname can not be resolved");
-        }*/
         launch(args);
 
     }
@@ -69,16 +56,6 @@ public class Main extends Application {
         }
     }
 
-    /*    private static String getComputerName()
-    {
-        Map<String, String> env = System.getenv();
-        if (env.containsKey("COMPUTERNAME"))
-            return env.get("COMPUTERNAME");
-        else if (env.containsKey("HOSTNAME"))
-            return env.get("HOSTNAME");
-        else
-            return "Unknown Computer";
-    }*/
 
     // ****************************** //
     //   Override Methods             //
@@ -106,7 +83,6 @@ public class Main extends Application {
                         auctionDisplay.getAuctionHousePort(),
                         auctionDisplay.getBankHostName(),
                         auctionDisplay.getBankPort());
-
             }
         });
 
