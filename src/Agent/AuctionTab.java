@@ -17,6 +17,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class AuctionTab {
@@ -31,6 +32,7 @@ public class AuctionTab {
     private Label itemName, itemID, currentPrice, minBid;
     private TextField proposedBid;
     private HBox leaveHold, biddingArea;
+    private DecimalFormat df;
     /**
      * stores the eahc auction houses tab info.
      * @param items the items available
@@ -46,6 +48,7 @@ public class AuctionTab {
         list.setItems(itemDisp);
         pane = new BorderPane();
         pane.setLeft(list);
+        df = new DecimalFormat("####0.00");
 
         selectedItem = -1;
         this.items = items;
@@ -79,7 +82,7 @@ public class AuctionTab {
                     }
                 });
 
-        proposedBid = new TextField("0000");
+        proposedBid = new TextField("00.00");
         itemName = new Label("     Item");
         itemID = new Label("     ID");
         currentPrice = new Label("price");
@@ -147,7 +150,7 @@ public class AuctionTab {
                 if(item.getBid().getBidState() == Bid.BidState.SOLD){
                     info = item.getItemName() + "\nSOLD";
                 }else {
-                    info = item.getItemName() + "\n$" + bid;
+                    info = item.getItemName() + "\n$" + df.format(bid);
                 }
                 itemDisp.add(info);
             }
@@ -161,8 +164,8 @@ public class AuctionTab {
                 minBid.setText("Min Bid: SOLD");
                 bid.setDisable(true);
             }else{
-                currentPrice.setText("Current Bid: $" + Double.toString(hold.getBid().getCurrentBid()));
-                minBid.setText("Min Bid: $" + Double.toString(hold.getBid().getMinBid()));
+                currentPrice.setText("Current Bid: $" + df.format(hold.getBid().getCurrentBid()));
+                minBid.setText("Min Bid: $" + df.format(hold.getBid().getMinBid()));
                 bid.setDisable(false);
             }
             itemID.setText("     Item ID: " + Integer.toString(hold.getItemID()));
@@ -198,6 +201,6 @@ public class AuctionTab {
         double bid = Double.parseDouble(proposedBid.getText())*100;
         int holdBid = (int)bid;
         bid = ((double) holdBid)/100;
-        proposedBid.setText(Double.toString(bid));
+        proposedBid.setText(df.format(bid));
         return bid;}
 }

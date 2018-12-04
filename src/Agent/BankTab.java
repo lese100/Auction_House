@@ -35,6 +35,7 @@ public class BankTab {
     private List<AuctionItem> purchased, pendingTransfer;
     private int selectedToTransfer;
     private Label name,accountNum,totalBal,frozenBal;
+    private DecimalFormat df;
 
     /**
      * sets up the bank display
@@ -44,6 +45,7 @@ public class BankTab {
         this.join = join;
         aucHouses = null;
         selectedItem = null;
+        df = new DecimalFormat("####0.00");
 
         Label pendingTransactions = new Label("Pending Transactions:");
         Label purchaseHistory = new Label("Purchase History:");
@@ -64,7 +66,7 @@ public class BankTab {
         transferHold.getChildren().addAll(pendingTransactions,pending,transfer);
         transactions.getChildren().addAll(transferHold,purchaseHistory,purchases);
         transactions.setSpacing(10);
-        purchasedDisp.add("Deposit" + getSpacing("Deposit") + "+$" + deposit);
+        purchasedDisp.add("Deposit" + getSpacing("Deposit") + "+$" + df.format(deposit));
 
         pending.getSelectionModel().selectedIndexProperty().addListener(
                 new ChangeListener<Number>() {
@@ -154,14 +156,6 @@ public class BankTab {
         aucDisp.clear();
         return selectedItem;
     }
-    private void updatePurchased(){
-        purchasedDisp.clear();
-        for(AuctionItem item : purchased){
-            String info = item.getItemName() + "_" + item.getItemID();
-            info += getSpacing(info) + "-$" + item.getBid().getCurrentBid();
-            purchasedDisp.add(info);
-        }
-    }
     private String getSpacing(String item){
         String spacing = "";
         for(int i = item.length(); i < 55; i++){
@@ -173,7 +167,7 @@ public class BankTab {
         pendingDisp.clear();
         for(AuctionItem item : pendingTransfer){
             String info = item.getItemName() + "_" + item.getItemID();
-            info += getSpacing(info) + "-$" + item.getBid().getCurrentBid();
+            info += getSpacing(info) + "-$" + df.format(item.getBid().getCurrentBid());
             pendingDisp.add(info);
         }
     }
@@ -187,7 +181,7 @@ public class BankTab {
         updatePending();
         //updatePurchased();
         String info = hold.getItemName() + "_" + hold.getItemID();
-        info += getSpacing(info) + "-$" + hold.getBid().getCurrentBid();
+        info += getSpacing(info) + "-$" + df.format(hold.getBid().getCurrentBid());
         purchasedDisp.add(info);
         return hold;
     }
@@ -198,7 +192,7 @@ public class BankTab {
     public void updateLabels(BankAccount account){
         name.setText("  "+account.getUserName());
         accountNum.setText("    Account#: " + Integer.toString(account.getAccountNumber()));
-        frozenBal.setText(" (" + Double.toString(account.getTotalUnfrozen()) + ")");
-        totalBal.setText("    Balance: " + Double.toString(account.getTotalBalance()));
+        frozenBal.setText(" (" + df.format(account.getTotalUnfrozen()) + ")");
+        totalBal.setText("    Balance: " + df.format(account.getTotalBalance()));
     }
 }
