@@ -47,7 +47,7 @@ public class Display {
         tabs.getTabs().add(bank.getBankTab());
         tabs.getSelectionModel().selectedItemProperty().addListener((ov, oldTab, newTab) -> {
             currentTab = newTab;
-            if(currentTab.getId() != "Bank" && oldTab.getId() !="Bank"){
+            if(currentTab.getId() != "Bank"){
                 AuctionTab hold = auctions.get(Integer.parseInt(currentTab.getId()));
                 hold.replaceButtons(leaveAuc,bid);
             }
@@ -127,5 +127,8 @@ public class Display {
         newTransfer.setResizable(false);
         newTransfer.initOwner(stage);
         newTransfer.show();
+    }
+    public int getCurrentTab(){
+        return Integer.parseInt(currentTab.getId());
     }
 }

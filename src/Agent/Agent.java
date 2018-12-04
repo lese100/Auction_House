@@ -201,7 +201,7 @@ public class Agent extends Application {
             }
         });
         leaveAuc.setOnAction(event -> {
-            AuctionHouseLink link = auctionHouses.get(display.getSelectedAuctionHouse().getNumericalID());
+            AuctionHouseLink link = auctionHouses.get(display.getCurrentTab());
             if(link.getProxy().closeRequest(myRecords,link.getSecretKey())){
                 auctionHouses.remove(link.getId().getNumericalID());
                 display.removeCurrentTab();
