@@ -330,10 +330,6 @@ public class AuctionHouse {
     public void updateAmountOwed(double owed){
         amountOwed += owed;
 
-        if (amountOwed == -0.0){
-            amountOwed = 0.0;
-        }
-
         display.updateAmountOwed(amountOwed);
     }
 

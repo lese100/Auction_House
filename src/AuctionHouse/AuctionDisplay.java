@@ -247,7 +247,11 @@ public class AuctionDisplay {
     }
 
     public void updateAmountOwed(double owed){
-        amountOwed.setText("\tAmount Owed: $" + df.format(owed) + "\t");
+        if(owed == 0){
+            amountOwed.setText("\tAmount Owed: $0.00\t");
+        }else{
+            amountOwed.setText("\tAmount Owed: $" + df.format(owed) + "\t");
+        }
     }
 
 
