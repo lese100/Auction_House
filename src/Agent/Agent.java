@@ -200,6 +200,15 @@ public class Agent extends Application {
                 System.out.println("Can't Bid");
             }
         });
+        stage.setOnCloseRequest(event -> {
+            event.consume();
+            if(auctionHouses.isEmpty() && bankProxy.closeRequest(myRecords)){
+                canIClose = true;
+                stop();
+            }else{
+                display.displayNotification("Please transfer all funds and leave all auctions");
+            }
+        });
         leaveAuc.setOnAction(event -> {
             AuctionHouseLink link = auctionHouses.get(display.getCurrentTab());
             if(link.getProxy().closeRequest(myRecords,link.getSecretKey())){
