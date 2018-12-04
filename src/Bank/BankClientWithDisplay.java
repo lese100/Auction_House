@@ -150,13 +150,16 @@ public class BankClientWithDisplay {
         setButtonHandlers(btnGetSecretKey);
         Button btnTransferFunds = new Button("Transfer $100");
         setButtonHandlers(btnTransferFunds);
+        Button btnCloseAccount = new Button("Close Account");
+        setButtonHandlers(btnCloseAccount);
 
         FlowPane flowPaneBottomButtons = new FlowPane();
         flowPaneBottomButtons.getChildren().addAll(
             btnConnectToBank, btnSendTestMsg, btnOpenAgentAccount,
             btnOpenAHAccount, btnCheckBalance,
             btnAddFunds, btnFreezeFunds, btnUnFreezeFunds,
-            btnGetListOfAuctionHouses, btnGetSecretKey, btnTransferFunds);
+            btnGetListOfAuctionHouses, btnGetSecretKey, btnTransferFunds,
+            btnCloseAccount);
         flowPaneBottomButtons.setPadding(new Insets(10, 10, 10, 10));
         flowPaneBottomButtons.setHgap(10);
         flowPaneBottomButtons.setVgap(10);
@@ -301,6 +304,16 @@ public class BankClientWithDisplay {
                     public void handle(ActionEvent event) {
                         System.out.println("Transfering Funds");
                         transferFunds();
+                    }
+                });
+                break;
+
+            case "Close Account":
+                button.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                        System.out.println("Attempting to Close Account");
+                        closeAccount();
                     }
                 });
                 break;
@@ -595,6 +608,46 @@ public class BankClientWithDisplay {
         choiceBoxAccountType.setValue(
             myBankAccount.getAccountType().toString()
         );
+    }
+
+    public void closeAccount () {
+        // using information from GUI for acct # and acct type
+        // and construct a temporary simulated IDRecord
+        IDRecord tempIDRecord;
+        int tempAcctNumber =
+            Integer.parseInt(textFieldAccountNumber.getText());
+        System.out.println("Attempting to close Bank account " +
+            tempAcctNumber );
+        String acctTypeString = choiceBoxAccountType.getValue().toString();
+        // construct a temporary simulated IDRecord
+        IDRecord.RecordType tempRecordType;
+        switch(acctTypeString){
+            case "AGENT":
+                tempRecordType = IDRecord.RecordType.AGENT;
+                break;
+            case "AUCTION_HOUSE":
+                tempRecordType = IDRecord.RecordType.AUCTION_HOUSE;
+                break;
+            default:
+                tempRecordType = IDRecord.RecordType.AGENT;
+                break;
+        }
+        tempIDRecord = new IDRecord(tempRecordType, "unknown", 0.00,
+            "unknown", 0);
+        tempIDRecord.setNumericalID(tempAcctNumber);
+        boolean accountClosed = bankProxyForTesting.closeAccount(tempIDRecord);
+        System.out.println("BCWD.closeAccount(): accountClosed = " +
+            accountClosed);
+
+        // update GUI display
+        if ( accountClosed ) {
+            textAreaOutput.appendText("\nAccount # " + tempAcctNumber +
+                " has been CLOSED!");
+        } else {
+            textAreaOutput.appendText("\nAccount # " + tempAcctNumber +
+                " could NOT be closed!");
+        }
+
     }
 
 

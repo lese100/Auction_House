@@ -147,7 +147,31 @@ public class BankProxyForTesting {
         }
 
         if ( reply.getMessageIdentifier() ==
-            Message.MessageIdentifier.TRANSFER_SUCCESS ) {
+             Message.MessageIdentifier.TRANSFER_SUCCESS ) {
+
+            return true;
+
+        } else {
+            return false;
+        }
+    }
+
+    public boolean closeAccount( IDRecord theIDRecord ) {
+
+        Message message = null;
+        Message reply = null;
+        try {
+            message =
+                new Message<>(Message.MessageIdentifier.CLOSE_REQUEST,
+                    theIDRecord);
+            reply = cs.sendMessage(message);
+
+        } catch( IOException ioe ) {
+            ioe.printStackTrace();
+        }
+
+        if ( reply.getMessageIdentifier() ==
+             Message.MessageIdentifier.CLOSE_ACCEPTED ) {
 
             return true;
 

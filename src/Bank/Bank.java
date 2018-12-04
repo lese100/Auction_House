@@ -362,8 +362,21 @@ public class Bank {
                 hashMapOfAllAccts.remove(theBankAccountNumber);
 
                 // 3(b) Remove account from listOfAuctionHouseIDRecords
-                // will this work? Does it know how to compare IDRecords?
-                listOfAuctionHouseIDRecords.remove(theIDRecord);
+                // Complicated because process doesn't know how to compare
+                // IDRecords (IDRecord class not over-riding .equals() method),
+                // so using list.remove(Obj) does not work!
+                // so we try something different …
+                int indexToRemove = -1;
+                for ( int i = 0; i < listOfAuctionHouseIDRecords.size(); i++ ) {
+                    int tempAcctNum = (listOfAuctionHouseIDRecords.get(i)).getNumericalID();
+                    if (tempAcctNum == theBankAccountNumber ) {
+                        indexToRemove = i;
+                        break;
+                    }
+                }
+                if ( indexToRemove >= 0 ) {
+                    listOfAuctionHouseIDRecords.remove(indexToRemove);
+                }
 
                 // 3(c) More difficult: remove from the HashMap of secretKeys
                 Set<Integer> setOfSecretKeys = hashMapOfSecretKeys.keySet();
@@ -377,7 +390,8 @@ public class Bank {
                     }
                 }
 
-                // 3(d) then return BankAccount
+                // 3(d) then update display and return BankAccount
+                updateBankDisplay();
                 return theBankAccount;
 
 
@@ -387,15 +401,36 @@ public class Bank {
                        BankAccount.AccountType.AGENT &&
                        theBankAccount.getTotalFrozen() == 0.0) {
 
+                System.out.println("Bank.removeAccount: before removing " +
+                    "from hashMapOfAllAccts, it looks like this: " +
+                    hashMapOfAllAccts );
                 // 4(a) Remove account from hashMapOfAllAccts
                 hashMapOfAllAccts.remove(theBankAccountNumber);
+                System.out.println("Bank.removeAccount: after removing " +
+                    "from hashMapOfAllAccts, it looks like this: " +
+                    hashMapOfAllAccts );
 
                 // 4(b) Remove account from listOfAgentIDRecords
-                // will this work? Does it know how to compare IDRecords?
-                listOfAgentIDRecords.remove(theIDRecord);
+                // Complicated because process doesn't know how to compare
+                // IDRecords (IDRecord class not over-riding .equals() method),
+                // so using list.remove(Obj) does not work!
+                // so we try something different …
+                int indexToRemove = -1;
+                for ( int i = 0; i < listOfAgentIDRecords.size(); i++ ) {
+                    int tempAcctNum = (listOfAgentIDRecords.get(i)).getNumericalID();
+                    if (tempAcctNum == theBankAccountNumber ) {
+                        indexToRemove = i;
+                        break;
+                    }
+                }
+                if ( indexToRemove >= 0 ) {
+                    listOfAgentIDRecords.remove(indexToRemove);
+                }
 
                 // 4(c) More difficult: remove from the HashMap of secretKeys
                 Set<Integer> setOfSecretKeys = hashMapOfSecretKeys.keySet();
+                System.out.println("Bank.closeAccount(): Set Size = " +
+                    setOfSecretKeys.size());
                 for (int i : setOfSecretKeys) {
                     int tempAcctNum =
                         (hashMapOfSecretKeys.get(i)).getAGENT_ACCOUNT_NUMBER();
@@ -405,8 +440,11 @@ public class Bank {
                         // with multiple secret keys; so keep searching
                     }
                 }
+                System.out.println("Bank.closeAccount(): Set Size = " +
+                    setOfSecretKeys.size());
 
-                // 4(d) then return BankAccount
+                // 4(d) then  update display and return BankAccount
+                updateBankDisplay();
                 return theBankAccount;
 
             } else {
@@ -535,10 +573,12 @@ public class Bank {
      */
     private void updateBankDisplay () {
 
+        System.out.println("Bank.updateBankDisplay(): entering");
         // create string of account info for displaying bankDisplay
         // first getting Agent accts, then Auction House accts
         summaryInfoString = "Summary of Account(s): " +
             "\n\nAcct # \tType \tBalance \t\tFrozen \t\tAvailable \tUser Name";
+        System.out.println("Bank.updateBankDisplay(): after summaryInfoString");
         for ( IDRecord rec : listOfAgentIDRecords ) {
             int tempAcctNum = rec.getNumericalID();
             BankAccount tempBA = hashMapOfAllAccts.get(tempAcctNum);
@@ -550,6 +590,7 @@ public class Bank {
                 "\t\t$" + df.format(tempBA.getTotalUnfrozen()) +
                 "\t\t" +  tempBA.getUserName();
         }
+        System.out.println("Bank.updateBankDisplay(): after listOfAgentIDRecords");
         for ( IDRecord rec : listOfAuctionHouseIDRecords ) {
             int tempAcctNum = rec.getNumericalID();
             BankAccount tempBA = hashMapOfAllAccts.get(tempAcctNum);
@@ -561,6 +602,7 @@ public class Bank {
                 "\t\t$" +  df.format(tempBA.getTotalUnfrozen()) +
                 "\t\t" + tempBA.getUserName();
         }
+        System.out.println("Bank.updateBankDisplay(): after listOfAgentAHRecords");
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
