@@ -148,7 +148,7 @@ public class AuctionTab {
                 if(item.getBid().getBidState() == Bid.BidState.SOLD){
                     info = item.getItemName() + "\nSOLD";
                 }else {
-                    info = item.getItemName() + "\n" + bid;
+                    info = item.getItemName() + "\n$" + bid;
                 }
                 itemDisp.add(info);
             }
@@ -162,8 +162,8 @@ public class AuctionTab {
                 minBid.setText("Min Bid: SOLD");
                 bid.setDisable(true);
             }else{
-                currentPrice.setText("Current Bid: " + Double.toString(hold.getBid().getCurrentBid()));
-                minBid.setText("Min Bid: " + Double.toString(hold.getBid().getMinBid()));
+                currentPrice.setText("Current Bid: $" + Double.toString(hold.getBid().getCurrentBid()));
+                minBid.setText("Min Bid: $" + Double.toString(hold.getBid().getMinBid()));
                 bid.setDisable(false);
             }
             itemID.setText("     Item ID: " + Integer.toString(hold.getItemID()));

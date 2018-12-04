@@ -20,6 +20,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class BankTab {
     /**
      * sets up the bank display
      */
-    public BankTab(Button leave,Button getAuctions, Button getBalance,Button transfer,Button join){
+    public BankTab(Button leave,Button getAuctions, Button getBalance,Button transfer,Button join,double deposit){
         this.getAuctions = getAuctions;
         this.join = join;
         aucHouses = null;
@@ -63,6 +64,7 @@ public class BankTab {
         transferHold.getChildren().addAll(pendingTransactions,pending,transfer);
         transactions.getChildren().addAll(transferHold,purchaseHistory,purchases);
         transactions.setSpacing(10);
+        purchasedDisp.add("Deposit" + getSpacing("Deposit") + "+$" + deposit);
 
         pending.getSelectionModel().selectedIndexProperty().addListener(
                 new ChangeListener<Number>() {
@@ -157,7 +159,7 @@ public class BankTab {
         purchasedDisp.clear();
         for(AuctionItem item : purchased){
             String info = item.getItemName() + "_" + item.getItemID();
-            info += getSpacing(info) + "-" + item.getBid().getCurrentBid();
+            info += getSpacing(info) + "-$" + item.getBid().getCurrentBid();
             purchasedDisp.add(info);
         }
     }
@@ -172,7 +174,7 @@ public class BankTab {
         pendingDisp.clear();
         for(AuctionItem item : pendingTransfer){
             String info = item.getItemName() + "_" + item.getItemID();
-            info += getSpacing(info) + "-" + item.getBid().getCurrentBid();
+            info += getSpacing(info) + "-$" + item.getBid().getCurrentBid();
             pendingDisp.add(info);
         }
     }
@@ -184,7 +186,10 @@ public class BankTab {
         pendingTransfer.remove(selectedToTransfer);
         purchased.add(hold);
         updatePending();
-        updatePurchased();
+        //updatePurchased();
+        String info = hold.getItemName() + "_" + hold.getItemID();
+        info += getSpacing(info) + "-$" + hold.getBid().getCurrentBid();
+        purchasedDisp.add(info);
         return hold;
     }
     public void addTransferItem(AuctionItem item){

@@ -27,7 +27,7 @@ public class Display {
      * @param stage the main display stage
      */
     public Display(Stage stage,IDRecord myInfo,Button bid,Button leaveAuc,Button leaveBank,Button getAuction,Button getBalance,
-                   Button transfer,Button join){
+                   Button transfer,Button join,Double deposit){
         this.myInfo = myInfo;
         this.bid = bid;
         this.stage = stage;
@@ -42,7 +42,7 @@ public class Display {
         stage.setTitle("Agent Interface");
         tabs = new TabPane();
         Scene layout = new Scene(tabs,450,620, Color.WHITE);
-        bank = new BankTab(leaveBank,getAuction,getBalance,transfer,join);
+        bank = new BankTab(leaveBank,getAuction,getBalance,transfer,join,deposit);
         currentTab = bank.getBankTab();
         tabs.getTabs().add(bank.getBankTab());
         tabs.getSelectionModel().selectedItemProperty().addListener((ov, oldTab, newTab) -> {
@@ -113,7 +113,9 @@ public class Display {
     public IDRecord getSelectedAuctionHouse(){return bank.getSelectedItem();}
     public AuctionItem getSelectedTransfer(){return bank.getSelectedToTransfer();}
     public void addTransferItem(AuctionItem wonItem){
-        bank.addTransferItem(wonItem);
+        AuctionItem item = new AuctionItem(wonItem.getHouseID(),wonItem.getItemID(),wonItem.getItemName(),
+                wonItem.getBid());
+        bank.addTransferItem(item);
         displayNotification("New Transfer Request");
 
     }

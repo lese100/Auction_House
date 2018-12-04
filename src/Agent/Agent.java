@@ -23,7 +23,7 @@ public class Agent extends Application {
     private HashMap<Integer, AuctionHouseLink> auctionHouses;
     private Button bid, leaveAuc, leaveBank, getAuction, getBalance, transfer, join;
     private BankProxy bankProxy;
-    private Boolean canIClose;
+    private ArrayList<AuctionItem> waiting;
 
     /**
      * initial constructor
@@ -52,6 +52,7 @@ public class Agent extends Application {
     public void addTransferItem(AuctionItem item) {
         display.addTransferItem(item);
         BankAccount info = bankProxy.requestBalance(myRecords);
+        waiting.add(item);
         if(info != null) {
             display.updateLabels(info);
         }else{
@@ -80,11 +81,10 @@ public class Agent extends Application {
 
     @Override
     public void start(Stage stage) {
-        canIClose = true;
         Stage inputs = new Stage();
         inputs.setTitle("Connect");
         auctionHouses = new HashMap<>();
-
+        waiting = new ArrayList<>();
         /*set up host information*/
         GridPane grid = new GridPane();
         Label port = new Label("Port Number:");
@@ -171,7 +171,8 @@ public class Agent extends Application {
         transfer = new Button("Transfer Funds");
         join = new Button("Join");
         join.setDisable(true);
-        display = new Display(stage, myRecords, bid, leaveAuc, leaveBank, getAuction, getBalance, transfer, join);
+        display = new Display(stage, myRecords, bid, leaveAuc, leaveBank, getAuction, getBalance, transfer, join,
+                myRecords.getInitialBalance());
         if(me != null) {
             display.updateLabels(me);
         }else{
@@ -203,7 +204,6 @@ public class Agent extends Application {
         stage.setOnCloseRequest(event -> {
             event.consume();
             if(auctionHouses.isEmpty() && bankProxy.closeRequest(myRecords)){
-                canIClose = true;
                 stop();
             }else{
                 display.displayNotification("Please transfer all funds and leave all auctions");
@@ -211,16 +211,22 @@ public class Agent extends Application {
         });
         leaveAuc.setOnAction(event -> {
             AuctionHouseLink link = auctionHouses.get(display.getCurrentTab());
-            if(link.getProxy().closeRequest(myRecords,link.getSecretKey())){
+            boolean foundPending = false;
+            for(AuctionItem houseId : waiting){
+                if(houseId.getHouseID() == link.getId().getNumericalID()){
+                    foundPending = true;
+                    break;
+                }
+            }
+            if(link.getProxy().closeRequest(myRecords,link.getSecretKey()) && ! foundPending){
                 auctionHouses.remove(link.getId().getNumericalID());
                 display.removeCurrentTab();
             }else{
-                display.displayNotification("Cannot leave: Active Bids");
+                display.displayNotification("Cannot leave: Active Bids or Pending Transfers");
             }
         });
         leaveBank.setOnAction(event -> {
             if(auctionHouses.isEmpty() && bankProxy.closeRequest(myRecords)){
-                canIClose = true;
                 stop();
             }else{
                 display.displayNotification("Please transfer all funds and leave all auctions");
@@ -247,6 +253,7 @@ public class Agent extends Application {
             AuctionItem item = display.getSelectedTransfer();
             if (item != null) {
                 bankProxy.transferFunds(item);
+                waiting.remove(item);
                 BankAccount info = bankProxy.requestBalance(myRecords);
                 auctionHouses.get(item.getHouseID()).getProxy().transferedFunds(item);
                 if(info != null) {
@@ -263,7 +270,6 @@ public class Agent extends Application {
             join.setDisable(true);
             if(newAuctionHouse != null) {
                 if(!display.doesAuctionExist(newAuctionHouse.getNumericalID())) {
-                    canIClose = false;
                     AuctionHouseProxy proxy = new AuctionHouseProxy(newAuctionHouse.getHostname(),
                             newAuctionHouse.getPortNumber());
                     AccountLink link = new AccountLink(myRecords.getNumericalID(), newAuctionHouse.getNumericalID());
