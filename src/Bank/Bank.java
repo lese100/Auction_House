@@ -7,6 +7,7 @@ import Utility.NotificationServer;
 import javafx.application.Platform;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -42,6 +43,7 @@ public class Bank {
     private BankDisplay bankDisplay;
 
     private Random rng = new Random();
+    private DecimalFormat df = new DecimalFormat("####0.00");
 
     // ****************************** //
     //   Constructor(s)               //
@@ -325,6 +327,102 @@ public class Bank {
 
     }
 
+    public BankAccount closeAccount ( IDRecord theIDRecord ) {
+
+        // Basically, if request is legitimate, then remove associated
+        // item(s) from the:
+        // (1) hashMapOfAllAccts
+        // (2) listOfAuctionHouseIDRecords;
+        // (3) listOfAgentIDRecords
+        // (4) hashMapOfSecretKeys
+
+        // For closure requests from an Auction House, simply comply
+        // with request -- any un-realized gains from
+        // frozen-but-not-transferred funds from agent accounts is ignored
+
+        // For closure requests from an Agent, comply with request only
+        // if agent account has no frozen funds. Frozen funds indicate a
+        // transfer that is pending.
+
+        // (0) extract the Bank Account Number
+        int theBankAccountNumber = theIDRecord.getNumericalID();
+
+        // (1) Get the actual BankAccount
+        BankAccount theBankAccount =
+            hashMapOfAllAccts.get(theBankAccountNumber);
+
+        // (2) If such a BankAccount actually exists ...
+        if (theBankAccount != null) {
+
+            // (3) Check if we're dealing with an Auction House
+            if ( theBankAccount.getAccountType() ==
+                 BankAccount.AccountType.AUCTION_HOUSE) {
+
+                // 3(a) Remove account from hashMapOfAllAccts
+                hashMapOfAllAccts.remove(theBankAccountNumber);
+
+                // 3(b) Remove account from listOfAuctionHouseIDRecords
+                // will this work? Does it know how to compare IDRecords?
+                listOfAuctionHouseIDRecords.remove(theIDRecord);
+
+                // 3(c) More difficult: remove from the HashMap of secretKeys
+                Set<Integer> setOfSecretKeys = hashMapOfSecretKeys.keySet();
+                for (int i : setOfSecretKeys) {
+                    int tempAcctNum =
+                        (hashMapOfSecretKeys.get(i)).getAH_ACCOUNT_NUMBER();
+                    if ( tempAcctNum == theBankAccountNumber ) {
+                        hashMapOfSecretKeys.remove(i);
+                        // we don't break, because AH might be associated
+                        // with multiple secret keys; so keep searching
+                    }
+                }
+
+                // 3(d) then return BankAccount
+                return theBankAccount;
+
+
+            }
+            // (4) if account type is AGENT and Agent has no frozen funds
+            else if ( theBankAccount.getAccountType() ==
+                       BankAccount.AccountType.AGENT &&
+                       theBankAccount.getTotalFrozen() == 0.0) {
+
+                // 4(a) Remove account from hashMapOfAllAccts
+                hashMapOfAllAccts.remove(theBankAccountNumber);
+
+                // 4(b) Remove account from listOfAgentIDRecords
+                // will this work? Does it know how to compare IDRecords?
+                listOfAgentIDRecords.remove(theIDRecord);
+
+                // 4(c) More difficult: remove from the HashMap of secretKeys
+                Set<Integer> setOfSecretKeys = hashMapOfSecretKeys.keySet();
+                for (int i : setOfSecretKeys) {
+                    int tempAcctNum =
+                        (hashMapOfSecretKeys.get(i)).getAGENT_ACCOUNT_NUMBER();
+                    if ( tempAcctNum == theBankAccountNumber ) {
+                        hashMapOfSecretKeys.remove(i);
+                        // we don't break, because AH might be associated
+                        // with multiple secret keys; so keep searching
+                    }
+                }
+
+                // 4(d) then return BankAccount
+                return theBankAccount;
+
+            } else {
+                // valid BankAccount but:
+                // not an auction house
+                // not an agent with 0 frozen funds
+                return new BankAccount();
+            }
+
+        } else {
+            // null BankAccount -- cannot close
+            return new BankAccount();
+        }
+
+    }
+
     public BankAccount getBankAccount (int secretKey) {
         // using a secretKey to obtain a BankAccount means/assumes that
         // the BankAccount belongs to an Agent that has been involved in
@@ -440,16 +538,17 @@ public class Bank {
         // create string of account info for displaying bankDisplay
         // first getting Agent accts, then Auction House accts
         summaryInfoString = "Summary of Account(s): " +
-            "\n\nAcct # \t Type \t Balance \t\t Available \t User Name";
+            "\n\nAcct # \tType \tBalance \t\tFrozen \t\tAvailable \tUser Name";
         for ( IDRecord rec : listOfAgentIDRecords ) {
             int tempAcctNum = rec.getNumericalID();
             BankAccount tempBA = hashMapOfAllAccts.get(tempAcctNum);
             summaryInfoString = summaryInfoString +
-                "\n" + tempAcctNum +
-                "\t" + rec.getRecordType() +
-                "\t$" + tempBA.getTotalBalance() +
-                "\t\t$" + tempBA.getTotalUnfrozen() +
-                "\t\t" + tempBA.getUserName();
+                "\n" +    tempAcctNum +
+                "\t" +    rec.getRecordType() +
+                "\t$" +   df.format(tempBA.getTotalBalance()) +
+                "\t\t$" + df.format(tempBA.getTotalFrozen()) +
+                "\t\t$" + df.format(tempBA.getTotalUnfrozen()) +
+                "\t\t" +  tempBA.getUserName();
         }
         for ( IDRecord rec : listOfAuctionHouseIDRecords ) {
             int tempAcctNum = rec.getNumericalID();
@@ -457,9 +556,10 @@ public class Bank {
             summaryInfoString = summaryInfoString +
                 "\n" + tempAcctNum +
                 "\tAH" +
-                "\t\t$" + tempBA.getTotalBalance() +
-                "\t\tN/A" +
-                "\t\t\t" + tempBA.getUserName();
+                "\t\t$" +  df.format(tempBA.getTotalBalance()) +
+                "\t\t$" +  df.format(tempBA.getTotalFrozen()) +
+                "\t\t$" +  df.format(tempBA.getTotalUnfrozen()) +
+                "\t\t" + tempBA.getUserName();
         }
         Platform.runLater(new Runnable() {
             @Override
