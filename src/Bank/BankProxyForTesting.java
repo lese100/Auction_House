@@ -133,6 +133,29 @@ public class BankProxyForTesting {
 
     }
 
+    public boolean transferFunds ( AuctionItem theAuctionItem ) {
+        Message message = null;
+        Message reply = null;
+        try {
+            message =
+                new Message<>(Message.MessageIdentifier.TRANSFER_FUNDS,
+                    theAuctionItem);
+            reply = cs.sendMessage(message);
+
+        } catch( IOException ioe ) {
+            ioe.printStackTrace();
+        }
+
+        if ( reply.getMessageIdentifier() ==
+            Message.MessageIdentifier.TRANSFER_SUCCESS ) {
+
+            return true;
+
+        } else {
+            return false;
+        }
+    }
+
     public String sendTestMessage () {
         Message message = null;
         try {

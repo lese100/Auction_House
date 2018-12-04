@@ -63,9 +63,9 @@ public class BankClientWithDisplay {
 
     private void initDisplay(Stage stage) {
         stage.setMinWidth(400);
-        stage.setMinHeight(500);
+        stage.setMinHeight(550);
         // stage.setMaxWidth(400);
-        stage.setMaxHeight(500);
+        stage.setMaxHeight(550);
 
         // VBox to hold contents for left side
         VBox vBox = new VBox();
@@ -148,13 +148,15 @@ public class BankClientWithDisplay {
         setButtonHandlers(btnGetListOfAuctionHouses);
         Button btnGetSecretKey = new Button("Get Secret Key");
         setButtonHandlers(btnGetSecretKey);
+        Button btnTransferFunds = new Button("Transfer $100");
+        setButtonHandlers(btnTransferFunds);
 
         FlowPane flowPaneBottomButtons = new FlowPane();
         flowPaneBottomButtons.getChildren().addAll(
             btnConnectToBank, btnSendTestMsg, btnOpenAgentAccount,
             btnOpenAHAccount, btnCheckBalance,
             btnAddFunds, btnFreezeFunds, btnUnFreezeFunds,
-            btnGetListOfAuctionHouses, btnGetSecretKey);
+            btnGetListOfAuctionHouses, btnGetSecretKey, btnTransferFunds);
         flowPaneBottomButtons.setPadding(new Insets(10, 10, 10, 10));
         flowPaneBottomButtons.setHgap(10);
         flowPaneBottomButtons.setVgap(10);
@@ -289,6 +291,16 @@ public class BankClientWithDisplay {
                     public void handle(ActionEvent event) {
                         System.out.println("Getting a Secret Key!");
                         getSecretKey();
+                    }
+                });
+                break;
+
+            case "Transfer $100":
+                button.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                        System.out.println("Transfering Funds");
+                        transferFunds();
                     }
                 });
                 break;
@@ -500,6 +512,34 @@ public class BankClientWithDisplay {
         System.out.println("BCWD.checkAndFreezeFunds(): fundsUnfrozen = " +
             fundsUnfrozen);
 
+    }
+
+    public void transferFunds() {
+        // use current secret key field in display to generate
+        // a simulated AuctionItem object, which will be the vehicle for
+        // communicating the info about the fund transfer (basically in a
+        // Bid object inside the AuctionItem object
+        int houseID = -1;
+        int itemID = -1;
+        String itemName = "unknown";
+        double minBid = 10.00;
+        double currentBid = 100.00; // should be winning bid and transfer amt
+        int secretKey =
+            Integer.parseInt(textFieldAccountLinkSecretKey.getText());
+        double proposedBid = 100.00;
+        Bid theBid = new Bid(minBid);
+        theBid.setBidState(Bid.BidState.BIDDING);
+        theBid.setCurrentBid(currentBid);
+        theBid.setSecretKey(secretKey);
+        theBid.setProposedBid(proposedBid);
+        AuctionItem theAuctionItem =
+            new AuctionItem(houseID, itemID, itemName, theBid);
+
+        // then send along the auction item to the BankProxy
+        boolean fundsTransferred =
+            bankProxyForTesting.transferFunds(theAuctionItem);
+        System.out.println("BCWD.transferFunds(): fundsTransferred = " +
+            fundsTransferred);
     }
 
     public void addFunds () {

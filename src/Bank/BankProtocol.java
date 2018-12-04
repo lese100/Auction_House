@@ -110,9 +110,30 @@ public class BankProtocol implements PublicAuctionProtocol {
                 break;
 
             case CLOSE_REQUEST:
-                msgToSend = new Message<>(Message.MessageIdentifier.
-                    ACKNOWLEDGED,
-                    null);
+                if ( msgContent instanceof IDRecord ) {
+                    IDRecord theIDRecord = (IDRecord) msgContent;
+                    BankAccount theBankAccount =
+                        bank.closeAccount(theIDRecord);
+                    if ( theBankAccount.getAccountNumber() != -1 ) {
+                        // request appears to have worked
+                        msgToSend =
+                            new Message<>(Message.MessageIdentifier.
+                                CLOSE_ACCEPTED,
+                                theBankAccount);
+                    } else {
+                        // request apparently rejected
+                        msgToSend =
+                            new Message<>(Message.MessageIdentifier.
+                                CLOSE_REJECTED,
+                                theBankAccount);
+                    }
+                } else {
+                    // incorrect msgContent; reject request
+                    msgToSend =
+                        new Message<>(Message.MessageIdentifier.
+                            CLOSE_REJECTED,
+                            new BankAccount());
+                }
                 break;
 
             case GET_LIST_OF_AUCTION_HOUSES:
