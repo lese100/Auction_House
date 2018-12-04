@@ -132,6 +132,7 @@ public class BankAccount implements Serializable {
     public synchronized void increaseTotalBalance (double balanceIncrease) {
         totalBalance += balanceIncrease;
         totalUnfrozen += balanceIncrease;
+        roundAllValues();
     }
 
     /**
@@ -148,6 +149,7 @@ public class BankAccount implements Serializable {
             totalFrozen += freezeIncrease;
             totalUnfrozen = totalUnfrozen - freezeIncrease;
             // and does not change total balance
+            roundAllValues();
             return true;
         }
         return false;
@@ -166,6 +168,7 @@ public class BankAccount implements Serializable {
         if ( totalFrozen >= freezeDecrease ) {
             totalFrozen -= freezeDecrease;
             totalUnfrozen += freezeDecrease;
+            roundAllValues();
             // and this does not change total balance
             return true;
         }
@@ -183,11 +186,11 @@ public class BankAccount implements Serializable {
     public synchronized boolean decreaseFrozenAndBalance (double decrease) {
         // used when transferring previously blocked funds
         // over to an auction house
-        totalFrozen = round(totalFrozen, 2);
         if ( totalFrozen >= decrease ) {
             totalFrozen -= decrease;
             totalBalance -= decrease;
             // and does not change the unfrozen balance
+            roundAllValues();
             return true;
         }
         return false;
@@ -208,6 +211,7 @@ public class BankAccount implements Serializable {
              totalFrozen += amountToFreeze;
              totalUnfrozen -= amountToFreeze;
              // and total balance does not change
+            roundAllValues();
             return true;
         }
         return false;
@@ -234,6 +238,14 @@ public class BankAccount implements Serializable {
         BigDecimal bd = new BigDecimal(value);
         bd = bd.setScale(places, RoundingMode.HALF_UP);
         return bd.doubleValue();
+    }
+
+    private void roundAllValues() {
+
+        totalBalance = round(totalBalance, 2);
+        totalFrozen = round(totalFrozen, 2);
+        totalUnfrozen = round(totalUnfrozen, 2);
+
     }
 
 }
