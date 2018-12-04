@@ -1,6 +1,7 @@
 package AuctionHouse;
 
 import Utility.AuctionItem;
+import Utility.Bid;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -48,6 +49,7 @@ public class AuctionDisplay {
     private Stage newWindow;
 
     private DecimalFormat df;
+    private DecimalFormat itemDF;
 
 
     // ****************************** //
@@ -58,6 +60,7 @@ public class AuctionDisplay {
         this.window = window;
 
         df = new DecimalFormat("####0.00");
+        itemDF = new DecimalFormat("00");
 
         initializeDisplay();
     }
@@ -200,7 +203,7 @@ public class AuctionDisplay {
         newWindow.show();
     }
 
-    public void setupAHInitializers(Button createAuctionHouse, Stage newWindow){
+    public void setupAHGUIComponents(Button createAuctionHouse, Stage newWindow){
         gridPane.add(createAuctionHouse, 1, 5);
         this.newWindow = newWindow;
     }
@@ -214,12 +217,21 @@ public class AuctionDisplay {
 
         for(int i = 0; i < auctionItems.size(); i++){
             AuctionItem ai = auctionItems.get(i);
-            output = output + "\nITEM ID: " + ai.getItemID() +
-                    "\t BID STATE: " + ai.getBid().getBidState() +
-                    "\t MIN BID: $" + df.format(ai.getBid().getMinBid()) +
-                    "\t CURRENT BID: $" + df.format(ai.getBid().
-                    getCurrentBid()) +
-                    "\t ITEM NAME: " + ai.getItemName();
+            if(ai.getBid().getBidState() == Bid.BidState.BIDDING){
+                output = output + "\nITEM ID: " + itemDF.format(ai.getItemID()) +
+                        "\t BID STATE: " + ai.getBid().getBidState() +
+                        "\t MIN BID: $" + df.format(ai.getBid().getMinBid()) +
+                        "\t CURRENT BID: $" + df.format(ai.getBid().
+                        getCurrentBid()) +
+                        "\t ITEM NAME: " + ai.getItemName();
+            }else{
+                output = output + "\nITEM ID: " + itemDF.format(ai.getItemID()) +
+                        "\t BID STATE: " + ai.getBid().getBidState() + "      " +
+                        "\t MIN BID: $" + df.format(ai.getBid().getMinBid()) +
+                        "\t CURRENT BID: $" + df.format(ai.getBid().
+                        getCurrentBid()) +
+                        "\t ITEM NAME: " + ai.getItemName();
+            }
         }
 
         auctionTextArea.setText(output);

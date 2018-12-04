@@ -1,15 +1,10 @@
 package AuctionHouse;
 
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
-import java.beans.EventHandler;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Map;
 
 /**
  * The Main class within the AuctionHouse package, providing the construction
@@ -103,7 +98,7 @@ public class Main extends Application {
             }
         });
 
-        auctionDisplay.setupAHInitializers(createAuctionHouse, newWindow);
+        auctionDisplay.setupAHGUIComponents(createAuctionHouse, newWindow);
 
     }
 }

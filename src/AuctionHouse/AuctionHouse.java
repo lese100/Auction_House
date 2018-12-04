@@ -55,7 +55,7 @@ public class AuctionHouse {
         CommunicationService cs;
         try{
             cs = new CommunicationService(bankHostName, bankPort);
-            display.updateConsoleDisplay("Connected to Bank Host: " +
+            display.updateConsoleDisplay("Connected to Bank — Host: " +
                     bankHostName + " Port: " + bankPort);
         }catch(ConnectException e){
             cs = null;
@@ -219,7 +219,7 @@ public class AuctionHouse {
 
     public void joinAuctionHouse(IDRecord agentInfo) throws IOException{
         display.updateConsoleDisplay("Agent \"" + agentInfo.getName() + "\" " +
-                "connected to this Auction House" +
+                "has connected." +
                 " — Host: " + agentInfo.getHostname() + " Port: " +
                 agentInfo.getPortNumber());
 
@@ -329,6 +329,10 @@ public class AuctionHouse {
 
     public void updateAmountOwed(double owed){
         amountOwed += owed;
+
+        if (amountOwed == -0.0){
+            amountOwed = 0.0;
+        }
 
         display.updateAmountOwed(amountOwed);
     }
