@@ -24,6 +24,7 @@ public class Agent extends Application {
     private Button bid, leaveAuc, leaveBank, getAuction, getBalance, transfer, join;
     private BankProxy bankProxy;
     private ArrayList<AuctionItem> waiting;
+    private boolean bankFlag;
 
     /**
      * initial constructor
@@ -81,6 +82,7 @@ public class Agent extends Application {
 
     @Override
     public void start(Stage stage) {
+        bankFlag = false;
         Stage inputs = new Stage();
         inputs.setTitle("Connect");
         auctionHouses = new HashMap<>();
@@ -176,6 +178,7 @@ public class Agent extends Application {
         if(me != null) {
             display.updateLabels(me);
         }else{
+            bankFlag = true;
             System.out.println("can't get balance");
         }
 
@@ -202,11 +205,14 @@ public class Agent extends Application {
             }
         });
         stage.setOnCloseRequest(event -> {
-            event.consume();
-            if(auctionHouses.isEmpty() && bankProxy.closeRequest(myRecords)){
-                stop();
-            }else{
-                display.displayNotification("Please transfer all funds and leave all auctions");
+            if(!bankFlag) {
+                event.consume();
+                System.out.println(bankProxy);
+                if (auctionHouses.isEmpty() && bankProxy.closeRequest(myRecords)) {
+                    stop();
+                } else {
+                    display.displayNotification("Please transfer all funds and leave all auctions");
+                }
             }
         });
         leaveAuc.setOnAction(event -> {
@@ -218,11 +224,15 @@ public class Agent extends Application {
                     break;
                 }
             }
-            if(link.getProxy().closeRequest(myRecords,link.getSecretKey()) && ! foundPending){
-                auctionHouses.remove(link.getId().getNumericalID());
-                display.removeCurrentTab();
+            if(!foundPending) {
+                if (link.getProxy().closeRequest(myRecords, link.getSecretKey())) {
+                    auctionHouses.remove(link.getId().getNumericalID());
+                    display.removeCurrentTab();
+                } else {
+                    display.displayNotification("Cannot leave: Active Bids");
+                }
             }else{
-                display.displayNotification("Cannot leave: Active Bids or Pending Transfers");
+                display.displayNotification("Cannot leave: Pending Transfers");
             }
         });
         leaveBank.setOnAction(event -> {

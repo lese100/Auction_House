@@ -105,8 +105,7 @@ public class BankTab {
                 });
 
         HBox leaveHold = new HBox();
-        Label leaveSpacing = new Label("                                                                       " +
-                "                                       ");
+        Label leaveSpacing = new Label("                                                                       ");
         leaveHold.getChildren().addAll(leaveSpacing,leave);
 
         name = new Label("  name");

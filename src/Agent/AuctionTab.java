@@ -113,8 +113,7 @@ public class AuctionTab {
         hold.setAlignment(Pos.BASELINE_CENTER);
 
         leaveHold = new HBox();
-        Label leaveSpacing = new Label("                                                                       " +
-                "                                       ");
+        Label leaveSpacing = new Label("                                                                       ");
         leaveHold.getChildren().addAll(leaveSpacing,this.leave);
 
         pane.setPadding(new Insets(10,10,10,10));
