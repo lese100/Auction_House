@@ -69,7 +69,10 @@ public class BankTab {
                     @Override
                     public void changed(ObservableValue<? extends Number> observable,
                                         Number oldValue, Number newValue) {
-                        selectedToTransfer = (int)newValue;
+                        int selected = (int)newValue;
+                        if(selected >= 0 && selected <pendingTransfer.size()){
+                            selectedToTransfer = selected;
+                        }
                     }
                 });
 
@@ -153,8 +156,8 @@ public class BankTab {
     private void updatePurchased(){
         purchasedDisp.clear();
         for(AuctionItem item : purchased){
-            String info = item.getItemName() + "_" + item.getItemID()+"   -";
-            info += getSpacing(info) + item.getBid().getCurrentBid();
+            String info = item.getItemName() + "_" + item.getItemID();
+            info += getSpacing(info) + "-" + item.getBid().getCurrentBid();
             purchasedDisp.add(info);
         }
     }
