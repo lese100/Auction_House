@@ -133,4 +133,13 @@ public class IDRecord implements Serializable {
         this.numericalID = numericalID;
     }
 
+    @Override
+    public String toString(){
+        return recordType + " IDRecord:\n" +
+                "Name: " + name + "\n" +
+                "NumericalID: " + numericalID + "\n" +
+                "HostName: " + hostname + "\n" +
+                "PortNumber: " + portNumber + "\n" +
+                "InitialBalance: " + initialBalance;
+    }
 }
