@@ -24,7 +24,7 @@ import java.util.*;
 public class AuctionHouse {
 
     private final int NUM_AUCTION_ITEMS = 15;
-    private final long BID_TIMER = 10000;
+    private final long BID_TIMER = 30000;
 
     private IDRecord idRecord;
     private AuctionDisplay display;

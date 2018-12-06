@@ -17,6 +17,7 @@ import java.io.Serializable;
 public class BidTimer implements Runnable, Serializable {
 
     private final long TIME;
+    private final long ONE_SEC = 1000;
     private AgentProxy ap;
     private AuctionItem ai;
     private boolean stillValid;
@@ -67,10 +68,19 @@ public class BidTimer implements Runnable, Serializable {
     @Override
     public void run() {
         try{
-            Thread.sleep(TIME);
+
+            for(int i = 0; i < TIME/ONE_SEC; i++){
+                if(stillValid){
+                    ai.setTimeLeftOnBid((int)(TIME/ONE_SEC - i));
+                    ah.updateDisplay();
+                    Thread.sleep(ONE_SEC);
+                }
+            }
+
             if(stillValid){
                 ap.notifyWinner(ai);
                 ai.getBid().setBidState(Bid.BidState.SOLD);
+                ai.setTimeLeftOnBid(0);
                 ah.updateDisplay();
                 ah.updateAgentsAboutChanges();
                 Platform.runLater(new Runnable() {

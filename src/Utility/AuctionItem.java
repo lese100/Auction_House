@@ -5,7 +5,7 @@ import java.io.Serializable;
 import AuctionHouse.AgentProxy;
 import AuctionHouse.AuctionHouse;
 import AuctionHouse.BidTimer;
-import Utility.Bid.BidState;
+
 /**
  * Provides a structure for managing and observing an Auction Item which
  * will be contained in an Auction House. Each AuctionItem holds its
@@ -32,6 +32,7 @@ public class AuctionItem implements Serializable {
     //irrelevant when passing an AuctionItem between Public Auction
     //components, and need not be serialized.
     private transient BidTimer bidTimer;
+    private transient int timeLeftOnBid;
 
     // ****************************** //
     //   Constructor(s)               //
@@ -125,6 +126,23 @@ public class AuctionItem implements Serializable {
      * @param newBid bid object that is replacing the old one
      */
     public void setBid(Bid newBid){bid = newBid;}
+
+    /**
+     * Sets the time left on current bid. If 0, the bid either hasn't
+     * begun or is over.
+     * @param timeLeftOnBid int amount of sec left on bid
+     */
+    public void setTimeLeftOnBid(int timeLeftOnBid){
+        this.timeLeftOnBid = timeLeftOnBid;
+    }
+
+    /**
+     * Used by AuctionGUI to display time left on bid.
+     * @return int the amount of time left on the bid
+     */
+    public int getTimeLeftOnBid(){
+        return timeLeftOnBid;
+    }
 
     public void startTimer(long time, AgentProxy ap, AuctionHouse ah){
         if(bidTimer != null){

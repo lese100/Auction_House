@@ -206,8 +206,14 @@ public class AuctionDisplay {
 
         Label consoleLabel = new Label("Console");
         auctionLabel = new Label("AuctionHouse");
-        bankBalance = new Label("\tBank Balance: $0.00\t");
+        bankBalance = new Label("\t\tBank Balance: $0.00\t");
         amountOwed = new Label("\tAmount Owed: $0.00");
+
+        consoleLabel.setFont(new Font("Arial", 15));
+        auctionLabel.setFont(new Font("Arial", 15));
+        bankBalance.setFont(new Font("Arial", 15));
+        amountOwed.setFont(new Font("Arial", 15));
+
 
         HBox hbox = new HBox();
 
@@ -235,6 +241,11 @@ public class AuctionDisplay {
             theTable.getSelectionModel().clearSelection();
         });
 
+        TableColumn colBidTimer = new TableColumn<>("Bid Timer");
+        colBidTimer.setMinWidth(10);
+        colBidTimer.setCellValueFactory(
+                new PropertyValueFactory<AuctionItem, Integer>("timeLeftOnBid")
+        );
 
         TableColumn colItemID = new TableColumn<>("Item ID");
         colItemID.setMinWidth(20);
@@ -243,7 +254,7 @@ public class AuctionDisplay {
         );
 
         TableColumn colItemName = new TableColumn<>("Item Name");
-        colItemName.setMinWidth(345);
+        colItemName.setMinWidth(269);
         colItemName.setCellValueFactory(
                 new PropertyValueFactory<AuctionItem, String>("itemName"));
 
@@ -255,14 +266,14 @@ public class AuctionDisplay {
         );
 
         TableColumn colMinBid = new TableColumn<>("Min Bid");
-        colMinBid.setMinWidth(50);
+        colMinBid.setMinWidth(55);
         colMinBid.setCellValueFactory(
                 new PropertyValueFactory<AuctionItem,
                         Double>("bidsMinBid")
         );
 
         TableColumn colCurrentBid = new TableColumn<>("Current Bid");
-        colCurrentBid.setMinWidth(50);
+        colCurrentBid.setMinWidth(55);
         colCurrentBid.setCellValueFactory(
                 new PropertyValueFactory<AuctionItem, Double>("bidsCurrentBid")
         );
@@ -277,8 +288,8 @@ public class AuctionDisplay {
         theTable.setItems(auctions);
 
         theTable.getColumns().addAll(
-                colItemID, colItemName, colBidState,
-                colMinBid, colCurrentBid
+                colItemID, colItemName, colBidState, colBidTimer,
+                colCurrentBid, colMinBid
         );
 
         theTable.getSortOrder().addAll(colItemID);
@@ -447,6 +458,34 @@ public class AuctionDisplay {
             }
         });
 
+        colBidTimer.setCellFactory(new Callback<TableColumn, TableCell>() {
+            @Override
+            public TableCell call(TableColumn param) {
+                TableCell cell = new TableCell<AuctionItem, Integer>() {
+                    @Override
+                    public void updateItem(Integer item, boolean empty) {
+                        super.updateItem(item, empty);
+                        setText(empty ? null : getString());
+                        setGraphic(null);
+                    }
+                    private String getString() {
+                        String ret = "";
+                        if (getItem() != null) {
+                            if(getItem() == 0){
+                                ret = null;
+                            }else{
+                                String gi = getItem().toString();
+                                ret = gi;
+                            }
+                        }
+                        return ret;
+                    }
+                };
+                cell.setStyle("-fx-alignment: center;");
+                return cell;
+            }
+        });
+
 
         auctionPane.setTop(hbox);
         auctionPane.setBottom(theTable);
@@ -515,7 +554,7 @@ public class AuctionDisplay {
      * @param balance the amount of total funds available to the AuctionHouse
      */
     public void updateBankBalance(double balance){
-        bankBalance.setText("\tBank Balance: $" + df.format(balance) + "\t");
+        bankBalance.setText("\t\tBank Balance: $" + df.format(balance) + "\t");
     }
 
     /**
