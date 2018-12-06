@@ -2,7 +2,6 @@ package AuctionHouse;
 
 import Utility.*;
 import javafx.application.Platform;
-
 import java.io.IOException;
 
 /**
@@ -21,6 +20,12 @@ public class AuctionHouseProtocol implements PublicAuctionProtocol {
     //   Constructor(s)               //
     // ****************************** //
 
+    /**
+     * Constructor for an AuctionHouseProtocol. Holds a reference to the
+     * AuctionHouse class in order to properly execute AuctionHouse methods
+     * when routing messages.
+     * @param auctionHouse
+     */
     public AuctionHouseProtocol(AuctionHouse auctionHouse){
         this.auctionHouse = auctionHouse;
     }
@@ -29,6 +34,14 @@ public class AuctionHouseProtocol implements PublicAuctionProtocol {
     //   Override Methods             //
     // ****************************** //
 
+    /**
+     * Opens a message, executes a set of instructions based on the message's
+     * content, then returns a reply message to be sent back to the original
+     * sender.
+     * @param message received message that will be read
+     * @return reply message that will be sent to the original sender in
+     * response to the received message
+     */
     @Override
     public Message handleMessage(Message message) {
 

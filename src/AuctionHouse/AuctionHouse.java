@@ -1,12 +1,10 @@
 package AuctionHouse;
 
 import Utility.*;
-
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.ConnectException;
-import java.net.SocketException;
 import java.util.*;
 
 /**
@@ -41,6 +39,19 @@ public class AuctionHouse {
     //   Constructor(s)               //
     // ****************************** //
 
+    /**
+     * Constructor for the AuctionHouse. After the user has filled in
+     * necessary setup information (Name, HostName, Port, BankHostName,
+     * BankPort), an AuctionHouse is created and passed a reference of its
+     * display.
+     * @param display The AuctionHouse GUI class
+     * @param name A string name to describe the AuctionHouse
+     * @param hostName The hostname of the pc this auction house is running on
+     * @param port The chosen port number for this auction house to run on
+     * @param bankHostName The hostname of the pc the bank runs on
+     * @param bankPort The port number the bank is running on
+     * @throws IOException
+     */
     public AuctionHouse(AuctionDisplay display, String name, String hostName,
                         int port, String bankHostName, int bankPort)
             throws IOException {
@@ -66,23 +77,9 @@ public class AuctionHouse {
         bankProxy = new BankProxy(cs);
         idRecord = bankProxy.openAccount(idRecord);
 
-
-        System.out.println("AH Created");
-        System.out.println("NAME:\t" + name);
-        System.out.println("HOST:\t" + hostName);
-        System.out.println("PORT:\t" + port);
-        System.out.println("BHOST:\t" + bankHostName);
-        System.out.println("BPORT:\t" + bankPort);
-
-        System.out.println("MY ACCOUNT NUM:" + idRecord.getNumericalID());
-        System.out.println("\n\n");
-
-
         List<String> names = createAuctionNames();
         List<Bid> bids = createBids();
         createAuctionItems(names, bids);
-
-        printAuctionItems();
 
         display.setupAHLabelInfo(name, idRecord.getNumericalID());
         updateDisplay();
@@ -97,6 +94,12 @@ public class AuctionHouse {
     //   Private Methods              //
     // ****************************** //
 
+    /**
+     * Creates a new AuctionItem with the same values as the passed
+     * AuctionItem. A copy of the contained bid is also made.
+     * @param auctionItem to be copied
+     * @return AuctionItem the copy of the passed auctionItem
+     */
     private AuctionItem createCopyAuctionItem(AuctionItem auctionItem){
         Bid bid = auctionItem.getBid();
 
@@ -112,6 +115,12 @@ public class AuctionHouse {
         return copyAuctionItem;
     }
 
+    /**
+     * Does a linear search through the list of auctions, returning the
+     * first AuctionItem that matches the itemOfInterest.
+     * @param itemOfInterest AuctionItem of interest
+     * @return Matching AuctionItem to the passed argument
+     */
     private AuctionItem findMatchingAuctionItem(AuctionItem itemOfInterest){
         for(AuctionItem ai : auctions){
             if(ai.equals(itemOfInterest)){
@@ -121,6 +130,12 @@ public class AuctionHouse {
         return null;
     }
 
+    /**
+     * Using an AuctionFileReader, randomly selects adjective/noun pairs
+     * from resource text files to be concatenated and returned as a list
+     * of String names for AuctionItems.
+     * @return Randomly generated List<String> AuctionItem names
+     */
     private List<String> createAuctionNames(){
         List<String> auctionNames = new ArrayList<>();
 
@@ -161,18 +176,30 @@ public class AuctionHouse {
         return auctionNames;
     }
 
+    /**
+     * Creates random bid objects by choosing a random double [0.00, 999.99]
+     * inclusive to be used as the starting minBid.
+     * @return List<Bid> to create AuctionItems.
+     */
     private List<Bid> createBids(){
         List<Bid> bids = new ArrayList<>();
         Random rand = new Random();
 
         for(int i = 0; i < NUM_AUCTION_ITEMS; i++){
-            Bid bid = new Bid(round(rand.nextInt(999) + rand.nextDouble(), 2));
+            Bid bid = new Bid(round(rand.nextInt(1000) + rand.nextDouble(), 2));
             bids.add(bid);
         }
 
         return bids;
     }
 
+    /**
+     * Using the randomly generated List of names and List of bids, creates
+     * a list of AuctionItems to be used as inventory of this AuctionHouse.
+     * @param names List of names of AuctionItems
+     * @param bids List of bid objects to be used when creating the
+     *             AuctionItems.
+     */
     private void createAuctionItems(List<String> names, List<Bid> bids){
         auctions = new ArrayList<>();
 
@@ -203,6 +230,9 @@ public class AuctionHouse {
         return bd.doubleValue();
     }
 
+    /**
+     * Debugging print method. Prints all AuctionItems to the console.
+     */
     private void printAuctionItems(){
         for(AuctionItem ai : auctions){
             System.out.println("ITEM ID: " + ai.getItemID() +
@@ -217,6 +247,17 @@ public class AuctionHouse {
     //   Public Methods               //
     // ****************************** //
 
+    /**
+     * This method is called when an agent requests to join the AuctionHouse.
+     * A CommunicationService is established with the agent to allow for
+     * future notifications about bids, which is then passed to an AgentProxy,
+     * whose reference will then be stored in a HashMap, with it's secretKey
+     * (found in the IDRecord's numericalID field) as the key, and the
+     * AgentProxy reference as the value.
+     * @param agentInfo IDRecord of the agent requesting to join the
+     *                  AuctionHouse
+     * @throws IOException
+     */
     public void joinAuctionHouse(IDRecord agentInfo) throws IOException{
         display.updateConsoleDisplay("Agent \"" + agentInfo.getName() + "\" " +
                 "has connected." +
@@ -236,6 +277,13 @@ public class AuctionHouse {
         connectedAgents.put(agentInfo.getNumericalID(), ap);
     }
 
+    /**
+     * Creates an AuctionHouseInventory object which contains this
+     * AuctionHouse's account number, and a current up-to-date list
+     * of AuctionItems. This object is then sent to each connected agent,
+     * usually to let them know of any changes that have been made in the
+     * AuctionHouse.
+     */
     public void updateAgentsAboutChanges(){
         AuctionHouseInventory ahi =
                 new AuctionHouseInventory(idRecord.getNumericalID(), auctions);
@@ -245,10 +293,40 @@ public class AuctionHouse {
         }
     }
 
+    /**
+     * Updates the AuctionHouse GUI with the current set of AuctionItems.
+     */
     public void updateDisplay(){
         display.updateAuctionItemDisplay(auctions);
     }
 
+    /**
+     * This method is called anytime an agent requests to make a bid on an
+     * AuctionItem in this AuctionHouse. The agent sends a copy of the
+     * AuctionItem they are interested in bidding on, and include the details
+     * of their bid in the attached Bid object (in the secretKey field — to
+     * identify who is making the bid, and the proposedBid field — to say
+     * how much they want to bid).
+     *
+     * Once a matching AuctionItem reference is found, a synchronized operation
+     * on that item commences. Checking first if the agent's bid was high
+     * enough (proposedBid >= minBid), then if the agent has sufficient funds
+     * in their account (by checking with the bank), and finally starting a
+     * BidTimer and notifying the agent of a successful bid in the case that
+     * all other tests checked out.
+     *
+     * If an item is being outbid, the previous bidder will be notified that
+     * they were outbid.
+     *
+     * If a successful bid is placed, all agents are notified of the changes.
+     *
+     * @param itemOfInterest copy of an AuctionItem that the agent wants to
+     *                       place a bid on. Contains the proposedBid and
+     *                       secretKey fields in the contained Bid object.
+     * @return MessageIdentifier that needs to be sent back to the bidding
+     *                           agent.
+     * @throws IOException
+     */
     public Message.MessageIdentifier makeBid
             (AuctionItem itemOfInterest) throws IOException{
 
@@ -303,6 +381,14 @@ public class AuctionHouse {
         return Message.MessageIdentifier.BID_ACCEPTED;
     }
 
+    /**
+     * Called whenever an agent requests to leave the AuctionHouse. If any
+     * bids are currently in a BIDDING status by that agent, the request
+     * will be denied. Otherwise, it'll be approved.
+     * @param idRecord IDRecord of the agent requesting to leave, including
+     *                 their secretKey in the numericalID field.
+     * @return True if agent is permitted to leave, else false.
+     */
     public boolean requestToLeaveAuctionHouse(IDRecord idRecord){
 
         for(AuctionItem ai : auctions){
@@ -319,6 +405,11 @@ public class AuctionHouse {
         return true;
     }
 
+    /**
+     * Checks if it's safe for the AuctionHouse to close, and leave the bank.
+     * @return True if no agents are still connected to the AuctionHouse,
+     *         else false.
+     */
     public boolean safeToClose(){
         if(connectedAgents.isEmpty()){
             bankProxy.closeAccount(idRecord);
@@ -327,12 +418,24 @@ public class AuctionHouse {
         return false;
     }
 
+    /**
+     * Adds to the current amount owed by any agents who have won an Auction.
+     * The amountOwed is then presented on the display.
+     * @param owed the amount to be added to amountOwed.
+     */
     public void updateAmountOwed(double owed){
         amountOwed += owed;
 
         display.updateAmountOwed(amountOwed);
     }
 
+    /**
+     * Requests an updated balance by messaging the bank. If the balance
+     * received is different that the previous balance (AuctionHouse balances
+     * can only ever go up), then the difference between the newBalance and
+     * oldBalance is removed from amountOwed. The current Bank Balance and
+     * amount owed totals are then updated on the AuctionHouse GUI.
+     */
     public void updateBankBalance(){
         double currentBalance = bankProxy.
                 checkFunds(idRecord).getTotalBalance();
@@ -349,10 +452,18 @@ public class AuctionHouse {
     //   Getter(s) & Setter(s)        //
     // ****************************** //
 
+    /**
+     * Returns the list of AuctionItems in this auction.
+     * @return List<AuctionItem>
+     */
     public List<AuctionItem> getAuctions(){
         return auctions;
     }
 
+    /**
+     * Returns the current IDRecord associated with this AuctionHouse.
+     * @return IDRecord
+     */
     public IDRecord getIdRecord(){
         return idRecord;
     }

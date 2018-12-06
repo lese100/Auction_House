@@ -14,7 +14,7 @@ package Utility;
 public interface PublicAuctionProtocol {
 
     /**
-     * Opens a message, executes a set of instructions based on the messages
+     * Opens a message, executes a set of instructions based on the message's
      * content, then returns a reply message to be sent back to the original
      * sender.
      * @param message received message that will be read

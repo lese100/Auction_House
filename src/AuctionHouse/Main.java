@@ -3,7 +3,6 @@ package AuctionHouse;
 import javafx.application.Application;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 
 /**
@@ -25,6 +24,10 @@ public class Main extends Application {
     //   Main Method                  //
     // ****************************** //
 
+    /**
+     * Standard main method that launches JavaFX application
+     * @param args command line arguments (unused in this program)
+     */
     public static void main(String[] args){
 
         launch(args);
@@ -35,6 +38,16 @@ public class Main extends Application {
     //   Private Methods              //
     // ****************************** //
 
+    /**
+     * Creates an AuctionHouse object with the information provided in the
+     * setup GUI.
+     * @param display
+     * @param auctionHouseName
+     * @param auctionHouseHostName
+     * @param auctionHousePort
+     * @param bankHostName
+     * @param bankPort
+     */
     private static void createAuctionHouse(AuctionDisplay display,
                                            String auctionHouseName,
                                            String auctionHouseHostName,
@@ -56,11 +69,24 @@ public class Main extends Application {
     //   Override Methods             //
     // ****************************** //
 
+    /**
+     * Override of stop method, called whenever the default close button
+     * is pressed. System.exit(0) will close all active threads of the
+     * program at once.
+     * @throws Exception
+     */
     @Override
     public void stop() throws Exception {
         System.exit(0);
     }
 
+    /**
+     * The starting point of the program. Creates the display, and
+     * defines the event handlers for the createAuctionHouse button and
+     * close button for the AuctionHouse Stage.
+     * @param primaryStage
+     * @throws Exception
+     */
     @Override
     public void start(Stage primaryStage) throws Exception {
 

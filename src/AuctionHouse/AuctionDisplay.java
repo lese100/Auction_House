@@ -2,13 +2,11 @@ package AuctionHouse;
 
 import Utility.AuctionItem;
 import Utility.Bid;
-import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import java.text.DecimalFormat;
 import java.util.List;
@@ -56,6 +54,12 @@ public class AuctionDisplay {
     //   Constructor(s)               //
     // ****************************** //
 
+    /**
+     * Constructor for the AuctionDisplay. Initializes the display
+     * (setup window), and DecimalFormat objects for a slightly nicer
+     * looking GUI.
+     * @param window
+     */
     public AuctionDisplay(Stage window){
         this.window = window;
 
@@ -70,6 +74,9 @@ public class AuctionDisplay {
     //   Private Methods              //
     // ****************************** //
 
+    /**
+     * Creates the initial setup window for an AuctionHouse.
+     */
     private void initializeDisplay(){
         window.setMinHeight(200);
         window.setMinWidth(330);
@@ -131,15 +138,22 @@ public class AuctionDisplay {
     //   Public Methods               //
     // ****************************** //
 
+    /**
+     * Displays an error message pop up with the passed String.
+     * @param errorMessage to be displayed
+     */
     public void displayErrorMessage(String errorMessage){
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setContentText(errorMessage);
         alert.show();
     }
 
+    /**
+     * Makes sure that Integers are present in the port number fields.
+     * @return True if all information filled out "correctly" else false.
+     */
     public boolean infoFilledOut(){
         boolean infoFilledOut = true;
-
 
         try{
             Integer.parseInt(auctionHousePort.getText().trim());
@@ -152,6 +166,11 @@ public class AuctionDisplay {
         return infoFilledOut;
     }
 
+    /**
+     * Creates the main AuctionHouse GUI that lists all AuctionItems,
+     * their statuses, and a console that gives useful information about
+     * connections/disconnections with the bank and agents.
+     */
     public void openTerminalWindow(){
         window.close();
 
@@ -203,30 +222,52 @@ public class AuctionDisplay {
         newWindow.show();
     }
 
-    public void setupAHGUIComponents(Button createAuctionHouse, Stage newWindow){
+    /**
+     * Updates the display with the passed button and Stage with appropriate
+     * EventHandlers attached to them from Main.
+     * @param createAuctionHouse button that initializes an AuctionHouse
+     *                           reference.
+     * @param newWindow Main AuctionHouse Stage that displays all auctions and
+     *                  a console with connection information.
+     */
+    public void setupAHGUIComponents(Button createAuctionHouse,
+                                     Stage newWindow){
         gridPane.add(createAuctionHouse, 1, 5);
         this.newWindow = newWindow;
     }
 
+    /**
+     * Sets up the AuctionHouse name and account ID labels.
+     * @param name Name of the AuctionHouse
+     * @param id Account Number of the AuctionHouse provided by the bank
+     */
     public void setupAHLabelInfo(String name, int id){
         auctionLabel.setText(name + " — ID: " + id);
     }
 
+    /**
+     * Updates the AuctionItems display portion of the main GUI.
+     * @param auctionItems a list of current AuctionItems
+     */
     public void updateAuctionItemDisplay(List<AuctionItem> auctionItems){
         String output = "Auction Item Information:";
 
         for(int i = 0; i < auctionItems.size(); i++){
             AuctionItem ai = auctionItems.get(i);
             if(ai.getBid().getBidState() == Bid.BidState.BIDDING){
-                output = output + "\nITEM ID: " + itemDF.format(ai.getItemID()) +
-                        "\t BID STATE: " + ai.getBid().getBidState() +
+                output = output + "\nITEM ID: " +
+                        itemDF.format(ai.getItemID()) +
+                        "\t BID STATE: " +
+                        ai.getBid().getBidState() +
                         "\t MIN BID: $" + df.format(ai.getBid().getMinBid()) +
                         "\t CURRENT BID: $" + df.format(ai.getBid().
                         getCurrentBid()) +
                         "\t ITEM NAME: " + ai.getItemName();
             }else{
-                output = output + "\nITEM ID: " + itemDF.format(ai.getItemID()) +
-                        "\t BID STATE: " + ai.getBid().getBidState() + "      " +
+                output = output + "\nITEM ID: " +
+                        itemDF.format(ai.getItemID()) +
+                        "\t BID STATE: " +
+                        ai.getBid().getBidState() + "      " +
                         "\t MIN BID: $" + df.format(ai.getBid().getMinBid()) +
                         "\t CURRENT BID: $" + df.format(ai.getBid().
                         getCurrentBid()) +
@@ -237,15 +278,28 @@ public class AuctionDisplay {
         auctionTextArea.setText(output);
     }
 
+    /**
+     * Appends any additional console messages to the display.
+     * @param message to be appended
+     */
     public void updateConsoleDisplay(String message){
         consoleText += "\n" + message;
         consoleTextArea.setText(consoleText);
     }
 
+    /**
+     * Updates the bankBalance label.
+     * @param balance the amount of total funds available to the AuctionHouse
+     */
     public void updateBankBalance(double balance){
         bankBalance.setText("\tBank Balance: $" + df.format(balance) + "\t");
     }
 
+    /**
+     * Updates the amountOwed label.
+     * @param owed the total amount of money agents owe this AuctionHouse for
+     *             won bids.
+     */
     public void updateAmountOwed(double owed){
         if(owed < 0.01){
             amountOwed.setText("\tAmount Owed: $0.00\t");
@@ -259,24 +313,43 @@ public class AuctionDisplay {
     //   Getter(s) & Setter(s)        //
     // ****************************** //
 
+    /**
+     * Useful getter function for initializing an AuctionHouse.
+     * @return the name of the AuctionHouse entered by the user
+     */
     public String getAuctionHouseName() {
         return auctionHouseName.getText().trim();
     }
 
+    /**
+     * Useful getter function for initializing an AuctionHouse.
+     * @return the HostName of the AuctionHouse entered by the user
+     */
     public String getAuctionHouseHostName() {
         return auctionHouseHostName.getText().trim();
     }
 
+    /**
+     * Useful getter function for initializing an AuctionHouse.
+     * @return the PortNumber of the AuctionHouse entered by the user
+     */
     public int getAuctionHousePort() {
         return Integer.parseInt(auctionHousePort.getText());
     }
 
+    /**
+     * Useful getter function for initializing an AuctionHouse.
+     * @return the HostName of the Bank entered by the user
+     */
     public String getBankHostName() {
         return bankHostName.getText().trim();
     }
 
+    /**
+     * Useful getter function for initializing an AuctionHouse.
+     * @return the PortNumber of the Bank entered by the user
+     */
     public int getBankPort() {
         return Integer.parseInt(bankPort.getText().trim());
     }
-
 }

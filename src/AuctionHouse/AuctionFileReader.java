@@ -19,7 +19,6 @@ public class AuctionFileReader {
     private BufferedReader file;
     private FileReader userFile;
 
-
     // ****************************** //
     //   Constructor(s)               //
     // ****************************** //

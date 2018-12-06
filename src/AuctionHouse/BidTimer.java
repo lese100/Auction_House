@@ -3,7 +3,6 @@ package AuctionHouse;
 import Utility.AuctionItem;
 import Utility.Bid;
 import javafx.application.Platform;
-
 import java.io.Serializable;
 
 /**
@@ -27,6 +26,16 @@ public class BidTimer implements Runnable, Serializable {
     //   Constructor(s)               //
     // ****************************** //
 
+    /**
+     * Constructor for a BidTimer. Bid timers are initialized with a long time,
+     * which decides how long the timer will last, and uses references of the
+     * related AgentProxy, AuctionItem, and AuctionHouse to notify the
+     * appropriate parties of the timer finishing.
+     * @param time How long the BidTimer will last for
+     * @param ap The AgentProxy reference of the agent who bid on the item
+     * @param ai The AuctionItem the agent bid on
+     * @param ah The AuctionHouse the item that was bid on is in
+     */
     public BidTimer(long time, AgentProxy ap, AuctionItem ai, AuctionHouse ah){
         this.TIME = time;
         this.ap = ap;
@@ -38,6 +47,10 @@ public class BidTimer implements Runnable, Serializable {
     //   Public Methods               //
     // ****************************** //
 
+    /**
+     * If this method is called, when the timer is finished, it will no
+     * longer notify anyone, and will die in silence.
+     */
     public void cancelTimer(){
         stillValid = false;
     }
@@ -46,6 +59,11 @@ public class BidTimer implements Runnable, Serializable {
     //   Override Methods             //
     // ****************************** //
 
+    /**
+     * Called when the thread is started. After TIME seconds, if the
+     * cancelTimer() method was never called, the agent will be notified
+     * of winning the bid, and the AuctionHouse GUI will be updated.
+     */
     @Override
     public void run() {
         try{
