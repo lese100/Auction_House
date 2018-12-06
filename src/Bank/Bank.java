@@ -601,37 +601,8 @@ public class Bank {
      */
     private void updateBankDisplay () {
 
-        System.out.println("Bank.updateBankDisplay(): entering");
-        // create string of account info for displaying bankDisplay
-        // first getting Agent accts, then Auction House accts
-        summaryInfoString = "Summary of Account(s): " +
-            "\n\nAcct # \tType \tBalance \t\tFrozen \t\tAvailable \tUser Name";
-        System.out.println("Bank.updateBankDisplay(): after summaryInfoString");
-        for ( IDRecord rec : listOfAgentIDRecords ) {
-            int tempAcctNum = rec.getNumericalID();
-            BankAccount tempBA = hashMapOfAllAccts.get(tempAcctNum);
-            summaryInfoString = summaryInfoString +
-                "\n" +    tempAcctNum +
-                "\t" +    rec.getRecordType() +
-                "\t$" +   df.format(tempBA.getTotalBalance()) +
-                "\t\t$" + df.format(tempBA.getTotalFrozen()) +
-                "\t\t$" + df.format(tempBA.getTotalUnfrozen()) +
-                "\t\t" +  tempBA.getUserName();
-        }
-        System.out.println("Bank.updateBankDisplay(): after listOfAgentIDRecords");
-        for ( IDRecord rec : listOfAuctionHouseIDRecords ) {
-            int tempAcctNum = rec.getNumericalID();
-            BankAccount tempBA = hashMapOfAllAccts.get(tempAcctNum);
-            summaryInfoString = summaryInfoString +
-                "\n" + tempAcctNum +
-                "\tAH" +
-                "\t\t$" +  df.format(tempBA.getTotalBalance()) +
-                "\t\t$" +  df.format(tempBA.getTotalFrozen()) +
-                "\t\t$" +  df.format(tempBA.getTotalUnfrozen()) +
-                "\t\t" + tempBA.getUserName();
-        }
-        // Make an ObservableArrayList of the BankAccounts to pass
-        // to the BankDisplay
+        // Make an ObservableArrayList of the BankAccounts
+        // to pass to the BankDisplay
         ObservableList<BankAccount> tempListOfBankAccounts =
             FXCollections.observableArrayList();
         Set<Integer> tempSetOfAcctNumbers = hashMapOfAllAccts.keySet();
@@ -640,7 +611,6 @@ public class Bank {
             tempListOfBankAccounts.add(tempBA);
         }
 
-        System.out.println("Bank.updateBankDisplay(): after listOfAgentAHRecords");
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
@@ -649,7 +619,6 @@ public class Bank {
                     listOfAgentIDRecords.size());
                 bankDisplay.updateNumberOfAHAccounts(
                     listOfAuctionHouseIDRecords.size());
-                bankDisplay.updateTextAreaOutput(summaryInfoString);
                 bankDisplay.updateAccountData(tempListOfBankAccounts);
 
             }

@@ -1,12 +1,8 @@
 package Bank;
 
 import Utility.BankAccount;
-import Utility.CommunicationService;
-import Utility.IDRecord;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -21,38 +17,28 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.HashMap;
-import java.util.Set;
 
 /**
  * Provides a 2-phase GUI display for a Bank.
  * (1) Phase 1 is a window in which the user can specify info about the
- *     Bank and use that info to construct a Bank;
- * (2) Phase 2 is then a final window that represents the established,
- *     working bank and displays information about the Bank and its
- *     operations and accounts.
+ * Bank (name, machine location, port number) and use that info to
+ * construct a Bank; (2) Phase 2 is then a final window that represents the
+ * established, working bank and displays information about the Bank and its
+ * operations and accounts.
  * created: 12/02/2018 by wdc
- * last modified: 12/02/2018 by wdc
+ * last modified: 12/06/2018 by wdc
  * @author Liam Brady (lb)
  * @author Warren D. Craft
  * @author Tyler Fenske (thf)
  */
 public class BankDisplay {
 
-    private Stage theStage;
     private Stage stage01;
     private Stage stage02;
 
-    private CommunicationService communicationService;
-    private BankProxyForTesting bankProxyForTesting;
-    private IDRecord clientIDRecord;
-    private BankAccount myBankAccount;
-
     private BorderPane borderPane;
     private BorderPane borderPane01;
-    private BorderPane borderPane02;
 
     // mutable components of the GUI display
     private Label textLabelBank = new Label("BANK: My Bank");
@@ -67,36 +53,182 @@ public class BankDisplay {
     private HBox hBoxForBottomPanel;
     private TableView theTable = new TableView();
 
+    // an observable list to hold data from the Bank and
+    // used in displaying Bank's accounts information
     private ObservableList<BankAccount> accountData =
         FXCollections.observableArrayList();
-
-    private boolean bankOnline = false;
-
-    private DecimalFormat df;
-
-    private Bank bank;
 
     // ****************************** //
     //   Constructor(s)               //
     // ****************************** //
 
     /**
-     * Public constructor for the GUI/display associated with a Bank.
-     * This manifests in two stages:
-     * (1) a preliminary window that accepts Bank information (name,
-     * hostname, host port);
-     * (2) then a final window that represents the active Bank,
-     * exhibiting information such as number of accounts, balances, etc.
-     * @param theStage A JavaFX Stage object, passed from Main.
+     * Public constructor for the initial GUI/display associated with a Bank,
+     * which provides a simple interactive window that accepts info
+     * (name, hostname, and port number) for constructing a Bank. The
+     * constructing entity that call this constructor is also expected to
+     * place an action button in the initial GUI, to accept the information
+     * and use the BankDisplay methods to construct the final GUI that
+     * exhibits Bank-related information.
+     * @param theStage A JavaFX Stage object, passed from the
+     *                 constructing entity.
      */
     public BankDisplay(Stage theStage){
+
         this.stage01 = theStage;
-
-        df = new DecimalFormat("####0.00");
-
         initializeDisplay01();
     }
 
+    // ****************************** //
+    //   Public Methods               //
+    //   (alphabetical order)         //
+    // ****************************** //
+
+
+    /**
+     * Displays an error message pop up with the passed String.
+     * @param errorMessage to be displayed
+     */
+    public void displayErrorMessage(String errorMessage){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setContentText(errorMessage);
+        alert.show();
+    }
+
+    /**
+     * Gets the bank name text entered in the Phase 1 GUI.
+     * @return String trimmed version of default or user-entered bank name
+     */
+    public String getBankName() {
+        return textFieldBankName.getText().trim();
+    }
+
+    /**
+     * Gets the bank hostname text entered in the Phase 1 GUI.
+     * @return String trimmed version of default or user-entered hostname
+     */
+    public String getBankHostName() {
+        return textFieldBankHost.getText().trim();
+    }
+
+    /**
+     * Gets the bank port number entered in the Phase 1 GUI.
+     * @return Int trimmed version of default or user-entered port number
+     */
+    public int getBankPort() {
+        return Integer.parseInt(textFieldBankPort.getText());
+    }
+
+    /**
+     * Checks if text fields of Phase 1 GUI have minimally-valid info,
+     * returning true if so, false otherwise.
+     * @return boolean true if Phase 1 GUI text fields are all non-empty,
+     *                 and port number appears to be an integer;
+     *                 false otherwise
+     */
+    public boolean infoFilledOut () {
+        boolean infoFilledOut = true;
+
+        if( textFieldBankName.getText().trim().equals("" ) ||
+            textFieldBankHost.getText().trim().equals("") ||
+            textFieldBankPort.getText().trim().equals("") ){
+
+            System.out.println("PLEASE CHANGE ALL FIELDS");
+            infoFilledOut = false;
+        }
+
+        try{
+           Integer.parseInt(textFieldBankPort.getText().trim());
+        }catch(NumberFormatException e){
+            System.out.println("NUMBER EXPECTED FOR PORT NUMBER FIELDS");
+            infoFilledOut = false;
+        }
+
+        return infoFilledOut;
+    }
+
+    /**
+     * Closes the Phase 1 GUI and sets up the Phase 2 GUI
+     */
+    public void openStage02 () {
+        stage01.close();
+
+        // The Stage stage02 is initialized from stage01
+        // using setupBankGUIComponents() defined further below
+
+        // Then set up details for stage02
+        initializeDisplay02();
+    }
+
+
+    /**
+     * Sets up a control button within the Phase 1 GUI and initiates a given
+     * JavaFX stage to be the display's stage02 (used for Phase 2 GUI).
+     * The public method allows an external entity to create the button
+     * and stage, perhaps linking them with important event handlers, and
+     * then hand them to the display.
+     * @param btnCreateBank JavaFX Button
+     * @param stage02 JavaFX Stage
+     */
+    public void setupBankGUIComponents(Button btnCreateBank, Stage stage02){
+        this.btnCreateBank = btnCreateBank;
+        this.stage02 = stage02;
+        hBoxForBottomPanel.getChildren().add(btnCreateBank);
+    }
+
+    /**
+     * Updates the textfield representing the number of currently-active/open
+     * Bank Accounts at the Bank.
+     * @param numOfAccts int number of currently open bank accounts
+     */
+    public void updateNumberOfAccounts (int numOfAccts) {
+        textLabelNumberOfActiveAccounts.setText("" + numOfAccts);
+    }
+
+    /**
+     * Updates the textfield representing the number of currently-active/open
+     * AGENT-type Bank Accounts at the Bank.
+     * @param numOfAccts int number of currently open bank accounts of
+     *                   type AGENT
+     */
+    public void updateNumberOfAgentAccounts (int numOfAccts) {
+        textLabelNumberOfAgentAccounts.setText("" + numOfAccts);
+    }
+
+    /**
+     * Updates the textfield representing the number of currently-active/open
+     * AUCTION_HOUSE-type Bank Accounts at the Bank.
+     * @param numOfAccts int number of currently open bank accounts of
+     *                   type AUCTION_HOUSE
+     */
+    public void updateNumberOfAHAccounts (int numOfAccts) {
+        textLabelNumberOfAHAccounts.setText("" + numOfAccts);
+    }
+
+    /**
+     * Updates the ObservableList accountData with given ObservableList.
+     * Typically called from the Bank, which passes the new ObservableList
+     * when Bank Account information has changed.
+     * @param listOfBankAccounts An ObservableList of BankAccount objects
+     */
+    public void updateAccountData (ObservableList listOfBankAccounts) {
+
+        accountData.setAll(listOfBankAccounts);
+        theTable.sort();
+        // this should then automatically update the table theTable
+        // populating it with most recent info, and sorting it by
+        // account type (AGENT vs. AUCTION_HOUSE)
+    }
+
+    // ****************************** //
+    //   Private Utility Fxns         //
+    //   (alphabetical order)         //
+    // ****************************** //
+
+    /**
+     * Sets up the initial Phase 1 GUI for accepting initial information
+     * used to create a Bank. Called from the BankDisplay constructor.
+     */
     private void initializeDisplay01() {
 
         stage01.setMinWidth(400);
@@ -112,9 +244,9 @@ public class BankDisplay {
         hBoxTitle.setSpacing(10);
         hBoxTitle.setAlignment(Pos.TOP_CENTER);
 
-        // VBox to hold contents for inputs
+        // VBox for Input fields and related labels
         VBox vBoxForInputs = new VBox();
-        // Contents of VBox
+        // Contents of VBox: Input Fields and related Labels
         Label textLabelBankNameTitle = new Label("bank name: ");
         HBox hBoxBankName = new HBox(textLabelBankNameTitle, textFieldBankName);
         hBoxBankName.setSpacing(10);
@@ -133,6 +265,8 @@ public class BankDisplay {
         vBoxForInputs.setPadding(new Insets(10, 10, 10, 10));
         vBoxForInputs.setSpacing(10);
 
+        // HBox for holding control(s) along the bottom of the GUI
+        // made modifiable from outside the BankDisplay class
         hBoxForBottomPanel = new HBox();
         hBoxForBottomPanel.setPadding(new Insets(10, 10, 10, 10));
         hBoxForBottomPanel.setSpacing(10);
@@ -152,34 +286,34 @@ public class BankDisplay {
         stage01.show();
     }
 
-    public void openStage02 () {
-        System.out.println("Successful Setup");
-
-        stage01.close();
-
-        // stage02 = new Stage();
-
-        initializeDisplay02();
-    }
-
+    /**
+     * Rather long procedure setting up the Phase 2 GUI for a Bank.
+     * The Phase 2 GUI is the "final" window in which the Bank is up and
+     * running and displaying information about itself and the client
+     * Bank Accounts. The length is exacerbated considerably by the work
+     * necessary for setting up and maintaining the TableView object for
+     * displaying the Bank Account information.
+     */
     private void initializeDisplay02() {
+
         stage02.setMinWidth(500);
         stage02.setMinHeight(400);
-        // stage02.setMaxWidth(400);
         stage02.setMaxHeight(400);
 
         // ---------------------------------------//
         // Contents of LEFT panel                 //
         // ---------------------------------------//
 
-        // VBox to hold contents for left side
-        VBox vBox = new VBox();
+        // VBox to hold entire contents for left side
+        VBox vBoxOuter = new VBox();
+        // VBox to hold stats info within left side
+        VBox vBoxInner = new VBox();
         // Contents for left side
-        Label textLabelBankNameTitle = new Label("bank name: ");
         Label textLabelBankName = new Label(textFieldBankName.getText());
-        HBox hBoxBankName = new HBox(textLabelBankNameTitle, textLabelBankName);
+        textLabelBankName.setFont(new Font("Georgia", 24));
+        HBox hBoxBankName = new HBox(textLabelBankName);
         hBoxBankName.setSpacing(10);
-        hBoxBankName.setAlignment(Pos.CENTER_LEFT);
+        hBoxBankName.setAlignment(Pos.CENTER);
         Label textLabelBankHostTitle = new Label("host: ");
         Label textLabelBankHost = new Label(textFieldBankHost.getText());
         HBox hBoxBankHost = new HBox(textLabelBankHostTitle, textLabelBankHost);
@@ -208,20 +342,28 @@ public class BankDisplay {
         hBoxAHAccts.setSpacing(10);
         hBoxAHAccts.setAlignment(Pos.CENTER_LEFT);
 
-        vBox.getChildren().addAll(
-            hBoxBankName, hBoxBankHost, hBoxBankPort,
+        vBoxInner.getChildren().addAll(
+            hBoxBankHost, hBoxBankPort,
             hBoxActiveAccts, hBoxAgentAccts, hBoxAHAccts);
-        vBox.setPadding(new Insets(10, 10, 10, 10));
-        vBox.setSpacing(10);
+        vBoxInner.setPadding(new Insets(10, 10, 10, 10));
+        vBoxInner.setSpacing(10);
+        String cssLayout = "-fx-border-color: deepskyblue;\n" +
+            "-fx-border-insets: 10;\n" +
+            "-fx-border-width: 2;\n" +
+            "-fx-border-style: solid;\n";
+        vBoxInner.setStyle(cssLayout);
+        vBoxOuter.getChildren().addAll(hBoxBankName, vBoxInner);
+        vBoxOuter.setSpacing(10);
+        vBoxOuter.setPadding(new Insets(10, 10, 10, 10));
 
         // ---------------------------------------//
         // Contents of BOTTOM panel               //
         // ---------------------------------------//
 
         // HBox to hold contents for bottom panel
+        // no contents right now — just available for an external entity
+        // to insert control(s)
         HBox hBoxForBottomPanel = new HBox();
-        // Contents for bottom panel
-        // no contents right now
         hBoxForBottomPanel.setPadding(new Insets(10, 10, 10, 10));
         hBoxForBottomPanel.setSpacing(10);
 
@@ -231,17 +373,18 @@ public class BankDisplay {
         // for display BankAccount information    //
         // ---------------------------------------//
 
-        // VBox to hold contents for center panel
+        // VBox to hold contents of center panel
         VBox vBoxForCenterPanel = new VBox();
         vBoxForCenterPanel.setPadding(new Insets(10, 10, 10, 10));
         vBoxForCenterPanel.setSpacing(20);
         vBoxForCenterPanel.setAlignment(Pos.CENTER);
 
-        // Header Label for top of table
+        // Header Label for top of Table
         Label textLabelTableHeader = new Label("Summary of Current Accounts");
         textLabelTableHeader.setFont(new Font("Georgia", 24));
         textLabelTableHeader.setTextAlignment(TextAlignment.CENTER);
 
+        // Establishing columns to be used in the Table
         TableColumn colAcctNum = new TableColumn("Acct #");
         colAcctNum.setMinWidth(50);
         colAcctNum.setCellValueFactory(
@@ -272,6 +415,9 @@ public class BankDisplay {
         colClientName.setCellValueFactory(
             new PropertyValueFactory<BankAccount, String>("userName")
         );
+
+        // link data and columns to the Table and set some
+        // table characteristics
         theTable.setItems(accountData);
         theTable.getColumns().addAll(
             colAcctNum, colAcctType, colBalance,
@@ -334,7 +480,8 @@ public class BankDisplay {
                         if (getItem() != null) {
                             String gi = getItem().toString();
                             // NumberFormat df = DecimalFormat.getInstance();
-                            NumberFormat df = NumberFormat.getCurrencyInstance();
+                            NumberFormat df =
+                                NumberFormat.getCurrencyInstance();
                             df.setMinimumFractionDigits(2);
                             df.setRoundingMode(RoundingMode.HALF_UP);
                             ret = df.format(Double.parseDouble(gi));
@@ -365,7 +512,8 @@ public class BankDisplay {
                         if (getItem() != null) {
                             String gi = getItem().toString();
                             // NumberFormat df = DecimalFormat.getInstance();
-                            NumberFormat df = NumberFormat.getCurrencyInstance();
+                            NumberFormat df =
+                                NumberFormat.getCurrencyInstance();
                             df.setMinimumFractionDigits(2);
                             df.setRoundingMode(RoundingMode.HALF_UP);
                             ret = df.format(Double.parseDouble(gi));
@@ -396,7 +544,8 @@ public class BankDisplay {
                         if (getItem() != null) {
                             String gi = getItem().toString();
                             // NumberFormat df = DecimalFormat.getInstance();
-                            NumberFormat df = NumberFormat.getCurrencyInstance();
+                            NumberFormat df =
+                                NumberFormat.getCurrencyInstance();
                             df.setMinimumFractionDigits(2);
                             df.setRoundingMode(RoundingMode.HALF_UP);
                             ret = df.format(Double.parseDouble(gi));
@@ -420,10 +569,10 @@ public class BankDisplay {
         borderPane = new BorderPane();
 
         // put info displays in left
-        borderPane.setLeft(vBox);
+        borderPane.setLeft(vBoxOuter);
         // put controls in bottom
         borderPane.setBottom(hBoxForBottomPanel);
-        // put text area in center for output
+        // put Table in center for dynamic output
         borderPane.setCenter(vBoxForCenterPanel);
 
         stage02.setScene(new Scene(borderPane));
@@ -431,120 +580,5 @@ public class BankDisplay {
 
     }
 
-    public String getBankName() {
-        return textFieldBankName.getText().trim();
-    }
-
-    public String getBankHostName() {
-        return textFieldBankHost.getText().trim();
-    }
-
-    public int getBankPort() {
-        return Integer.parseInt(textFieldBankPort.getText());
-    }
-
-    public boolean infoFilledOut () {
-        boolean infoFilledOut = true;
-
-        if( textFieldBankName.getText().trim().equals("" ) ||
-            textFieldBankHost.getText().trim().equals("") ||
-            textFieldBankPort.getText().trim().equals("") ){
-
-            System.out.println("PLEASE CHANGE ALL FIELDS");
-            infoFilledOut = false;
-        }
-
-        try{
-           Integer.parseInt(textFieldBankPort.getText().trim());
-        }catch(NumberFormatException e){
-            System.out.println("NUMBER EXPECTED FOR PORT NUMBER FIELDS");
-            infoFilledOut = false;
-        }
-
-        return infoFilledOut;
-    }
-
-    /**
-     * Displays an error message pop up with the passed String.
-     * @param errorMessage to be displayed
-     */
-    public void displayErrorMessage(String errorMessage){
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setContentText(errorMessage);
-        alert.show();
-    }
-
-    public void updateTextAreaOutput(
-        HashMap<Integer, BankAccount> bankAccounts){
-
-        Set<Integer> accountNumbers = bankAccounts.keySet();
-        String output = "Account(s) Summary:";
-        for ( int acctNum : accountNumbers ) {
-            BankAccount tempBankAccount = bankAccounts.get(acctNum);
-            output = output + "\nAcct #" + acctNum + "(" +
-                     tempBankAccount.getAccountType().toString() + ") $" +
-                     tempBankAccount.getTotalBalance();
-        }
-
-        textAreaOutput.setText(output);
-    }
-
-    /**
-     * Sets up the EventHandlers for various buttons, using a switch()
-     * on the original button text string
-     *
-     * @param button
-     */
-    private void setButtonHandlers(Button button) {
-
-        String buttonText = button.getText();
-
-        switch (buttonText) {
-
-            case "Go Online":
-                button.setOnAction(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent event) {
-                        System.out.println("Establishing Bank");
-                    }
-                });
-                break;
-
-            default:
-                break;
-
-        } // end switch()
-
-    } // end setButtonHandlers()
-
-
-    public void setupBankGUIComponents(Button btnCreateBank, Stage stage02){
-        this.btnCreateBank = btnCreateBank;
-        this.stage02 = stage02;
-        hBoxForBottomPanel.getChildren().add(btnCreateBank);
-    }
-
-    public void updateNumberOfAccounts (int numOfAccts) {
-        textLabelNumberOfActiveAccounts.setText("" + numOfAccts);
-    }
-    public void updateNumberOfAgentAccounts (int numOfAccts) {
-        textLabelNumberOfAgentAccounts.setText("" + numOfAccts);
-    }
-    public void updateNumberOfAHAccounts (int numOfAccts) {
-        textLabelNumberOfAHAccounts.setText("" + numOfAccts);
-    }
-
-    public void updateTextAreaOutput (String theString) {
-        textAreaOutput.setText(theString);
-    }
-
-    public void updateAccountData (ObservableList listOfBankAccounts) {
-        System.out.println("BankDisplay.updateAccountData: entering");
-        accountData.setAll(listOfBankAccounts);
-        theTable.sort();
-        // this should then automatically update the table theTable
-        // populating it with most recent info, and sorting it by
-        // account type (AGENT vs. AUCTION_HOUSE)
-    }
 
 }
