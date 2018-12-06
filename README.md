@@ -9,11 +9,16 @@ between an Agent and an Auction House.
 
 ## Getting Started ##
 
-The project can be run directly from the latest trio .jar file(s), with
-filenames Bank.jar, AuctionHouse.jar, and Agent.jar,
-which can be downloaded and opened directly on a single computer on multiple
-computers (for example, with Bank, AuctionHouse, and Agent all running
-all separate computers simultaneously, but on the same network).
+The project can be run directly from the latest trio of .jar file(s):
+
+
+`Bank.jar`<br>
+`AuctionHouse.jar`<br>
+`Agent.jar`
+
+which can be downloaded and opened directly on a single computer or on
+multiple computers (for example, with Bank, AuctionHouse, and Agent all
+running all separate computers simultaneously, but on the same network).
 The project could also be run from inside IntelliJ IDEA, with the main
 access point being the Main class in the Bank and AuctionHouse packages and
 the Agent class in the Agent package.
@@ -26,20 +31,45 @@ best to start the Bank first, then the other two components in either order.
 Generally, the most straightforward startup process involves the following
 sequence of steps (see more detailed explanation further below):
 
-(1) Start the Bank;
-(2) Start one or more Auction Houses;
-(3) Start one or more Agents.
+<blockquote>
+(1) Start the Bank;<br>
+(2) Start one or more Auction Houses;<br>
+(3) Start one or more Agents.<br>
+</blockquote>
 
-<u>Starting the Bank</u>. the user is presented with a GUI …
+**(1)** Starting the Bank. The user is presented with a small GUI asking for
+a name (optional) and the hostname and port number from which you want to
+run the bank. The initial default values are set to work when running all
+three components on a single machine. For multiple machines on a single
+network, set the hostname to the network-designated name of the computer
+(in a computer lab, the machines are often labeled with their network id)
+and the desired port number. Both the hostname and port number will be needed
+when completing the start-up process for an Auction House and an Agent.
 
-<u>Starting an Auction House</u>. the user is presented with a GUI …
+Once you supply the appropriate hostname and port number and click on the
+`Create Bank` button, a new GUI appears that lets you monitor the active
+account information for the Bank. Along the left-hand side you will see the
+designated name, hostname, and port number being used, and in the center
+appears a constantly updating table of current bank accounts. The bank
+account information includes the unique Bank Account number, the account
+type (AGENT vs. AUCTION_HOUSE), the current overall balance, the portion of
+the overall balance that has been frozen or held (for a bidding process),
+the "available" non-frozen funds remaining from the overall balance, and
+any name associated with the account.
 
-<u>Starting an Agent</u>. the user is presented with a GUI …
+As clients connect and disconnect from the Bank, you will see accounts
+appear and disappear from the list. As Agents participate in the bidding
+process, you will see their balances fluctuate and eventually you will
+see money being transferred from Agent accounts to Auction House accounts.
+
+**(2)** Starting an Auction House. The user is presented with a GUI …
+
+**(3)** Starting an Agent. The user is presented with a GUI …
 
 The GUIs for the Bank and an Auction House allow monitoring of activity, but
 little else …
 
-<u>Agent Participating in an Auction</u>. 
+**(4)** Agent Participating in an Auction. 
 
 ## Extras ##
 

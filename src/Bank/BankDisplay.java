@@ -278,6 +278,9 @@ public class BankDisplay {
             colFrozen, colAvailable, colClientName
         );
         theTable.getSortOrder().addAll(colAcctType, colAcctNum);
+        Label placeHolderLabel = new Label("No Active Accounts");
+        placeHolderLabel.setFont(new Font("Georgia", 24));
+        theTable.setPlaceholder(placeHolderLabel);
 
         vBoxForCenterPanel.getChildren().addAll(
             textLabelTableHeader, theTable);
@@ -504,8 +507,6 @@ public class BankDisplay {
 
     public void updateAccountData (ObservableList listOfBankAccounts) {
         System.out.println("BankDisplay.updateAccountData: entering");
-        System.out.println("1st BA has acct number: " +
-            ((BankAccount) listOfBankAccounts.get(0)).getAccountNumber() );
         accountData.setAll(listOfBankAccounts);
         theTable.sort();
         // this should then automatically update the table theTable
