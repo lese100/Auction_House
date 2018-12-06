@@ -507,6 +507,7 @@ public class AuctionDisplay {
     public void updateConsoleDisplay(String message){
         consoleText += "\n" + message;
         consoleTextArea.setText(consoleText);
+        consoleTextArea.appendText("");
     }
 
     /**
