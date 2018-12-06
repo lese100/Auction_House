@@ -114,9 +114,8 @@ public class Main extends Application {
                 if(auctionHouse.safeToClose()){
                     stop();
                 }else{
-                    auctionDisplay.displayErrorMessage("ALL AGENTS MUST BE " +
-                            "DISCONNECTED IN ORDER TO " +
-                            "CLOSE DOWN THIS AUCTION HOUSE!");
+                    auctionDisplay.displayErrorMessage("PLEASE WAIT FOR ALL" +
+                            "AGENTS TO DISCONNECT!");
                     event.consume();
                 }
             }catch(Exception e){
