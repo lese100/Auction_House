@@ -4,6 +4,7 @@ import Utility.*;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.BindException;
 import java.net.ConnectException;
 import java.util.*;
 
@@ -85,9 +86,18 @@ public class AuctionHouse {
         updateDisplay();
 
         PublicAuctionProtocol auctionProtocol = new AuctionHouseProtocol(this);
-        NotificationServer ns = new NotificationServer(port, auctionProtocol);
-        Thread notificationServer = new Thread(ns);
-        notificationServer.start();
+
+        try{
+            NotificationServer ns = new NotificationServer(port, auctionProtocol);
+            Thread notificationServer = new Thread(ns);
+            notificationServer.start();
+        }catch(BindException e){
+            System.out.println("Port already in use. Terminating session. " +
+                    "Please relaunch.");
+            bankProxy.closeAccount(idRecord);
+            System.exit(3);
+        }
+
     }
 
     // ****************************** //
