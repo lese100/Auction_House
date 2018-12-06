@@ -157,7 +157,7 @@ public class BankDisplay {
 
         stage01.close();
 
-        stage02 = new Stage();
+        // stage02 = new Stage();
 
         initializeDisplay02();
     }
@@ -464,8 +464,14 @@ public class BankDisplay {
         return infoFilledOut;
     }
 
-    public void displayErrorMessage(){
-        System.out.println("TEST");
+    /**
+     * Displays an error message pop up with the passed String.
+     * @param errorMessage to be displayed
+     */
+    public void displayErrorMessage(String errorMessage){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setContentText(errorMessage);
+        alert.show();
     }
 
     public void updateTextAreaOutput(
@@ -512,8 +518,9 @@ public class BankDisplay {
     } // end setButtonHandlers()
 
 
-    public void setupBankInitializeButton(Button btnCreateBank){
+    public void setupBankGUIComponents(Button btnCreateBank, Stage stage02){
         this.btnCreateBank = btnCreateBank;
+        this.stage02 = stage02;
         hBoxForBottomPanel.getChildren().add(btnCreateBank);
     }
 

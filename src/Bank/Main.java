@@ -27,7 +27,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        Bank theBank;
+        //Bank theBank; // check this later?
         BankDisplay theBankDisplay = new BankDisplay(primaryStage);
 
         Button btnCreateBank = new Button("Create Bank");
@@ -43,11 +43,32 @@ public class Main extends Application {
                       theBankDisplay );
 
             } else {
-                theBankDisplay.displayErrorMessage();
+                theBankDisplay.displayErrorMessage(
+                    "Please complete the requested information first."
+                );
             }
         });
 
-        theBankDisplay.setupBankInitializeButton(btnCreateBank);
+        // declare the 2nd stage here in the start() so we can set up
+        // its closing handler and then hand it over to the display class
+        Stage stage02 = new Stage();
+        stage02.setOnCloseRequest(event -> {
+            try{
+                if(theBank.safeToClose()){
+                    stop();
+                }else{
+                    theBankDisplay.displayErrorMessage(
+                        "SORRY: ALL BANK CLIENTS MUST CLOSE THEIR ACCOUNTS " +
+                        "BEOFORE THE BANK CAN CLOSE DOWN.");
+                    event.consume();
+                }
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        });
+
+
+        theBankDisplay.setupBankGUIComponents(btnCreateBank, stage02);
     }
 
     @Override
