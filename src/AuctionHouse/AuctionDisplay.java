@@ -2,13 +2,23 @@ package AuctionHouse;
 
 import Utility.AuctionItem;
 import Utility.Bid;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.util.Callback;
+
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.List;
 
 /**
@@ -35,7 +45,11 @@ public class AuctionDisplay {
     private TextField bankHostName;
     private TextField bankPort;
 
-    private TextArea auctionTextArea;
+    private TableView<AuctionItem> theTable = new TableView<>();
+
+    private ObservableList<AuctionItem> auctions =
+            FXCollections.observableArrayList();
+
     private TextArea consoleTextArea;
     private String consoleText;
     private Label auctionLabel;
@@ -47,7 +61,6 @@ public class AuctionDisplay {
     private Stage newWindow;
 
     private DecimalFormat df;
-    private DecimalFormat itemDF;
 
 
     // ****************************** //
@@ -64,7 +77,6 @@ public class AuctionDisplay {
         this.window = window;
 
         df = new DecimalFormat("####0.00");
-        itemDF = new DecimalFormat("00");
 
         initializeDisplay();
     }
@@ -186,14 +198,11 @@ public class AuctionDisplay {
 
         consoleText = "Connection Information:";
 
-        auctionTextArea = new TextArea("auctions will appear here");
         consoleTextArea = new TextArea(consoleText);
-
-        auctionTextArea.setMaxSize(700, 325);
         consoleTextArea.setMaxSize(700, 325);
-
-        auctionTextArea.setEditable(false);
         consoleTextArea.setEditable(false);
+        consoleTextArea.setStyle("-fx-focus-color: transparent; " +
+                "-fx-faint-focus-color: transparent;");
 
         Label consoleLabel = new Label("Console");
         auctionLabel = new Label("AuctionHouse");
@@ -204,8 +213,237 @@ public class AuctionDisplay {
 
         hbox.getChildren().addAll(auctionLabel, bankBalance, amountOwed);
 
+        theTable.setMaxSize(700, 200);
+        theTable.setStyle("-fx-focus-color: transparent; " +
+                "-fx-faint-focus-color: transparent;");
+
+        //Some event filters added to fix strange bug that occurs when
+        //scrolling or dragging the scroll wheel (color of some rows
+        //spread to other rows. Refreshing TableView object fixes this).
+        //Clearing selection when the TableView is click on removes some
+        //unnecessary highlights on the first row's cell.
+        theTable.addEventFilter(ScrollEvent.ANY, scrollEvent ->{
+            theTable.refresh();
+        });
+        theTable.addEventFilter(MouseEvent.MOUSE_DRAGGED, event ->{
+            theTable.refresh();
+        });
+        theTable.addEventFilter(MouseEvent.MOUSE_CLICKED, event->{
+            theTable.refresh();
+        });
+        theTable.focusedProperty().addListener(event -> {
+            theTable.getSelectionModel().clearSelection();
+        });
+
+
+        TableColumn colItemID = new TableColumn<>("Item ID");
+        colItemID.setMinWidth(20);
+        colItemID.setCellValueFactory(
+                new PropertyValueFactory<AuctionItem, Integer>("itemID")
+        );
+
+        TableColumn colItemName = new TableColumn<>("Item Name");
+        colItemName.setMinWidth(345);
+        colItemName.setCellValueFactory(
+                new PropertyValueFactory<AuctionItem, String>("itemName"));
+
+        TableColumn colBidState = new TableColumn<>("State of Bid");
+        colBidState.setMinWidth(50);
+        colBidState.setCellValueFactory(
+                new PropertyValueFactory<AuctionItem,
+                        Bid.BidState>("bidsBidState")
+        );
+
+        TableColumn colMinBid = new TableColumn<>("Min Bid");
+        colMinBid.setMinWidth(50);
+        colMinBid.setCellValueFactory(
+                new PropertyValueFactory<AuctionItem,
+                        Double>("bidsMinBid")
+        );
+
+        TableColumn colCurrentBid = new TableColumn<>("Current Bid");
+        colCurrentBid.setMinWidth(50);
+        colCurrentBid.setCellValueFactory(
+                new PropertyValueFactory<AuctionItem, Double>("bidsCurrentBid")
+        );
+
+
+        theTable.setItems(auctions);
+
+        theTable.getColumns().addAll(
+                colItemID, colItemName, colBidState,
+                colMinBid, colCurrentBid
+        );
+
+        theTable.getSortOrder().addAll(colItemID);
+
+        Label placeHolderLabel = new Label("No Active Auctions");
+        placeHolderLabel.setFont(new Font("Georgia", 24));
+        theTable.setPlaceholder(placeHolderLabel);
+
+
+        // -----------------------------------------//
+        // Some excruciating code here to control   //
+        // display format of the numerical columns  //
+        // Code borrowed from:                      //
+        // http://simsam7.blogspot.com/2013/07/     //
+        // better-javafx-table-example-with.html    //
+        // -----------------------------------------//
+
+        colMinBid.setCellFactory(new Callback<TableColumn, TableCell>() {
+            @Override
+            public TableCell call(TableColumn param) {
+                TableCell cell = new TableCell<AuctionItem, Double>() {
+                    @Override
+                    public void updateItem(Double item, boolean empty) {
+                        super.updateItem(item, empty);
+                        setText(empty ? null : getString());
+                        setGraphic(null);
+                    }
+                    private String getString() {
+                        String ret = "";
+                        if (getItem() != null) {
+                            String gi = getItem().toString();
+                            // NumberFormat df = DecimalFormat.getInstance();
+                            NumberFormat df = NumberFormat.
+                                    getCurrencyInstance();
+                            df.setMinimumFractionDigits(2);
+                            df.setRoundingMode(RoundingMode.HALF_UP);
+                            ret = df.format(Double.parseDouble(gi));
+
+                        } else {
+                            ret = "0.00";
+                        }
+                        return ret;
+                    }
+                };
+                cell.setStyle("-fx-alignment: center;");
+                return cell;
+            }
+        });
+
+
+        colCurrentBid.setCellFactory(new Callback<TableColumn, TableCell>() {
+            @Override
+            public TableCell call(TableColumn param) {
+                TableCell cell = new TableCell<AuctionItem, Double>() {
+                    @Override
+                    public void updateItem(Double item, boolean empty) {
+                        super.updateItem(item, empty);
+                        setText(empty ? null : getString());
+                        setGraphic(null);
+                    }
+                    private String getString() {
+                        String ret = "";
+                        if (getItem() != null) {
+                            String gi = getItem().toString();
+                            // NumberFormat df = DecimalFormat.getInstance();
+                            NumberFormat df = NumberFormat.
+                                    getCurrencyInstance();
+                            df.setMinimumFractionDigits(2);
+                            df.setRoundingMode(RoundingMode.HALF_UP);
+                            ret = df.format(Double.parseDouble(gi));
+
+                        } else {
+                            ret = "0.00";
+                        }
+                        return ret;
+                    }
+                };
+                cell.setStyle("-fx-alignment: center;");
+                return cell;
+            }
+        });
+
+        colBidState.setCellFactory(new Callback<TableColumn, TableCell>() {
+            @Override
+            public TableCell call(TableColumn param) {
+                TableCell cell = new TableCell<AuctionItem, Bid.BidState>() {
+                    @Override
+                    public void updateItem(Bid.BidState item, boolean empty) {
+                        super.updateItem(item, empty);
+                        setText(empty ? null : getString());
+                        setGraphic(null);
+
+                        TableRow<AuctionItem> currentRow = getTableRow();
+
+                        if(!isEmpty()){
+
+                            if(item.equals(Bid.BidState.BIDDING)){
+                                currentRow.setStyle("-fx-background-color: " +
+                                        "#F8FF65;");
+                            }else if(item.equals(Bid.BidState.SOLD)){
+                                currentRow.setStyle("-fx-background-color: " +
+                                        "#FF605B;");
+                            }
+                        }
+
+                    }
+                    private String getString() {
+                        String ret = "";
+                        if (getItem() != null) {
+                            String gi = getItem().toString();
+                            ret = gi;
+                        }
+                        return ret;
+                    }
+                };
+
+                cell.setStyle("-fx-alignment: center;");
+                return cell;
+            }
+        });
+
+        colItemName.setCellFactory(new Callback<TableColumn, TableCell>() {
+            @Override
+            public TableCell call(TableColumn param) {
+                TableCell cell = new TableCell<AuctionItem, String>() {
+                    @Override
+                    public void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        setText(empty ? null : getString());
+                        setGraphic(null);
+                    }
+                    private String getString() {
+                        String ret = "";
+                        if (getItem() != null) {
+                            ret = getItem();
+                        }
+                        return ret;
+                    }
+                };
+                cell.setStyle("-fx-alignment: center;");
+                return cell;
+            }
+        });
+
+        colItemID.setCellFactory(new Callback<TableColumn, TableCell>() {
+            @Override
+            public TableCell call(TableColumn param) {
+                TableCell cell = new TableCell<AuctionItem, Integer>() {
+                    @Override
+                    public void updateItem(Integer item, boolean empty) {
+                        super.updateItem(item, empty);
+                        setText(empty ? null : getString());
+                        setGraphic(null);
+                    }
+                    private String getString() {
+                        String ret = "";
+                        if (getItem() != null) {
+                            String gi = getItem().toString();
+                            ret = gi;
+                        }
+                        return ret;
+                    }
+                };
+                cell.setStyle("-fx-alignment: center;");
+                return cell;
+            }
+        });
+
+
         auctionPane.setTop(hbox);
-        auctionPane.setBottom(auctionTextArea);
+        auctionPane.setBottom(theTable);
 
         consolePane.setTop(consoleLabel);
         consolePane.setCenter(consoleTextArea);
@@ -250,32 +488,10 @@ public class AuctionDisplay {
      * @param auctionItems a list of current AuctionItems
      */
     public void updateAuctionItemDisplay(List<AuctionItem> auctionItems){
-        String output = "Auction Item Information:";
-
-        for(int i = 0; i < auctionItems.size(); i++){
-            AuctionItem ai = auctionItems.get(i);
-            if(ai.getBid().getBidState() == Bid.BidState.BIDDING){
-                output = output + "\nITEM ID: " +
-                        itemDF.format(ai.getItemID()) +
-                        "\t BID STATE: " +
-                        ai.getBid().getBidState() +
-                        "\t MIN BID: $" + df.format(ai.getBid().getMinBid()) +
-                        "\t CURRENT BID: $" + df.format(ai.getBid().
-                        getCurrentBid()) +
-                        "\t ITEM NAME: " + ai.getItemName();
-            }else{
-                output = output + "\nITEM ID: " +
-                        itemDF.format(ai.getItemID()) +
-                        "\t BID STATE: " +
-                        ai.getBid().getBidState() + "      " +
-                        "\t MIN BID: $" + df.format(ai.getBid().getMinBid()) +
-                        "\t CURRENT BID: $" + df.format(ai.getBid().
-                        getCurrentBid()) +
-                        "\t ITEM NAME: " + ai.getItemName();
-            }
-        }
-
-        auctionTextArea.setText(output);
+        auctions.remove(0, auctions.size());
+        auctions.addAll(auctionItems);
+        theTable.sort();
+        theTable.refresh();
     }
 
     /**
@@ -352,4 +568,5 @@ public class AuctionDisplay {
     public int getBankPort() {
         return Integer.parseInt(bankPort.getText().trim());
     }
+
 }

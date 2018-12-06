@@ -95,8 +95,33 @@ public class AuctionItem implements Serializable {
     }
 
     /**
-     * Allows you to replace the old bid with the new updated one, so for when you
-     * are placing a bid or the Auction house is accepting the new proposed bid.
+     * Used for TableView JavaFX component to display bidState on GUI
+     * @return current bidState
+     */
+    public Bid.BidState getBidsBidState(){
+        return bid.getBidState();
+    }
+
+    /**
+     * Used for TableView JavaFX component to display minBid on GUI
+     * @return current minBid
+     */
+    public double getBidsMinBid(){
+        return bid.getMinBid();
+    }
+
+    /**
+     * Used for TableView JavaFX component to display currentBid on GUI
+     * @return current currentBid
+     */
+    public double getBidsCurrentBid(){
+        return bid.getCurrentBid();
+    }
+
+    /**
+     * Allows you to replace the old bid with the new updated one, so
+     * for when you are placing a bid or the Auction house is accepting
+     * the new proposed bid.
      * @param newBid bid object that is replacing the old one
      */
     public void setBid(Bid newBid){bid = newBid;}
