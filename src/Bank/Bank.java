@@ -498,6 +498,18 @@ public class Bank {
 
     }
 
+    /**
+     * Checks if it is safe for the Bank to close -- basically returning
+     * false if the Bank has any active client accounts.
+     * @return Boolean True if Bank has no current clients, else false.
+     */
+    public boolean safeToClose(){
+        if(hashMapOfAllAccts.isEmpty()){
+            return true;
+        }
+        return false;
+    }
+
     // ****************************** //
     //   Utility Fxns                 //
     // ****************************** //
