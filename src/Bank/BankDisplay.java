@@ -3,22 +3,26 @@ package Bank;
 import Utility.BankAccount;
 import Utility.CommunicationService;
 import Utility.IDRecord;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -61,6 +65,10 @@ public class BankDisplay {
     private TextArea textAreaOutput = new TextArea("Output Area");
     private Button btnCreateBank;
     private HBox hBoxForBottomPanel;
+    private TableView theTable = new TableView();
+
+    private ObservableList<BankAccount> accountData =
+        FXCollections.observableArrayList();
 
     private boolean bankOnline = false;
 
@@ -107,16 +115,16 @@ public class BankDisplay {
         // VBox to hold contents for inputs
         VBox vBoxForInputs = new VBox();
         // Contents of VBox
-        Label textLabelBankName = new Label("bank name: ");
-        HBox hBoxBankName = new HBox(textLabelBankName, textFieldBankName);
+        Label textLabelBankNameTitle = new Label("bank name: ");
+        HBox hBoxBankName = new HBox(textLabelBankNameTitle, textFieldBankName);
         hBoxBankName.setSpacing(10);
         hBoxBankName.setAlignment(Pos.CENTER_LEFT);
-        Label textLabelBankHost = new Label("host: ");
-        HBox hBoxBankHost = new HBox(textLabelBankHost, textFieldBankHost);
+        Label textLabelBankHostTitle = new Label("host: ");
+        HBox hBoxBankHost = new HBox(textLabelBankHostTitle, textFieldBankHost);
         hBoxBankHost.setSpacing(10);
         hBoxBankHost.setAlignment(Pos.CENTER_LEFT);
-        Label textLabelBankPort = new Label("port: ");
-        HBox hBoxBankPort = new HBox(textLabelBankPort, textFieldBankPort);
+        Label textLabelBankPortTitle = new Label("port: ");
+        HBox hBoxBankPort = new HBox(textLabelBankPortTitle, textFieldBankPort);
         hBoxBankPort.setSpacing(10);
         hBoxBankPort.setAlignment(Pos.CENTER_LEFT);
 
@@ -155,24 +163,31 @@ public class BankDisplay {
     }
 
     private void initializeDisplay02() {
-        stage02.setMinWidth(400);
+        stage02.setMinWidth(500);
         stage02.setMinHeight(400);
         // stage02.setMaxWidth(400);
         stage02.setMaxHeight(400);
 
+        // ---------------------------------------//
+        // Contents of LEFT panel                 //
+        // ---------------------------------------//
+
         // VBox to hold contents for left side
         VBox vBox = new VBox();
         // Contents for left side
-        Label textLabelBankName = new Label("bank name: ");
-        HBox hBoxBankName = new HBox(textLabelBankName, textFieldBankName);
+        Label textLabelBankNameTitle = new Label("bank name: ");
+        Label textLabelBankName = new Label(textFieldBankName.getText());
+        HBox hBoxBankName = new HBox(textLabelBankNameTitle, textLabelBankName);
         hBoxBankName.setSpacing(10);
         hBoxBankName.setAlignment(Pos.CENTER_LEFT);
-        Label textLabelBankHost = new Label("host: ");
-        HBox hBoxBankHost = new HBox(textLabelBankHost, textFieldBankHost);
+        Label textLabelBankHostTitle = new Label("host: ");
+        Label textLabelBankHost = new Label(textFieldBankHost.getText());
+        HBox hBoxBankHost = new HBox(textLabelBankHostTitle, textLabelBankHost);
         hBoxBankHost.setSpacing(10);
         hBoxBankHost.setAlignment(Pos.CENTER_LEFT);
-        Label textLabelBankPort = new Label("port: ");
-        HBox hBoxBankPort = new HBox(textLabelBankPort, textFieldBankPort);
+        Label textLabelBankPortTitle = new Label("port: ");
+        Label textLabelBankPort = new Label(textFieldBankPort.getText());
+        HBox hBoxBankPort = new HBox(textLabelBankPortTitle, textLabelBankPort);
         hBoxBankPort.setSpacing(10);
         hBoxBankPort.setAlignment(Pos.CENTER_LEFT);
         Label textLabelActiveAccts = new Label("# Active Accts: ");
@@ -199,6 +214,10 @@ public class BankDisplay {
         vBox.setPadding(new Insets(10, 10, 10, 10));
         vBox.setSpacing(10);
 
+        // ---------------------------------------//
+        // Contents of BOTTOM panel               //
+        // ---------------------------------------//
+
         // HBox to hold contents for bottom panel
         HBox hBoxForBottomPanel = new HBox();
         // Contents for bottom panel
@@ -206,6 +225,167 @@ public class BankDisplay {
         hBoxForBottomPanel.setPadding(new Insets(10, 10, 10, 10));
         hBoxForBottomPanel.setSpacing(10);
 
+        // ---------------------------------------//
+        // Contents of CENTER panel               //
+        // which includes a TableView object for  //
+        // for display BankAccount information    //
+        // ---------------------------------------//
+
+        // VBox to hold contents for center panel
+        VBox vBoxForCenterPanel = new VBox();
+        vBoxForCenterPanel.setPadding(new Insets(10, 10, 10, 10));
+        vBoxForCenterPanel.setSpacing(20);
+        vBoxForCenterPanel.setAlignment(Pos.CENTER);
+
+        // Header Label for top of table
+        Label textLabelTableHeader = new Label("Summary of Current Accounts");
+        textLabelTableHeader.setFont(new Font("Georgia", 24));
+        textLabelTableHeader.setTextAlignment(TextAlignment.CENTER);
+
+        TableColumn colAcctNum = new TableColumn("Acct #");
+        colAcctNum.setMinWidth(50);
+        colAcctNum.setCellValueFactory(
+            new PropertyValueFactory<BankAccount, Integer>("accountNumber"));
+        TableColumn colAcctType = new TableColumn("Acct Type");
+        colAcctType.setMinWidth(125);
+        colAcctType.setCellValueFactory(
+            new PropertyValueFactory<BankAccount, BankAccount.AccountType>
+                ("accountType")
+        );
+        TableColumn colBalance = new TableColumn("Balance");
+        colBalance.setMinWidth(75);
+        colBalance.setCellValueFactory(
+            new PropertyValueFactory<BankAccount, Double>("totalBalance")
+        );
+        TableColumn colFrozen = new TableColumn("Frozen");
+        colFrozen.setMinWidth(75);
+        colFrozen.setCellValueFactory(
+            new PropertyValueFactory<BankAccount, Double>("totalFrozen")
+        );
+        TableColumn colAvailable = new TableColumn("Available");
+        colAvailable.setMinWidth(75);
+        colAvailable.setCellValueFactory(
+            new PropertyValueFactory<BankAccount, Double>("totalUnfrozen")
+        );
+        TableColumn colClientName = new TableColumn("Client Name");
+        colClientName.setMinWidth(125);
+        colClientName.setCellValueFactory(
+            new PropertyValueFactory<BankAccount, String>("userName")
+        );
+        theTable.setItems(accountData);
+        theTable.getColumns().addAll(
+            colAcctNum, colAcctType, colBalance,
+            colFrozen, colAvailable, colClientName
+        );
+        theTable.getSortOrder().addAll(colAcctType, colAcctNum);
+
+        vBoxForCenterPanel.getChildren().addAll(
+            textLabelTableHeader, theTable);
+
+        // -----------------------------------------//
+        // Some excruciating code here to control   //
+        // display format of the numerical columns  //
+        // Code borrowed from:                      //
+        // http://simsam7.blogspot.com/2013/07/     //
+        // better-javafx-table-example-with.html    //
+        // -----------------------------------------//
+
+        colBalance.setCellFactory(new Callback<TableColumn, TableCell>() {
+            @Override
+            public TableCell call(TableColumn param) {
+                TableCell cell = new TableCell<BankAccount, Double>() {
+                    @Override
+                    public void updateItem(Double item, boolean empty) {
+                        super.updateItem(item, empty);
+                        setText(empty ? null : getString());
+                        setGraphic(null);
+                    }
+                    private String getString() {
+                        String ret = "";
+                        if (getItem() != null) {
+                            String gi = getItem().toString();
+                            // NumberFormat df = DecimalFormat.getInstance();
+                            NumberFormat df = NumberFormat.getCurrencyInstance();
+                            df.setMinimumFractionDigits(2);
+                            df.setRoundingMode(RoundingMode.HALF_UP);
+                            ret = df.format(Double.parseDouble(gi));
+
+                        } else {
+                            ret = "0.00";
+                        }
+                        return ret;
+                    }
+                };
+                cell.setStyle("-fx-alignment: top-right;");
+                return cell;
+            }
+        });
+
+        colFrozen.setCellFactory(new Callback<TableColumn, TableCell>() {
+            @Override
+            public TableCell call(TableColumn param) {
+                TableCell cell = new TableCell<BankAccount, Double>() {
+                    @Override
+                    public void updateItem(Double item, boolean empty) {
+                        super.updateItem(item, empty);
+                        setText(empty ? null : getString());
+                        setGraphic(null);
+                    }
+                    private String getString() {
+                        String ret = "";
+                        if (getItem() != null) {
+                            String gi = getItem().toString();
+                            // NumberFormat df = DecimalFormat.getInstance();
+                            NumberFormat df = NumberFormat.getCurrencyInstance();
+                            df.setMinimumFractionDigits(2);
+                            df.setRoundingMode(RoundingMode.HALF_UP);
+                            ret = df.format(Double.parseDouble(gi));
+
+                        } else {
+                            ret = "0.00";
+                        }
+                        return ret;
+                    }
+                };
+                cell.setStyle("-fx-alignment: top-right;");
+                return cell;
+            }
+        });
+
+        colAvailable.setCellFactory(new Callback<TableColumn, TableCell>() {
+            @Override
+            public TableCell call(TableColumn param) {
+                TableCell cell = new TableCell<BankAccount, Double>() {
+                    @Override
+                    public void updateItem(Double item, boolean empty) {
+                        super.updateItem(item, empty);
+                        setText(empty ? null : getString());
+                        setGraphic(null);
+                    }
+                    private String getString() {
+                        String ret = "";
+                        if (getItem() != null) {
+                            String gi = getItem().toString();
+                            // NumberFormat df = DecimalFormat.getInstance();
+                            NumberFormat df = NumberFormat.getCurrencyInstance();
+                            df.setMinimumFractionDigits(2);
+                            df.setRoundingMode(RoundingMode.HALF_UP);
+                            ret = df.format(Double.parseDouble(gi));
+
+                        } else {
+                            ret = "0.00";
+                        }
+                        return ret;
+                    }
+                };
+                cell.setStyle("-fx-alignment: top-right;");
+                return cell;
+            }
+        });
+
+        // -----------------------------------------//
+        // Establish BorderPane and fill in panels  //
+        // -----------------------------------------//
 
         // borderPane to hold entire contents
         borderPane = new BorderPane();
@@ -215,7 +395,7 @@ public class BankDisplay {
         // put controls in bottom
         borderPane.setBottom(hBoxForBottomPanel);
         // put text area in center for output
-        borderPane.setCenter(textAreaOutput);
+        borderPane.setCenter(vBoxForCenterPanel);
 
         stage02.setScene(new Scene(borderPane));
         stage02.show();
@@ -320,6 +500,17 @@ public class BankDisplay {
 
     public void updateTextAreaOutput (String theString) {
         textAreaOutput.setText(theString);
+    }
+
+    public void updateAccountData (ObservableList listOfBankAccounts) {
+        System.out.println("BankDisplay.updateAccountData: entering");
+        System.out.println("1st BA has acct number: " +
+            ((BankAccount) listOfBankAccounts.get(0)).getAccountNumber() );
+        accountData.setAll(listOfBankAccounts);
+        theTable.sort();
+        // this should then automatically update the table theTable
+        // populating it with most recent info, and sorting it by
+        // account type (AGENT vs. AUCTION_HOUSE)
     }
 
 }

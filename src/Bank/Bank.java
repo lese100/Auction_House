@@ -5,6 +5,8 @@ import Utility.BankAccount;
 import Utility.IDRecord;
 import Utility.NotificationServer;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -50,7 +52,8 @@ public class Bank {
     // ****************************** //
 
     /**
-     * Public constructor for a Bank object, requiring no specific params.
+     * Public constructor for a Bank object, requiring no specific params
+     * other than a reference to the Bank's GUI BankDisplay.
      * This then produces a Bank object with default location = localhost
      * and default port number 1234.
      */
@@ -602,6 +605,16 @@ public class Bank {
                 "\t\t$" +  df.format(tempBA.getTotalUnfrozen()) +
                 "\t\t" + tempBA.getUserName();
         }
+        // Make an ObservableArrayList of the BankAccounts to pass
+        // to the BankDisplay
+        ObservableList<BankAccount> tempListOfBankAccounts =
+            FXCollections.observableArrayList();
+        Set<Integer> tempSetOfAcctNumbers = hashMapOfAllAccts.keySet();
+        for ( int tempAcctNum : tempSetOfAcctNumbers ) {
+            BankAccount tempBA = hashMapOfAllAccts.get(tempAcctNum);
+            tempListOfBankAccounts.add(tempBA);
+        }
+
         System.out.println("Bank.updateBankDisplay(): after listOfAgentAHRecords");
         Platform.runLater(new Runnable() {
             @Override
@@ -612,6 +625,8 @@ public class Bank {
                 bankDisplay.updateNumberOfAHAccounts(
                     listOfAuctionHouseIDRecords.size());
                 bankDisplay.updateTextAreaOutput(summaryInfoString);
+                bankDisplay.updateAccountData(tempListOfBankAccounts);
+
             }
         });
     }
