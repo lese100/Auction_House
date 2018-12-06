@@ -267,6 +267,12 @@ public class AuctionDisplay {
                 new PropertyValueFactory<AuctionItem, Double>("bidsCurrentBid")
         );
 
+        colItemID.setResizable(false);
+        colItemName.setResizable(false);
+        colBidState.setResizable(false);
+        colMinBid.setResizable(false);
+        colCurrentBid.setResizable(false);
+
 
         theTable.setItems(auctions);
 
