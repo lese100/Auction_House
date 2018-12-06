@@ -240,6 +240,10 @@ public class BankAccount implements Serializable {
         return bd.doubleValue();
     }
 
+    /**
+     * Rounds all balances to two decimal places. This is done to
+     * clean up some ambiguous floating point precision.
+     */
     private void roundAllValues() {
 
         totalBalance = round(totalBalance, 2);

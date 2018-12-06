@@ -133,6 +133,10 @@ public class IDRecord implements Serializable {
         this.numericalID = numericalID;
     }
 
+    /**
+     * Converting this object to a String shows all bookkeeping fields.
+     * @return String representation of this object
+     */
     @Override
     public String toString(){
         return recordType + " IDRecord:\n" +
