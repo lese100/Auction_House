@@ -2,22 +2,44 @@
 
 The Auction House project is a simulation (and graphical representation) of
 a network-based interactive triplet of programs consisting of a Bank, one or
-more Auction Houses, and one or more Agents or users, …
+more Auction Houses, and one or more Agents or users who bid on items
+available for persual from an Auction House. Agents and Auction Houses open
+accounts with the Bank, which serves as a conduit for monetary transactions
+between an Agent and an Auction House.
 
 ## Getting Started ##
 
-The project can be run directly from the latest .jar file(s),
-which can be downloaded and opened directly on your system.
+The project can be run directly from the latest trio .jar file(s), with
+filenames Bank.jar, AuctionHouse.jar, and Agent.jar,
+which can be downloaded and opened directly on a single computer on multiple
+computers (for example, with Bank, AuctionHouse, and Agent all running
+all separate computers simultaneously, but on the same network).
 The project could also be run from inside IntelliJ IDEA, with the main
-access point being the Main() class, but this will require of course
-the appropriate installation of and access to the JavaFX library.
+access point being the Main class in the Bank and AuctionHouse packages and
+the Agent class in the Agent package.
 
-More info here: separate components can be run from different, networked
-computers …
+Because of the connectivity dependence among the three components, it works
+best to start the Bank first, then the other two components in either order.
 
 ## Running the Program: Participating in an Auction ##
 
-At startup, the user is presented with a GUI …
+Generally, the most straightforward startup process involves the following
+sequence of steps (see more detailed explanation further below):
+
+(1) Start the Bank;
+(2) Start one or more Auction Houses;
+(3) Start one or more Agents.
+
+<u>Starting the Bank</u>. the user is presented with a GUI …
+
+<u>Starting an Auction House</u>. the user is presented with a GUI …
+
+<u>Starting an Agent</u>. the user is presented with a GUI …
+
+The GUIs for the Bank and an Auction House allow monitoring of activity, but
+little else …
+
+<u>Agent Participating in an Auction</u>. 
 
 ## Extras ##
 
@@ -25,7 +47,7 @@ The project includes …
 
 ## Built With ##
 
-The program was written in Java, using JavaFX and IntelliJ IDEA.
+The program was written in Java and JavaFX, using IntelliJ IDEA.
 
 ## Authors and Contributors ##
 
