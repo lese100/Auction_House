@@ -293,6 +293,32 @@ public class BankDisplay {
         // better-javafx-table-example-with.html    //
         // -----------------------------------------//
 
+        colAcctNum.setCellFactory(new Callback<TableColumn, TableCell>() {
+            public TableCell call(TableColumn p) {
+                TableCell cell = new TableCell<BankAccount, Integer>() {
+                    @Override
+                    public void updateItem(Integer item, boolean empty) {
+                        super.updateItem(item, empty);
+                        setText(empty ? null : getString());
+                        setGraphic(null);
+                    }
+
+                    private String getString() {
+                        String ret = "";
+                        if (getItem() != null) {
+                            ret = getItem().toString();
+                        } else {
+                            ret = "0";
+                        }
+                        return ret;
+                    }
+                };
+
+                cell.setStyle("-fx-alignment: top-right;");
+                return cell;
+            }
+        });
+
         colBalance.setCellFactory(new Callback<TableColumn, TableCell>() {
             @Override
             public TableCell call(TableColumn param) {

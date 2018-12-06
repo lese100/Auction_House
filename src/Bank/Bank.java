@@ -10,10 +10,7 @@ import javafx.collections.ObservableList;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Provides the structure and functionality of a simulated Bank accessible to
@@ -434,15 +431,31 @@ public class Bank {
                 Set<Integer> setOfSecretKeys = hashMapOfSecretKeys.keySet();
                 System.out.println("Bank.closeAccount(): Set Size = " +
                     setOfSecretKeys.size());
+                List<Integer> secretKeysToRemove = new ArrayList<>();
                 for (int i : setOfSecretKeys) {
                     int tempAcctNum =
                         (hashMapOfSecretKeys.get(i)).getAGENT_ACCOUNT_NUMBER();
                     if ( tempAcctNum == theBankAccountNumber ) {
-                        hashMapOfSecretKeys.remove(i);
-                        // we don't break, because AH might be associated
+                        //hashMapOfSecretKeys.remove(i);
+                        // instead of trying to remove from a "list" over
+                        // which we are also iterating, just save the
+                        // to-be-removed secretKeys away:
+                        secretKeysToRemove.add(i);
+                        // we don't break, because Agent might be associated
                         // with multiple secret keys; so keep searching
                     }
                 }
+                // and only THEN go ahead and remove the HashMap items
+                //  associated with those saved secretKeyToRemove:
+                // sadly, HashMaps don't seem to have a removeAll() method,
+                // so we iterate through the secretKeysToRemove list:
+                if (secretKeysToRemove.size() > 0) {
+                    for (int i = 0; i < secretKeysToRemove.size(); i++) {
+                        hashMapOfSecretKeys.remove(secretKeysToRemove.get(i));
+                    }
+                }
+                // don't forget to do this same thing for the Auction House version!
+
                 System.out.println("Bank.closeAccount(): Set Size = " +
                     setOfSecretKeys.size());
 
