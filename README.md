@@ -83,14 +83,14 @@ accounts.
 **(2) Starting an Auction House.** In the process of starting up an
 Auction House, the Auction House automatically connects to the Bank. Thus
 you will want to start up the Bank first. With the Bank already running,
-starting up an Auction Hosue presents you with a GUI like that shown below
+starting up an Auction House presents you with a GUI like that shown below
 (or see the file `AuctionHouseGUI01.png` in the src/resource folder if the
 image does not appear):
 ![Display Screen Shot](src/resource/AuctionHouseGUI01.png)
 Supply a name for the Auction House, its hostname (machine location), and
-the communication port you want to use,then the hostname and port number
+the communication port you want to use, then the hostname and port number
 for the Bank (obtained or specified earlier when starting up the Bank).
-Hitting the `Create Auction House` button when then close that window and
+Hitting the `Create Auction House` button will then close that window and
 the Auction House monitoring window appears, looking like this (or see
 the file `AuctionHouseGUI01.png` in the src/resource folder if the
 image does not appear):
@@ -98,12 +98,12 @@ image does not appear):
 Across the top you will see the Auction House name and a unique,
 randomly-generated integer ID number corresponding to the Auction House's
 bank account number, the Auction House's current bank balance (which will
-be $0 when first started), and the amount owed the Auction House from Agents
+be $0 when first started), and the amount owed to the Auction House from Agents
 who have won bids on auction items.
 
 In the bottom pane you will seem some brief information describing
 connection activity, beginning with the Auction House's connection to the
-Bank, and giving details about Agents connecting to the AH.
+Bank, and giving details about Agents connecting/disconnecting to/from the AH.
 
 In the center pane you will see a table listing the items up for auction at
 this Auction House. The STATE column tells you if bidding is OPEN (but no
