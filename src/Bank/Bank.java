@@ -9,20 +9,19 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.util.*;
 
 /**
  * Provides the structure and functionality of a simulated Bank accessible to
- * Agents, Auction Houses, and other entities. Keeps track of client accounts
- * and provides some typical account functionality, such as opening and
+ * Agents and Auction Houses, keeping track of client accounts
+ * and providing some typical account functionality, such as opening and
  * closing accounts, funding an account, transferring funds from one account
  * to another, etc.
  * created: 11/28/18 by wdc
- * last modified: 12/02/18 by wdc (coord w/GUI)
+ * last modified: 12/06/18 by wdc (coord w/GUI)
  * previously modified: 12/01/18 by wdc
  * previously modified: 11/28/18 by wdc (creation)
- * @author Liam Brady
+ * @author Liam Brady (lb)
  * @author Warren D. Craft (wdc)
  * @author Tyler Fenske (thf)
  */
@@ -35,22 +34,22 @@ public class Bank {
     private HashMap<Integer, AccountLink> hashMapOfSecretKeys;
     private ArrayList<IDRecord> listOfAuctionHouseIDRecords;
     private ArrayList<IDRecord> listOfAgentIDRecords;
-    private String summaryInfoString;
+    // private String summaryInfoString;
     private BankProtocol bankProtocol;
     private NotificationServer notificationServer;
 
     private BankDisplay bankDisplay;
 
     private Random rng = new Random();
-    private DecimalFormat df = new DecimalFormat("####0.00");
+    // private DecimalFormat df = new DecimalFormat("####0.00");
 
     // ****************************** //
     //   Constructor(s)               //
     // ****************************** //
 
     /**
-     * Public constructor for a Bank object, requiring no specific params
-     * other than a reference to the Bank's GUI BankDisplay.
+     * Generic public constructor for a Bank object, requiring no specific
+     * params other than a reference to the Bank's GUI BankDisplay.
      * This then produces a Bank object with default location = localhost
      * and default port number 1234.
      */
@@ -61,22 +60,29 @@ public class Bank {
     /**
      * Public constructor for a Bank object, allowing the initial specification
      * of the Bank's (machine) location (e.g. localhost or network machine name)
-     * and the Bank's port number used for communications.
+     * the Bank's port number used for communications, and a reference to the
+     * Bank's GUI BankDisplay object.
+     * @param bankName String name of bank
      * @param location   String hostname
      * @param portNumber int communication port
+     * @param bankDisplay A BankDisplay object
      */
     public Bank(String bankName,
                 String location,
                 int portNumber,
                 BankDisplay bankDisplay) {
+
         this.bankName = bankName;
         this.location = location;
         this.portNumber = portNumber;
         this.bankDisplay = bankDisplay;
+
+        // several lists for keeping track of account-related information
         hashMapOfAllAccts = new HashMap<>();
         hashMapOfSecretKeys = new HashMap<>();
         listOfAuctionHouseIDRecords = new ArrayList<>();
         listOfAgentIDRecords = new ArrayList<>();
+
         try {
             bankSetup();
         } catch (IOException e) {
@@ -90,150 +96,36 @@ public class Bank {
 
     // ****************************** //
     //   Public Methods               //
+    //   (alphabetical order)         //
     // ****************************** //
 
-    /**
-     * Creates an account with the Bank, using information in the given
-     * IDRecord to create a BankAccount object of type AGENT or AUCTION_HOUSE.
-     * @param theIDRecord An IDRecord
-     * @return IDRecord An updated IDRecord with new bank account number
-     */
-    public IDRecord createAccount(IDRecord theIDRecord) {
-        System.out.println("Bank.createAccount() begins");
-        IDRecord updatedIDRecord = theIDRecord;
-
-        // pull out or generate info for BankAccount
-        String userName = updatedIDRecord.getName();
-        System.out.println("Bank.createAccount(): userName = " + userName);
-        // generate an account number
-        int acctNum = getUniqueAccountNumber();
-        double initBalance = updatedIDRecord.getInitialBalance();
-        System.out.println("Bank.createAccount(): initialBalance = " +
-            initBalance);
-        updatedIDRecord.setNumericalID(acctNum);
-        System.out.println("Bank.createAccount(): updated acctNum");
-
-        // formalize info into an actual BankAccount object
-        BankAccount.AccountType baType;
-        switch (updatedIDRecord.getRecordType()) {
-            case AGENT:
-                baType = BankAccount.AccountType.AGENT;
-                break;
-
-            case AUCTION_HOUSE:
-                baType = BankAccount.AccountType.AUCTION_HOUSE;
-                break;
-
-            case BANK:
-                baType = BankAccount.AccountType.BANK;
-                break;
-
-            default:
-                baType = BankAccount.AccountType.OTHER;
-                break;
-        }
-        BankAccount newBankAccount =
-            new BankAccount(baType, userName, acctNum, initBalance);
-        System.out.println("Bank.createAccount(): just after creation, " +
-            " the newBankAccount has balance: $" +
-            newBankAccount.getTotalBalance());
-
-        // update Bank's list(s) of accounts
-        hashMapOfAllAccts.put(acctNum, newBankAccount);
-        if (baType == BankAccount.AccountType.AUCTION_HOUSE) {
-            listOfAuctionHouseIDRecords.add(updatedIDRecord);
-            System.out.println("Bank: createAccount(): updated " +
-                "listOfAuctionHouseIDRecords: ");
-            for (IDRecord rec : listOfAuctionHouseIDRecords) {
-                System.out.println("Acct #: " + rec.getNumericalID());
-            }
-        } else if (baType == BankAccount.AccountType.AGENT) {
-            listOfAgentIDRecords.add(updatedIDRecord);
-            System.out.println("Bank: createAccount(): updated " +
-                "listOfAgentIDRecords: ");
-            for (IDRecord rec : listOfAgentIDRecords) {
-                System.out.println("Acct #: " + rec.getNumericalID());
-            }
-        }
-
-        updateBankDisplay();
-
-        return updatedIDRecord;
-    }
-
-    public int createSecretKey (AccountLink theAccountLink) {
-        // should verify that the accountlink contains valid account #s
-        // generate a unique secret key
-        int aSecretKey = getUniqueSecretKey();
-        // store away that secret key in HashMap with theAccountLink
-        hashMapOfSecretKeys.put(aSecretKey, theAccountLink);
-        System.out.println("Bank.createSecretKey(): aSecretKey = " +
-            aSecretKey);
-        return aSecretKey;
-    }
+    // --  Many of these public methods are intended for use by the  --//
+    // --  BankProtocol class, which specifies how incoming requests --//
+    // --  are handled                                               --//
 
     /**
-     * Gets account balance information for the account whose
-     * account number appears in the given IDRecord.
-     * @param idRecord An IDRecord
-     * @return BankAccount object with account balance information
+     * Adds given amount to given account, providing a general method for
+     * testing and future development.
+     * @param theAcctNum int account number
+     * @param amtToAdd double amount of money to add to account
+     * @return updated BankAccount object
      */
-    public BankAccount getBalance (IDRecord idRecord) {
-        System.out.println("Entering Bank: getBalance()");
-        BankAccount currentBankAccount;
-        int theAcctNum = idRecord.getNumericalID();
-        System.out.println("Bank.getBalance(): for acct # " + theAcctNum);
-
-        // find BankAccount from account -> BankAccount HashMap
-        currentBankAccount = hashMapOfAllAccts.get(theAcctNum);
-
-        if ( currentBankAccount == null) {
-            // if no account was found, generate a generic empty account
-            System.out.println("Bank: getBalance(): no account found!");
-            currentBankAccount = new BankAccount();
-        } else {
-            System.out.println("Bank: getBalance(): account found!");
-        }
-
-        return currentBankAccount;
-    }
-
-    /**
-     * Returns an ArrayList<IDRecord> of Auction House IDRecords corresponding
-     * to Auction Houses currently having accounts with the Bank. The ArrayList
-     * might be empty, but should never be null.
-     * @return ArrayList<IDRecord> of Auction House IDRecords
-     */
-    public ArrayList<IDRecord> getListOfAuctionHouses () {
-        System.out.println("Bank: getListofAHs(): ");
-        for (IDRecord rec : listOfAuctionHouseIDRecords) {
-            System.out.println("Acct #: " + rec.getNumericalID());
-        }
-        return listOfAuctionHouseIDRecords;
-    }
-
     public BankAccount addFunds(int theAcctNum, double amtToAdd) {
-        System.out.println("Bank.addFunds(): " + amtToAdd);
+
         BankAccount currentBankAccount;
-        System.out.println("Bank.addFunds(): for acct # " + theAcctNum);
 
         // find BankAccount from Bank's account -> BankAccount HashMap
         currentBankAccount = hashMapOfAllAccts.get(theAcctNum);
 
         if ( currentBankAccount == null) {
+
             // if no account was found, generate a generic empty account
-            System.out.println("Bank.addFunds(): no account found!");
             currentBankAccount = new BankAccount();
+
         } else {
-            System.out.println("Bank.addFunds(): account found!");
-            System.out.println("Bank.addFunds(): account has balance: $" +
-                currentBankAccount.getTotalBalance());
+
             // increase funds by amtToAdd
             currentBankAccount.increaseTotalBalance(amtToAdd);
-            System.out.println("Bank.addFunds(): increased total by: $" +
-                amtToAdd);
-            System.out.println("Bank.addFunds(): account now has " +
-                "balance: $" + currentBankAccount.getTotalBalance());
         }
 
         updateBankDisplay();
@@ -241,6 +133,15 @@ public class Bank {
 
     }
 
+    /**
+     * Provides a way to (1) check an account to see if it has at least a
+     * certain amount of unfrozen funds, and if so, to (2) freeze that amount
+     * in funds
+     * @param secretKey int secret key allowing access to the account
+     * @param proposedFreeze double amount to check for and freeze
+     * @return boolean true if checking and freezing the funds was successful,
+     *                 false otherwise
+     */
     public boolean checkAndFreezeFunds (int secretKey, double proposedFreeze) {
 
         int theBankAccountNumber;
@@ -258,73 +159,11 @@ public class Bank {
         // ask BankAccount to check and (if possible) freeze the amount
         boolean fundsFrozen = theBankAccount.checkAndFreeze(proposedFreeze);
 
-        updateBankDisplay();
+        if (fundsFrozen) {
+            updateBankDisplay();
+        }
 
         return fundsFrozen;
-    }
-
-    public boolean unfreezeFunds (int secretKey, double amtToUnfreeze) {
-
-        int theBankAccountNumber;
-        // use AccountLink and secret key to get actual Bank Account number
-        AccountLink theAccountLink = hashMapOfSecretKeys.get(secretKey);
-        if ( theAccountLink != null ) {
-            theBankAccountNumber = theAccountLink.getAGENT_ACCOUNT_NUMBER();
-        } else {
-            return false;
-        }
-        // use account number to get full BankAccount
-        BankAccount theBankAccount =
-            hashMapOfAllAccts.get(theBankAccountNumber);
-
-        // ask BankAccount to check and (if possible) un-freeze the amount
-        boolean fundsUnfrozen = theBankAccount.decreaseFreeze(amtToUnfreeze);
-
-        if ( fundsUnfrozen ) {
-            updateBankDisplay();
-        }
-
-        return fundsUnfrozen;
-    }
-
-    public boolean transferFunds (int secretKey, double amtToTransfer) {
-
-        int sourceBankAccountNumber;   // account FROM which to transfer
-        int targetBankAccountNumber;   // account TO which to transfer
-
-        // use secretKey to obtain AccountLink, which will contains the
-        // source and target BankAccount numbers
-        AccountLink theAccountLink = hashMapOfSecretKeys.get(secretKey);
-
-        if ( theAccountLink != null ) { // i.e. secretKey was valid
-
-            sourceBankAccountNumber = theAccountLink.getAGENT_ACCOUNT_NUMBER();
-            targetBankAccountNumber = theAccountLink.getAH_ACCOUNT_NUMBER();
-
-        } else { // secretKey appears invalid; no transfer possible
-            return false;
-        }
-
-        // use account numbers to get full BankAccounts
-        BankAccount sourceBankAccount =
-            hashMapOfAllAccts.get(sourceBankAccountNumber);
-        BankAccount targetBankAccount =
-            hashMapOfAllAccts.get(targetBankAccountNumber);
-
-        // ask source BankAccount to delete amtToTransfer (if possible)
-        boolean fundsTakenFromSource =
-            sourceBankAccount.decreaseFrozenAndBalance(amtToTransfer);
-
-        // if funds were able to be taken from source, then add amt to target
-        if ( fundsTakenFromSource ) {
-            targetBankAccount.increaseTotalBalance(amtToTransfer);
-            updateBankDisplay();
-        } else {
-            return false; // b/c funds could not be taken from source
-        }
-
-        return true;
-
     }
 
     public BankAccount closeAccount ( IDRecord theIDRecord ) {
@@ -356,7 +195,7 @@ public class Bank {
 
             // (3) Check if we're dealing with an Auction House
             if ( theBankAccount.getAccountType() ==
-                 BankAccount.AccountType.AUCTION_HOUSE) {
+                BankAccount.AccountType.AUCTION_HOUSE) {
 
                 // 3(a) Remove account from hashMapOfAllAccts
                 hashMapOfAllAccts.remove(theBankAccountNumber);
@@ -367,8 +206,9 @@ public class Bank {
                 // so using list.remove(Obj) does not work!
                 // so we try something different …
                 int indexToRemove = -1;
-                for ( int i = 0; i < listOfAuctionHouseIDRecords.size(); i++ ) {
-                    int tempAcctNum = (listOfAuctionHouseIDRecords.get(i)).getNumericalID();
+                for(int i = 0; i < listOfAuctionHouseIDRecords.size(); i++){
+                    int tempAcctNum =
+                        (listOfAuctionHouseIDRecords.get(i)).getNumericalID();
                     if (tempAcctNum == theBankAccountNumber ) {
                         indexToRemove = i;
                         break;
@@ -380,35 +220,33 @@ public class Bank {
 
                 // 3(c) More difficult: remove from the HashMap of secretKeys
                 Set<Integer> setOfSecretKeys = hashMapOfSecretKeys.keySet();
+                List<Integer> secretKeysToRemove = new ArrayList<>();
                 for (int i : setOfSecretKeys) {
                     int tempAcctNum =
                         (hashMapOfSecretKeys.get(i)).getAH_ACCOUNT_NUMBER();
                     if ( tempAcctNum == theBankAccountNumber ) {
-                        hashMapOfSecretKeys.remove(i);
-                        // we don't break, because AH might be associated
-                        // with multiple secret keys; so keep searching
+                        secretKeysToRemove.add(i);
+                    }
+                }
+                // and only THEN remove the HashMap items
+                // associated with those saved secretKeyToRemove items:
+                if (secretKeysToRemove.size() > 0) {
+                    for (int i = 0; i < secretKeysToRemove.size(); i++) {
+                        hashMapOfSecretKeys.remove(secretKeysToRemove.get(i));
                     }
                 }
 
                 // 3(d) then update display and return BankAccount
                 updateBankDisplay();
                 return theBankAccount;
-
-
             }
             // (4) if account type is AGENT and Agent has no frozen funds
             else if ( theBankAccount.getAccountType() ==
-                       BankAccount.AccountType.AGENT &&
-                       theBankAccount.getTotalFrozen() == 0.0) {
+                BankAccount.AccountType.AGENT &&
+                theBankAccount.getTotalFrozen() == 0.0) {
 
-                System.out.println("Bank.removeAccount: before removing " +
-                    "from hashMapOfAllAccts, it looks like this: " +
-                    hashMapOfAllAccts );
                 // 4(a) Remove account from hashMapOfAllAccts
                 hashMapOfAllAccts.remove(theBankAccountNumber);
-                System.out.println("Bank.removeAccount: after removing " +
-                    "from hashMapOfAllAccts, it looks like this: " +
-                    hashMapOfAllAccts );
 
                 // 4(b) Remove account from listOfAgentIDRecords
                 // Complicated because process doesn't know how to compare
@@ -417,7 +255,8 @@ public class Bank {
                 // so we try something different …
                 int indexToRemove = -1;
                 for ( int i = 0; i < listOfAgentIDRecords.size(); i++ ) {
-                    int tempAcctNum = (listOfAgentIDRecords.get(i)).getNumericalID();
+                    int tempAcctNum =
+                        (listOfAgentIDRecords.get(i)).getNumericalID();
                     if (tempAcctNum == theBankAccountNumber ) {
                         indexToRemove = i;
                         break;
@@ -429,35 +268,21 @@ public class Bank {
 
                 // 4(c) More difficult: remove from the HashMap of secretKeys
                 Set<Integer> setOfSecretKeys = hashMapOfSecretKeys.keySet();
-                System.out.println("Bank.closeAccount(): Set Size = " +
-                    setOfSecretKeys.size());
                 List<Integer> secretKeysToRemove = new ArrayList<>();
                 for (int i : setOfSecretKeys) {
                     int tempAcctNum =
                         (hashMapOfSecretKeys.get(i)).getAGENT_ACCOUNT_NUMBER();
                     if ( tempAcctNum == theBankAccountNumber ) {
-                        //hashMapOfSecretKeys.remove(i);
-                        // instead of trying to remove from a "list" over
-                        // which we are also iterating, just save the
-                        // to-be-removed secretKeys away:
                         secretKeysToRemove.add(i);
-                        // we don't break, because Agent might be associated
-                        // with multiple secret keys; so keep searching
                     }
                 }
-                // and only THEN go ahead and remove the HashMap items
-                //  associated with those saved secretKeyToRemove:
-                // sadly, HashMaps don't seem to have a removeAll() method,
-                // so we iterate through the secretKeysToRemove list:
+                // and only THEN remove the HashMap items
+                // associated with those saved secretKeyToRemove items:
                 if (secretKeysToRemove.size() > 0) {
                     for (int i = 0; i < secretKeysToRemove.size(); i++) {
                         hashMapOfSecretKeys.remove(secretKeysToRemove.get(i));
                     }
                 }
-                // don't forget to do this same thing for the Auction House version!
-
-                System.out.println("Bank.closeAccount(): Set Size = " +
-                    setOfSecretKeys.size());
 
                 // 4(d) then  update display and return BankAccount
                 updateBankDisplay();
@@ -477,6 +302,118 @@ public class Bank {
 
     }
 
+    /**
+     * Creates an account with the Bank, using information in the given
+     * IDRecord to create a BankAccount object of type AGENT or AUCTION_HOUSE.
+     * @param theIDRecord An IDRecord
+     * @return IDRecord An updated IDRecord with new bank account number
+     */
+    public IDRecord createAccount(IDRecord theIDRecord) {
+
+        IDRecord updatedIDRecord = theIDRecord;
+
+        // pull out or generate info for BankAccount
+        String userName = updatedIDRecord.getName();
+
+        // generate an account number
+        int acctNum = getUniqueAccountNumber();
+        double initBalance = updatedIDRecord.getInitialBalance();
+        updatedIDRecord.setNumericalID(acctNum);
+
+        // Formalize info into an actual BankAccount object.
+        // Some as-yet unused options here for future development.
+        BankAccount.AccountType baType;
+        switch (updatedIDRecord.getRecordType()) {
+            case AGENT:
+                baType = BankAccount.AccountType.AGENT;
+                break;
+
+            case AUCTION_HOUSE:
+                baType = BankAccount.AccountType.AUCTION_HOUSE;
+                break;
+
+            case BANK:
+                baType = BankAccount.AccountType.BANK;
+                break;
+
+            default:
+                baType = BankAccount.AccountType.OTHER;
+                break;
+        }
+        BankAccount newBankAccount =
+            new BankAccount(baType, userName, acctNum, initBalance);
+
+        // Update Bank's list(s) of accounts.
+        // Note: at account initiation, secretKeys HashMap not relevant.
+        hashMapOfAllAccts.put(acctNum, newBankAccount);
+        if (baType == BankAccount.AccountType.AUCTION_HOUSE) {
+
+            listOfAuctionHouseIDRecords.add(updatedIDRecord);
+
+        } else if (baType == BankAccount.AccountType.AGENT) {
+
+            listOfAgentIDRecords.add(updatedIDRecord);
+        }
+
+        // Send requests to the BankDisplay thread to update display
+        // to reflect new account information
+        updateBankDisplay();
+
+        return updatedIDRecord;
+    }
+
+    /**
+     * Generates and returns an integer "secret key" used to link an Agent
+     * account with an Auction House account, enabling the Agent and
+     * Auction House to do business with each other.
+     * @param theAccountLink An AccountLink object pairing two integer bank
+     *                       account numbers
+     * @return a unique multi-digit random integer
+     */
+    public int createSecretKey (AccountLink theAccountLink) {
+
+        // should verify that the accountlink contains valid account #s
+        // generate a unique secret key
+        int aSecretKey = getUniqueSecretKey();
+        // store away that secret key in HashMap with theAccountLink
+        hashMapOfSecretKeys.put(aSecretKey, theAccountLink);
+
+        return aSecretKey;
+    }
+
+    /**
+     * Gets account balance information for the account whose
+     * account number appears in the given IDRecord.
+     * @param idRecord An IDRecord
+     * @return BankAccount object with account balance information
+     */
+    public BankAccount getBalance (IDRecord idRecord) {
+
+        BankAccount currentBankAccount;
+        // extract the bank account number
+        int theAcctNum = idRecord.getNumericalID();
+
+        // find BankAccount from account -> BankAccount HashMap
+        currentBankAccount = hashMapOfAllAccts.get(theAcctNum);
+
+        if ( currentBankAccount == null) {
+            // if no account was found, generate a generic empty account
+            currentBankAccount = new BankAccount();
+
+        }
+
+        return currentBankAccount;
+    }
+
+
+    /**
+     * Gets a BankAccount object associated with a secret key. Not all
+     * BankAccount objects have an associated secret key, just those for
+     * Agents who have joined up to do business with a specific chosen
+     * Auction House.
+     * @param secretKey int secret key associated with an AccountLink
+     * @return BankAccount object
+     */
     public BankAccount getBankAccount (int secretKey) {
         // using a secretKey to obtain a BankAccount means/assumes that
         // the BankAccount belongs to an Agent that has been involved in
@@ -498,6 +435,18 @@ public class Bank {
 
     }
 
+
+    /**
+     * Returns an ArrayList<IDRecord> of Auction House IDRecords corresponding
+     * to Auction Houses currently having accounts with the Bank. The ArrayList
+     * might be empty, but should never be null.
+     * @return ArrayList<IDRecord> of Auction House IDRecords
+     */
+    public ArrayList<IDRecord> getListOfAuctionHouses () {
+
+        return listOfAuctionHouseIDRecords;
+    }
+
     /**
      * Checks if it is safe for the Bank to close -- basically returning
      * false if the Bank has any active client accounts.
@@ -510,10 +459,104 @@ public class Bank {
         return false;
     }
 
+    /**
+     * Transfers the specified amount from one account to another, with the
+     * secret key specifying a LinkedAccount object giving the source and
+     * target/destination accounts for the transfer. Transfer executed only
+     * if there are frozen funds in the source account equal to or greater
+     * than the desired transfer amount. If frozen funds less than desired
+     * transferred amount, no money is transferred at all.
+     * @param secretKey int secret key specifying to an AccountLink
+     * @param amtToTransfer double amount to transfer
+     * @return boolean true if transfer successful; false otherwise
+     */
+    public boolean transferFunds (int secretKey, double amtToTransfer) {
+
+        int sourceBankAccountNumber;   // account FROM which to transfer
+        int targetBankAccountNumber;   // account TO which to transfer
+
+        // use secretKey to obtain AccountLink, which will contains the
+        // source and target BankAccount numbers
+        AccountLink theAccountLink = hashMapOfSecretKeys.get(secretKey);
+
+        if ( theAccountLink != null ) { // i.e. secretKey was valid
+
+            sourceBankAccountNumber = theAccountLink.getAGENT_ACCOUNT_NUMBER();
+            targetBankAccountNumber = theAccountLink.getAH_ACCOUNT_NUMBER();
+
+        } else { // secretKey appears invalid; no transfer possible
+            return false;
+        }
+
+        // use account numbers to get full BankAccounts
+        BankAccount sourceBankAccount =
+            hashMapOfAllAccts.get(sourceBankAccountNumber);
+        BankAccount targetBankAccount =
+            hashMapOfAllAccts.get(targetBankAccountNumber);
+
+        // ask source BankAccount to delete amtToTransfer (if possible)
+        // This effects a transfer only if frozen funds >= amtToTransfer
+        boolean fundsTakenFromSource =
+            sourceBankAccount.decreaseFrozenAndBalance(amtToTransfer);
+
+        // if funds were able to be taken from source, then add amt to target
+        if ( fundsTakenFromSource ) {
+            targetBankAccount.increaseTotalBalance(amtToTransfer);
+            updateBankDisplay();
+        } else {
+            return false; // b/c funds could not be taken from source
+        }
+
+        return true;
+    }
+
+    /**
+     * Unfreezes funds in an account if the account's frozen funds exceed the
+     * amount specified. If frozen funds are less than specified amount, entire
+     * request is rejected.
+     * @param secretKey int secret key allowing access to the bank account
+     * @param amtToUnfreeze double amount to unfreeze
+     * @return boolean true if unfreezing was successful (requiring there
+     *                 to have been frozen funds at least equal to or greater
+     *                 than the amount specified to be unfrozen); false
+     *                 otherwise
+     */
+    public boolean unfreezeFunds (int secretKey, double amtToUnfreeze) {
+
+        int theBankAccountNumber;
+        // use AccountLink and secret key to get actual Bank Account number
+        AccountLink theAccountLink = hashMapOfSecretKeys.get(secretKey);
+        if ( theAccountLink != null ) {
+            theBankAccountNumber = theAccountLink.getAGENT_ACCOUNT_NUMBER();
+        } else {
+            return false;
+        }
+        // use account number to get full BankAccount
+        BankAccount theBankAccount =
+            hashMapOfAllAccts.get(theBankAccountNumber);
+
+        // ask BankAccount to check and (if possible) un-freeze the amount
+        boolean fundsUnfrozen = theBankAccount.decreaseFreeze(amtToUnfreeze);
+
+        if ( fundsUnfrozen ) {
+            updateBankDisplay();
+        }
+
+        return fundsUnfrozen;
+    }
+
+
     // ****************************** //
-    //   Utility Fxns                 //
+    //   Private Utility Fxns         //
     // ****************************** //
 
+    /**
+     * Establishes the Bank's BankProtocol (handing it a reference to the
+     * Bank) and the Bank's NotificationServer (using a port number defined
+     * elsewhere and the BankProtocol object). The corresponding
+     * NotificationServer created is then started on its own thread.
+     * @throws IOException
+     */
     private void bankSetup() throws IOException {
         bankProtocol = new BankProtocol(this);
         notificationServer = new NotificationServer(portNumber, bankProtocol);
@@ -529,7 +572,6 @@ public class Bank {
      */
     private int getUniqueAccountNumber () {
 
-        System.out.println("Entering Bank: getUniqueAccountNumber()");
         int minInt = 100000;
         int maxInt = 999999;
         int candidateNumber = -1;
@@ -566,7 +608,6 @@ public class Bank {
      */
     private int getUniqueSecretKey () {
 
-        System.out.println("Entering Bank: getUniqueSecretKey()");
         int minInt = 100000;
         int maxInt = 999999;
         int candidateNumber = -1;
