@@ -50,7 +50,7 @@ when completing the start-up process for an Auction House and an Agent.
 See the screen shot of the initial Bank GUI below (or see the file
 `BankGUI01.png` in the src/resource folder if the image does not appear):
 
-![Display Screen Shot](./src/resource/BankGUI01.png)
+![Display Screen Shot](src/resource/BankGUIInitial.png)
 
 Once you supply the appropriate hostname and port number and click on the
 `Create Bank` button, a new GUI appears that lets you monitor the active
@@ -240,34 +240,48 @@ Bank, Agents, and Auction Houses.
 
 ## Design & Design Issues ##
 
-The general design is shown in the instance diagram included in the /doc
-directory.
+The general design of of each of the major code components (Bank,
+Auction House, and Agent) is shown in the instance diagrams included in the
+`doc` folder.
 
 ## Known Issues ##
 
-(1)
-
-(2) 
+No known issues. We are not aware of any bugs or odd system behavior.
 
 ## Further Development ##
 
 The program functions well and conforms well to the assignment's
 specifications. Some next steps in development could include:
 
-(1) [topic] … allowing the deposit and withdrawal of other funds, instead of
-just allowing an initial deposit at the time of bank account creation
+(1) [Banking Functionality] Generalizing the banking system to allow money
+to be deposited into, and withdrawn from, bank accounts after a bank
+account has been opened (instead of limiting bank clients to a single
+initial “deposit” when the account is first established).
 
-(2) [topic] … looking more carefully at simulating potential security
-protocols (e.g. instituting more and better checks on Message content and
-Message origination to verify validity of sender and validity of requested
-actions, )
+(2) [Banking Security] Implementing protocols (for example, within the
+messaging system) to simulate improved security measures for bank
+transactions.
 
-(3) [topic] … further enabling Bank class for message origination
+(3) [Bank Functionality] Further enabling the Bank class to allow for
+message origination on the part of the Bank, instead of restricting the
+Bank to just replying to requests. This might contribute, for example,
+to efforts in Item (2) above regarding banking security.
 
-(4) [topic] … generalizing the system to admit other types of actors —
-for example, allowing multiple Banks, allowing Banks to have accounts
-with other Banks, the automated creation of multiple Auction Houses with
-speciality items …
+(4) [System Generalization] Generalizing the simulated economic system to
+admit other types of actors and other types of behaviors. For example, one
+might allow multiple Banks, allow Banks to have accounts
+with other Banks, implement an automated creation of multiple Auction Houses
+with speciality items, and allow Agents to offer items for sale through an
+Auction House.
+
+(5) [Bank, Auction House, Agent Interactivity] Generalizing the interactive
+connectivity of the principal components so that, for example, the Bank's
+location and communication port number does not need to be known ahead of
+time when starting an Auction House or an Agent. It proved to be
+surprisingly difficult, for example, to enable the Bank start-up process
+to infer its own machine location, and even more difficult to enable
+potential clients of the Bank to “ferret out” the bank's location rather
+than having it fed to them during the startup process. 
 
 
 
