@@ -14,7 +14,17 @@ import Utility.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-
+/**
+ * The Agent class initialized the heads of most objects, bank proxy, display, auctionHouseProxy, NotificationServer,
+ * and the AgentProtocol. The agent is the routing system for any messages received by the notification server. The
+ * Agent also handles getting all inputs required for launching the rest of the program. The Agent handles the displays
+ * button eventHandlers and sends out messages accordingly.
+ * created: 11/30/18 by lb
+ * last modified: 12/07/18 by lb
+ * @author Liam Brady (lb)
+ * @author Warren D. Craft (wdc)
+ * @author Tyler Fenske (thf)
+ */
 public class Agent extends Application {
     private int holdPort, holdMyPort;
     private String holdHost, localHost;
@@ -33,23 +43,11 @@ public class Agent extends Application {
     }
 
     /**
-     * Sets up the user port and makes its protocol and establishes its
-     * notification server to receive update messages.
-     *
-     * @param port the port im going to run my client on
+     * If you have the winning bid on a auction item a notification is received and this method is called with the
+     * item you have won. This item is passed to the display so the user knows they won the item and to transfer the
+     * funds.
+     * @param item Item won at a auction house
      */
-    public Agent(int port) {
-        AgentProtocol protocol = new AgentProtocol(this);
-        auctionHouses = new HashMap<>();
-        try {
-            NotificationServer notificationserver = new NotificationServer(port, protocol);
-            Thread t = new Thread(notificationserver);
-            t.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void addTransferItem(AuctionItem item) {
         display.addTransferItem(item);
         BankAccount info = bankProxy.requestBalance(myRecords);
@@ -61,6 +59,11 @@ public class Agent extends Application {
         }
     }
 
+    /**
+     * Notification that there has been a item inventory change in one the displays. Tells the display to update
+     * the auction item list.
+     * @param newInventory new auction item list
+     */
     public void itemsUpdate(AuctionHouseInventory newInventory) {
         Platform.runLater(new Runnable() {
             @Override
@@ -69,8 +72,14 @@ public class Agent extends Application {
             }
         });
     }
+
+    /**
+     * displays a notification for when someone has outbid an item you have bid on.
+     * @param item item the user was outbid on.
+     */
     public void displayOutbid(AuctionItem item){
-        display.displayNotification("Outbid: " + item.getItemName());
+        display.displayNotification("Outbid: " + item.getItemName() + "\nNew Price: $" +
+                item.getBid().getCurrentBid());
     }
     /**
      * closes everything when exiting the main menu
@@ -80,6 +89,11 @@ public class Agent extends Application {
         System.exit(1);
     }
 
+    /**
+     * Handles setting up the display, input arguments and event handlers. Details explanation written above important
+     * sections
+     * @param stage starting stage for the display
+     */
     @Override
     public void start(Stage stage) {
         bankFlag = false;
@@ -87,6 +101,7 @@ public class Agent extends Application {
         inputs.setTitle("Connect");
         auctionHouses = new HashMap<>();
         waiting = new ArrayList<>();
+
         /*set up host information*/
         GridPane grid = new GridPane();
         Label port = new Label("Port Number:");
@@ -99,6 +114,7 @@ public class Agent extends Application {
         final TextField myHostName = new TextField("localhost");
         Button submit = new Button("Submit");
 
+        /*places Text fields and labels accordingly on the display*/
         grid.add(myPort, 0, 0);
         grid.add(myPortNum, 1, 0);
         grid.add(host, 0, 2);
@@ -108,21 +124,23 @@ public class Agent extends Application {
         grid.add(myHost, 0, 1);
         grid.add(myHostName, 1, 1);
         grid.add(submit, 1, 4);
-
+        /*event handler for the submit button it closes the window*/
         Scene scene = new Scene(grid, 275, 150);
         submit.setOnAction(event -> {
             inputs.close();
         });
+        /*displays the input display and makes the program wait for it to be submitted/closed*/
         inputs.setResizable(false);
         inputs.setScene(scene);
         inputs.initOwner(stage);
         inputs.showAndWait();
+        /*sets the input arguments*/
         holdMyPort = Integer.parseInt(myPortNum.getText());
         holdHost = hostName.getText();
         holdPort = Integer.parseInt(portNum.getText());
         localHost = myHostName.getText();
 
-        //Agent agent = new Agent(holdMyPort);
+        /*creates the agent protocol and Notification server, then sets up the link to this object*/
         AgentProtocol protocol = new AgentProtocol(this);
         auctionHouses = new HashMap<>();
         try {
@@ -132,6 +150,8 @@ public class Agent extends Application {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        /*creates a window for user info*/
         Stage create = new Stage();
         create.setTitle("Connect");
 
@@ -144,12 +164,14 @@ public class Agent extends Application {
         final TextField balance = new TextField("2500");
         Button account = new Button("Create Account");
 
+        /*places the Text Fields and Labels onto the display*/
         grid2.add(user, 0, 0);
         grid2.add(name, 1, 0);
         grid2.add(deposit, 0, 1);
         grid2.add(balance, 1, 1);
         grid2.add(account, 1, 2);
 
+        /*sets up the event handler for submitting and has the program wait for the user to submit*/
         Scene scene2 = new Scene(grid2, 275, 100);
         account.setOnAction(event -> create.close());
         create.setResizable(false);
@@ -157,14 +179,14 @@ public class Agent extends Application {
         create.initOwner(stage);
         create.showAndWait();
 
-        /*connect to the bank*/
+        /*connect to the bank by setting up its bank proxy*/
         myRecords = new IDRecord(IDRecord.RecordType.AGENT, name.getText(), Integer.parseInt(balance.getText()),
                 localHost, holdMyPort);
-
         bankProxy = new BankProxy(holdHost, holdPort);
         myRecords = bankProxy.createBankAccount(myRecords);
         BankAccount me = bankProxy.requestBalance(myRecords);
 
+        /*creates the buttons the display will need*/
         bid = new Button("Bid");
         leaveAuc = new Button("Leave");
         leaveBank = new Button("Leave");
@@ -173,16 +195,25 @@ public class Agent extends Application {
         transfer = new Button("Transfer Funds");
         join = new Button("Join");
         join.setDisable(true);
+        /*creates the display object giving it the default bank information it needs to display*/
         display = new Display(stage, myRecords, bid, leaveAuc, leaveBank, getAuction, getBalance, transfer, join,
                 myRecords.getInitialBalance());
         if(me != null) {
             display.updateLabels(me);
         }else{
             bankFlag = true;
-            System.out.println("can't get balance");
+            display.displayNotification("can't get balance: Failed to connect to the Bank");
         }
 
-        /*event handlers*/
+        /*event handlers for the displays buttons*/
+
+        /*
+        * the same bid button is used for all auction tabs. When you click bid the display is asked for the current
+        * item being bid on. This is then used to grab the Auction Houses proxy using a hashmap of auction house ids
+        * and Auction House Links. This contains the Auction houses IDRecord, secretKey associated with the auction
+        * house and the auction house proxy. Sends the Auction Item that was bid on to the auction house and waits for
+        * a reply. Displays a pop up notification if anything goes wrong.
+        */
         bid.setOnAction(event -> {
             AuctionItem bid = display.getBid();
             if(bid != null) {
@@ -201,13 +232,18 @@ public class Agent extends Application {
                     System.out.println("case not found for bid");
                 }
             }else{
-                System.out.println("Can't Bid");
+                display.displayNotification("Can't Bid");
             }
         });
+        /*
+        * The leaveBank button and the exit button are made to have the same functionality. It makes sure there is a
+        * connection to the bank, if there is a connection is requests the close its account, reacts accordingly. Allows
+        * you to close if no bank connection is present.
+        */
         stage.setOnCloseRequest(event -> {
+            /*flag is added so you can close the tab is you cannot connect to the bank*/
             if(!bankFlag) {
                 event.consume();
-                System.out.println(bankProxy);
                 if (auctionHouses.isEmpty() && bankProxy.closeRequest(myRecords)) {
                     stop();
                 } else {
@@ -215,6 +251,26 @@ public class Agent extends Application {
                 }
             }
         });
+        leaveBank.setOnAction(event -> {
+            if(!bankFlag) {
+                if (auctionHouses.isEmpty() && bankProxy.closeRequest(myRecords)) {
+                    stop();
+                } else {
+                    display.displayNotification("Please transfer all funds and leave all auctions");
+                }
+            }else{
+                stop();
+            }
+        });
+        /*
+        * Event handler used to leave a auction house, all auction tabs use the same leave button, requests for
+        * the auction house id for the current tab. Uses this to get the Auction House Link which contains the auction
+        * houses information. Checks to see if there are any pending transfers that need to be sent to the Auction
+        * house. If any are found it displays a notification saying there are pending transfers. If no pending transfers
+        * are found it requests to leave sends a message to the auctionHouse requesting to leave. If the auction house
+        * denies a request a message is displayed saying there are active bids. Otherwise, the agent removes the auction
+        * house from its list of Auction House links and tells the display to remove the current tab.
+        */
         leaveAuc.setOnAction(event -> {
             AuctionHouseLink link = auctionHouses.get(display.getCurrentTab());
             boolean foundPending = false;
@@ -235,30 +291,37 @@ public class Agent extends Application {
                 display.displayNotification("Cannot leave: Pending Transfers");
             }
         });
-        leaveBank.setOnAction(event -> {
-            if(auctionHouses.isEmpty() && bankProxy.closeRequest(myRecords)){
-                stop();
-            }else{
-                display.displayNotification("Please transfer all funds and leave all auctions");
-            }
-        });
+        /*
+        * This button is used to request a list of auction houses from the bank. If the request is null or there are
+        * no open auction houses a notification is displayed. Otherwise tells the bank display to show the list.
+        */
         getAuction.setOnAction(event -> {
-            join.setDisable(false);
             ArrayList<IDRecord> auctions = bankProxy.getListOfAuctionHouses();
             if(auctions != null) {
-                display.displayAuctionHouses(auctions);
+                if(!auctions.isEmpty()) {
+                    join.setDisable(false);
+                    display.displayAuctionHouses(auctions);
+                }else{
+                    display.displayNotification("No Open Auction Houses");
+                }
             }else{
-                System.out.println("can't get Auction");
+                display.displayNotification("can't get Auction Houses");
             }
         });
+        /*
+        *
+        */
         getBalance.setOnAction(event -> {
             BankAccount info = bankProxy.requestBalance(myRecords);
             if(info != null) {
                 display.updateLabels(info);
             }else{
-                System.out.println("can't get balance");
+                display.displayNotification("can't get balance");
             }
         });
+        /*
+        *
+        */
         transfer.setOnAction(event -> {
             AuctionItem item = display.getSelectedTransfer();
             if (item != null) {
@@ -269,12 +332,15 @@ public class Agent extends Application {
                 if(info != null) {
                     display.updateLabels(info);
                 }else{
-                    System.out.println("can't get balance");
+                    display.displayNotification("can't get balance");
                 }
             }else{
-                System.out.println("can't Transfer Funds");
+                display.displayNotification("can't Transfer Funds");
             }
         });
+        /*
+        *
+        */
         join.setOnAction(event -> {
             IDRecord newAuctionHouse = display.getSelectedAuctionHouse();
             join.setDisable(true);
@@ -289,8 +355,7 @@ public class Agent extends Application {
                     auctionHouses.put(newAuctionHouse.getNumericalID(), linkToAuction);
                 }
             }else{
-                display.addAuctionTab(null,null);
-                System.out.println("can't join auction house");
+                display.displayNotification("can't join auction house");
             }
         });
     }

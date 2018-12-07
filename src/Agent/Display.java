@@ -13,7 +13,13 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
+/**
+ * created: 11/30/18 by lb
+ * last modified: 12/07/18 by lb
+ * @author Liam Brady (lb)
+ * @author Warren D. Craft (wdc)
+ * @author Tyler Fenske (thf)
+ */
 public class Display {
     private HashMap<Integer,AuctionTab> auctions;
     private BankTab bank;
@@ -63,20 +69,32 @@ public class Display {
      * @param auctionHouse auction house info
      */
     public void addAuctionTab(List<AuctionItem> items, IDRecord auctionHouse){
-        if(auctions.get(auctionHouse.getNumericalID()) == null) {
-            AuctionTab auction = new AuctionTab(items, auctionHouse, bid, leaveAuc);
-            tabs.getTabs().add(auction.getTab());
-            if (auctionHouse != null) {
-                auctions.put(auctionHouse.getNumericalID(), auction);
+        if(auctionHouse != null) {
+            if (auctions.get(auctionHouse.getNumericalID()) == null) {
+                AuctionTab auction = new AuctionTab(items, auctionHouse, bid, leaveAuc);
+                tabs.getTabs().add(auction.getTab());
+                if (auctionHouse != null) {
+                    auctions.put(auctionHouse.getNumericalID(), auction);
+                }
+            } else {
+                displayNotification("That Auction House Exists Already");
             }
-        }else{
-            System.out.println("fail");
         }
     }
+
+    /**
+     *
+     */
     public void removeCurrentTab(){
         auctions.remove(Integer.parseInt(currentTab.getId()));
         tabs.getTabs().remove(currentTab);
     }
+
+    /**
+     *
+     * @param ID
+     * @return
+     */
     public boolean doesAuctionExist(int ID){
         if(auctions.get(ID) != null) {
             displayNotification("Already in this auction house");
@@ -84,6 +102,11 @@ public class Display {
         }
         return false;
     }
+
+    /**
+     *
+     * @return
+     */
     public AuctionItem getBid(){
         AuctionItem item = null;
         if(currentTab.getId() != null) {
@@ -95,23 +118,48 @@ public class Display {
                 currentBid.setProposedBid(tab.getProposedBid());
                 item.setBid(currentBid);
             }else{
-                System.out.println("Nothing to bid on");
+                displayNotification("Nothing to bid on");
             }
         }else{
-            System.out.println("Nothing to bid on");
+            displayNotification("Nothing to bid on");
         }
         return item;
     }
+
+    /**
+     *
+     * @param update
+     */
     public void updateAuctionItems(AuctionHouseInventory update){
         List<AuctionItem> items = update.getAuctions();
         AuctionTab auction = auctions.get(update.getAccountNumber());
         auction.updateItems(items);
     }
+
+    /**
+     *
+     * @param auctionHouses
+     */
     public void displayAuctionHouses(ArrayList<IDRecord> auctionHouses){
         bank.setAucHouses(auctionHouses);
     }
+
+    /**
+     *
+     * @return
+     */
     public IDRecord getSelectedAuctionHouse(){return bank.getSelectedItem();}
+
+    /**
+     *
+     * @return
+     */
     public AuctionItem getSelectedTransfer(){return bank.getSelectedToTransfer();}
+
+    /**
+     *
+     * @param wonItem
+     */
     public void addTransferItem(AuctionItem wonItem){
         AuctionItem item = new AuctionItem(wonItem.getHouseID(),wonItem.getItemID(),wonItem.getItemName(),
                 wonItem.getBid());
@@ -119,7 +167,17 @@ public class Display {
         displayNotification("New Transfer Request");
 
     }
+
+    /**
+     *
+     * @param account
+     */
     public void updateLabels(BankAccount account){bank.updateLabels(account);}
+
+    /**
+     *
+     * @param msg
+     */
     public void displayNotification(String msg){
         Stage newTransfer = new Stage();
         Label transfer = new Label(msg);
@@ -130,6 +188,11 @@ public class Display {
         newTransfer.initOwner(stage);
         newTransfer.show();
     }
+
+    /**
+     *
+     * @return
+     */
     public int getCurrentTab(){
         return Integer.parseInt(currentTab.getId());
     }

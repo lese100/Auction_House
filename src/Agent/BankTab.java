@@ -3,14 +3,12 @@ package Agent;
 import Utility.AuctionItem;
 import Utility.BankAccount;
 import Utility.IDRecord;
-import javafx.beans.binding.ListBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -23,7 +21,13 @@ import javafx.scene.paint.Color;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * created: 11/30/18 by lb
+ * last modified: 12/07/18 by lb
+ * @author Liam Brady (lb)
+ * @author Warren D. Craft (wdc)
+ * @author Tyler Fenske (thf)
+ */
 public class BankTab {
     private Button getAuctions,join;
     private Tab bankTab;
@@ -147,15 +151,31 @@ public class BankTab {
             aucDisp.add(house.getName());
         }
     }
+
+    /**
+     *
+     * @param houses
+     */
     public void setAucHouses(ArrayList<IDRecord> houses){
         aucHouses = houses;
         aucDisp.clear();
         displayAucHouses();
     }
+
+    /**
+     *
+     * @return
+     */
     public IDRecord getSelectedItem(){
         aucDisp.clear();
         return selectedItem;
     }
+
+    /**
+     *
+     * @param item
+     * @return
+     */
     private String getSpacing(String item){
         String spacing = "";
         for(int i = item.length(); i < 55; i++){
@@ -163,6 +183,10 @@ public class BankTab {
         }
         return spacing;
     }
+
+    /**
+     *
+     */
     private void updatePending(){
         pendingDisp.clear();
         for(AuctionItem item : pendingTransfer){
@@ -171,6 +195,11 @@ public class BankTab {
             pendingDisp.add(info);
         }
     }
+
+    /**
+     *
+     * @return
+     */
     public AuctionItem getSelectedToTransfer(){
         if(pendingTransfer.isEmpty()){
             return null;
@@ -179,16 +208,25 @@ public class BankTab {
         pendingTransfer.remove(selectedToTransfer);
         purchased.add(hold);
         updatePending();
-        //updatePurchased();
         String info = hold.getItemName() + "_" + hold.getItemID();
         info += getSpacing(info) + "-$" + df.format(hold.getBid().getCurrentBid());
         purchasedDisp.add(info);
         return hold;
     }
+
+    /**
+     *
+     * @param item
+     */
     public void addTransferItem(AuctionItem item){
         pendingTransfer.add(item);
         updatePending();
     }
+
+    /**
+     *
+     * @param account
+     */
     public void updateLabels(BankAccount account){
         name.setText("  "+account.getUserName());
         accountNum.setText("    Account#: " + Integer.toString(account.getAccountNumber()));

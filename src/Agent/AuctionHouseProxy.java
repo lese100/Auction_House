@@ -5,6 +5,15 @@ import Utility.*;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Handles all messages that will ever be sent to the Auction house and returns responses from each message to the
+ * Agent.
+ * created: 11/30/18 by lb
+ * last modified: 12/07/18 by lb
+ * @author Liam Brady (lb)
+ * @author Warren D. Craft (wdc)
+ * @author Tyler Fenske (thf)
+ */
 public class AuctionHouseProxy {
     private CommunicationService coms;
 
@@ -59,6 +68,14 @@ public class AuctionHouseProxy {
             }
         }
     }
+
+    /**
+     * Makes a IDrecord with the secret key instead of my account number. Sends a message to the auction house asking
+     * if you can leave with the IDRecord it created. Waits for a response.
+     * @param myRecord my User information
+     * @param secretKey secretkey the auction house associates with me.
+     * @return whether I'm allowed to leave or not.
+     */
     public Boolean closeRequest(IDRecord myRecord, int secretKey){
         IDRecord temp = new IDRecord(myRecord.getRecordType(),myRecord.getName(),myRecord.getInitialBalance(),
                 myRecord.getHostname(),myRecord.getPortNumber());

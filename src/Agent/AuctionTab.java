@@ -4,7 +4,6 @@ import Utility.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -19,7 +18,13 @@ import javafx.scene.paint.Color;
 
 import java.text.DecimalFormat;
 import java.util.List;
-
+/**
+ * created: 11/30/18 by lb
+ * last modified: 12/07/18 by lb
+ * @author Liam Brady (lb)
+ * @author Warren D. Craft (wdc)
+ * @author Tyler Fenske (thf)
+ */
 public class AuctionTab {
     private ListView<String> list;
     private ObservableList<String> itemDisp;
@@ -126,6 +131,11 @@ public class AuctionTab {
 
     }
 
+    /**
+     *
+     * @param leave
+     * @param bid
+     */
     public void replaceButtons(Button leave, Button bid){
         leaveHold.getChildren().remove(this.leave);
         leaveHold.getChildren().add(leave);
@@ -156,6 +166,10 @@ public class AuctionTab {
             }
         }
     }
+
+    /**
+     *
+     */
     public void DisplayItem(){
         AuctionItem hold = items.get(selectedItem);
         if(hold != null) {
@@ -197,6 +211,11 @@ public class AuctionTab {
      * @return the tab
      */
     public Tab getTab(){return auctionHouse;}
+
+    /**
+     *
+     * @return
+     */
     public double getProposedBid(){
         double bid = Double.parseDouble(proposedBid.getText())*100;
         int holdBid = (int)bid;

@@ -2,7 +2,14 @@ package Agent;
 
 import Utility.*;
 import javafx.application.Platform;
-
+/**
+ * Handles messages received by the notification server.
+ * created: 11/30/18 by lb
+ * last modified: 12/07/18 by lb
+ * @author Liam Brady (lb)
+ * @author Warren D. Craft (wdc)
+ * @author Tyler Fenske (thf)
+ */
 public class AgentProtocol implements PublicAuctionProtocol{
     private Message msgToSend;
     private Agent agent;

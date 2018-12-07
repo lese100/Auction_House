@@ -5,6 +5,14 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.util.ArrayList;
 
+/**
+ * Handles all messages that will ever be sent to the bank and returns responses from each message to the Agent.
+ * created: 11/30/18 by lb
+ * last modified: 12/07/18 by lb
+ * @author Liam Brady (lb)
+ * @author Warren D. Craft (wdc)
+ * @author Tyler Fenske (thf)
+ */
 public class BankProxy {
     private CommunicationService coms;
 
@@ -99,6 +107,12 @@ public class BankProxy {
         }
         return -1;
     }
+
+    /**
+     * Sends a close request to the bank inorder to close the display
+     * @param myID my IDRecord so the bank knows who's asking
+     * @return a boolean saying whether or not the bank accepted my request
+     */
     public Boolean closeRequest(IDRecord myID) {
         Message<IDRecord> message = new Message<>(Message.MessageIdentifier.CLOSE_REQUEST, myID);
         Message <Integer>reply = sendMSG(message);
