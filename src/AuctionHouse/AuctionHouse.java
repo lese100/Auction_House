@@ -67,7 +67,8 @@ public class AuctionHouse {
         CommunicationService cs;
         try{
             cs = new CommunicationService(bankHostName, bankPort);
-            display.updateConsoleDisplay("Connected to Bank — Host: " +
+            display.updateConsoleDisplay("Connected to Bank's Notification " +
+                    "Server. — Host: " +
                     bankHostName + " Port: " + bankPort);
         }catch(ConnectException e){
             cs = null;
@@ -88,7 +89,8 @@ public class AuctionHouse {
         PublicAuctionProtocol auctionProtocol = new AuctionHouseProtocol(this);
 
         try{
-            NotificationServer ns = new NotificationServer(port, auctionProtocol);
+            NotificationServer ns = new NotificationServer(port,
+                    auctionProtocol);
             Thread notificationServer = new Thread(ns);
             notificationServer.start();
         }catch(BindException e){
@@ -269,7 +271,7 @@ public class AuctionHouse {
      * @throws IOException
      */
     public void joinAuctionHouse(IDRecord agentInfo) throws IOException{
-        display.updateConsoleDisplay("Agent \"" + agentInfo.getName() + "\" " +
+        display.updateConsoleDisplay("Agent [" + agentInfo.getName() + "] " +
                 "has connected." +
                 " — Host: " + agentInfo.getHostname() + " Port: " +
                 agentInfo.getPortNumber());
@@ -277,8 +279,8 @@ public class AuctionHouse {
         CommunicationService cs = new CommunicationService
                 (agentInfo.getHostname(), agentInfo.getPortNumber());
 
-        display.updateConsoleDisplay("Connected to Agent \"" +
-                agentInfo.getName() + "\"'s Notification Server" +
+        display.updateConsoleDisplay("Connected to Agent [" +
+                agentInfo.getName() + "]'s Notification Server." +
                 " — Host: " + agentInfo.getHostname() + " Port: " +
                 agentInfo.getPortNumber());
 
@@ -409,8 +411,8 @@ public class AuctionHouse {
         }
 
         connectedAgents.remove(idRecord.getNumericalID());
-        display.updateConsoleDisplay("Agent \"" + idRecord.getName() +
-                "\" has disconnected.");
+        display.updateConsoleDisplay("Agent [" + idRecord.getName() +
+                "] has disconnected.");
 
         return true;
     }
