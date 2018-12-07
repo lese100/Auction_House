@@ -8,7 +8,8 @@ import javafx.stage.Stage;
  * The Main class within the Bank package, providing the construction of a
  * Bank object. Run this to set up a Bank and open it for business.
  * created: 11/29/18 by wdc
- * last modified: 12/02/18 by wdc (coord w/GUI)
+ * last modified: 12/06/18 by wdc
+ * previously modified: 12/06/18 by wdc (coord w/GUI)
  * previously modified: 12/01/18 by wdc
  * @author Liam Brady (lb)
  * @author Warren D. Craft (wdc)
@@ -24,10 +25,16 @@ public class Main extends Application {
 
     }
 
+    /**
+     * The required start() method to extend the JavaFX Application class,
+     * creating the initial GUI asking for Bank information and initializing
+     * the JavaFX Stage for the 2nd GUI used by the Bank once in operation.
+     * @param primaryStage
+     * @throws Exception
+     */
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        //Bank theBank; // check this later?
         BankDisplay theBankDisplay = new BankDisplay(primaryStage);
 
         Button btnCreateBank = new Button("Create Bank");
@@ -50,7 +57,7 @@ public class Main extends Application {
         });
 
         // declare the 2nd stage here in the start() so we can set up
-        // its closing handler and then hand it over to the display class
+        // its closing handler and then hand it over to the BankDisplay class
         Stage stage02 = new Stage();
         stage02.setOnCloseRequest(event -> {
             try{
@@ -66,7 +73,6 @@ public class Main extends Application {
                 e.printStackTrace();
             }
         });
-
 
         theBankDisplay.setupBankGUIComponents(btnCreateBank, stage02);
     }
