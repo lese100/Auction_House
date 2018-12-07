@@ -1,4 +1,4 @@
-package Bank;
+package Testing;
 
 import Utility.*;
 import javafx.collections.FXCollections;
@@ -15,9 +15,11 @@ import java.util.ArrayList;
 
 /**
  * JavaFX-based display class for representing and displaying information
- * about a BankClient (which itself is used for testing a Bank object).
+ * about a BankClient and used as a jack-of-all-trades vehicle for testing
+ * a Bank object. Not intended for public consumption or public use.
  * created: 11/30/18 by wdc
- * last modified: 12/02/18 by wdc (adding fxnality to GUI)
+ * last modified: 12/06/18 by wdc (editing/cleaning)
+ * previously modified: 12/02/18 by wdc (adding fxnality to GUI)
  * previously modified: 12/01/18 by wdc
  * @author Liam Brady (lb)
  * @author Warren D. Craft (wdc)
@@ -339,7 +341,8 @@ public class BankClientWithDisplay {
             try {
                 communicationService =
                     new CommunicationService(hostName, portNumber);
-                bankProxyForTesting = new BankProxyForTesting(communicationService);
+                bankProxyForTesting =
+                    new BankProxyForTesting(communicationService);
                 connectedToBank = true;
                 System.out.println("Now connected to Bank at: " +
                     hostName + " (port " + portNumber + ")");
@@ -373,7 +376,8 @@ public class BankClientWithDisplay {
         IDRecord returnedIDRecord;
         System.out.println("Initial Account ID is: " +
             tempIDRecord.getNumericalID());
-        returnedIDRecord = bankProxyForTesting.openBankAccount(tempIDRecord, 1000.00);
+        returnedIDRecord =
+            bankProxyForTesting.openBankAccount(tempIDRecord, 1000.00);
         if ( returnedIDRecord instanceof IDRecord ) {
             int newAccountNumber = returnedIDRecord.getNumericalID();
             IDRecord.RecordType newAcctType = returnedIDRecord.getRecordType();
@@ -385,24 +389,11 @@ public class BankClientWithDisplay {
             textFieldAccountNumber.setText(
                 String.format("%d", newAccountNumber));
             choiceBoxAccountType.setValue(newAcctType.toString());
-//            switch(newAcctType) {
-//                case AGENT:
-//                    choiceBoxAccountType.setValue("agent");
-//                    break;
-//                case AUCTION_HOUSE:
-//                    choiceBoxAccountType.setValue("auction house");
-//                    break;
-//                default:
-//                    choiceBoxAccountType.setValue("unknown");
-//                    break;
-//            }
+
         } else {
             System.out.println("Returning object is not an IDRecord.");
         }
         clientIDRecord = returnedIDRecord;
-        // update the displayed account information
-
-        // augment display with label for account #
 
     }
 
@@ -524,9 +515,11 @@ public class BankClientWithDisplay {
         boolean fundsUnfrozen = bankProxyForTesting.unfreezeFunds(theBid);
         System.out.println("BCWD.checkAndFreezeFunds(): fundsUnfrozen = " +
             fundsUnfrozen);
-
     }
 
+    /**
+     * A method to simulate the transfer of funds from one account to another.
+     */
     public void transferFunds() {
         // use current secret key field in display to generate
         // a simulated AuctionItem object, which will be the vehicle for
@@ -555,6 +548,9 @@ public class BankClientWithDisplay {
             fundsTransferred);
     }
 
+    /**
+     * A method to simulate the adding of funds to an account.
+     */
     public void addFunds () {
 
         // using information from GUI for acct # and acct type
@@ -610,6 +606,9 @@ public class BankClientWithDisplay {
         );
     }
 
+    /**
+     * A method to simulate the closing of a client's account.
+     */
     public void closeAccount () {
         // using information from GUI for acct # and acct type
         // and construct a temporary simulated IDRecord
@@ -650,21 +649,4 @@ public class BankClientWithDisplay {
 
     }
 
-
-    public void notifyUser() {
-        Stage notificationStage = new Stage();
-        notificationStage.setMaxHeight(100);
-        notificationStage.setMinHeight(100);
-        notificationStage.setMaxWidth(300);
-        notificationStage.setMinWidth(300);
-
-        Label notify = new Label("YOU CHANGED DICTIONARIES 10 SEC AGO!");
-
-        StackPane sp = new StackPane();
-        sp.getChildren().add(notify);
-
-        Scene scene = new Scene(sp);
-        notificationStage.setScene(scene);
-        notificationStage.show();
-    }
 }

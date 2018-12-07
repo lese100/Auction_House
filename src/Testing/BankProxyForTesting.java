@@ -1,4 +1,4 @@
-package Bank;
+package Testing;
 
 import Utility.*;
 
@@ -6,10 +6,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
- * A temporary class for testing the Bank class, a BankProxyForTesting is used by a
- * BankClient to mediate communications with a Bank.
+ * A temporary class for testing the Bank class, a BankProxyForTesting is
+ * used by a (simulated) BankClient to mediate communications with a Bank.
  * created: 11/30/18 by Warren D. Craft (wdc)
- * last modified: 12/02/18 by wdc
+ * last modified: 12/06/18 by wdc
  * @author Liam Brady (lb)
  * @author Warren D. Craft (wdc)
  * @author Tyler Fenske (thf)
@@ -24,7 +24,7 @@ public class BankProxyForTesting {
 
     /**
      * Public constructor for a BankProxyForTesting, which is used by a
-     * BankClient to mediate communications with an actual Bank.
+     * (simulated) BankClient to mediate communications with an actual Bank.
      * @param cs CommunicationService
      */
     public BankProxyForTesting(CommunicationService cs){
@@ -38,6 +38,13 @@ public class BankProxyForTesting {
     //   messages to actual Bank      //
     // ****************************** //
 
+    /**
+     * Opens a bank account with an initial balance using an IDRecord to
+     * identify the client opening the account.
+     * @param idRecord
+     * @param initialBalance
+     * @return An updated IDRecord now containing a valid bank account number
+     */
     public IDRecord openBankAccount (IDRecord idRecord, double initialBalance) {
 
         System.out.println("Entering BankProxyForTesting.openBankAccount()");
@@ -69,6 +76,15 @@ public class BankProxyForTesting {
 
     }
 
+    /**
+     * Gets a secret key for an Agent to use when contacting and doing business
+     * with a specific Auction House.
+     * @param theAccountLink An AccountLink object containing the Agent bank
+     *                       account number and the account number for the
+     *                       Auction House the Agent desires to do business
+     *                       with.
+     * @return int secret key
+     */
     public int getSecretKey(AccountLink theAccountLink) {
         System.out.println("BankProxyForTesting.getSecretKey() ");
         Message message = null;
@@ -86,6 +102,13 @@ public class BankProxyForTesting {
         return reply.getMessageContent();
     }
 
+    /**
+     * Checks an account for suffient funds to be frozen, and freezes that
+     * amount if available.
+     * @param theBid A Bid object, which will contain an account number and the
+     *               amount to check and freeze.
+     * @return boolean true if check and freeze successful; false otherwise
+     */
     public boolean checkAndFreezeFunds(Bid theBid) {
         Message message = null;
         Message reply = null;
@@ -109,6 +132,13 @@ public class BankProxyForTesting {
         }
     }
 
+    /**
+     * Checks an account for sufficient funds to be unfrozen, and unfreezes
+     * that amount if available.
+     * @param theBid A Bid object, which will contain an account number and the
+     *               amount to check and unfreeze.
+     * @return boolean true if check and unfreeze successful; false otherwise
+     */
     public boolean unfreezeFunds(Bid theBid) {
         Message message = null;
         Message reply = null;
@@ -133,6 +163,13 @@ public class BankProxyForTesting {
 
     }
 
+    /**
+     * Transfers funds from a source account to a target/destination account,
+     * with the source, target, and transfer amounts specified in the
+     * AuctionItem object.
+     * @param theAuctionItem An AuctionItem object, which contains a Bid oject.
+     * @return boolean true if transfer successful; false otherwise
+     */
     public boolean transferFunds ( AuctionItem theAuctionItem ) {
         Message message = null;
         Message reply = null;
@@ -156,6 +193,12 @@ public class BankProxyForTesting {
         }
     }
 
+    /**
+     * Closes an account specified by the account number in the accompanying
+     * IDRecord.
+     * @param theIDRecord An IDRecord object.
+     * @return boolean true if account was successfully closed; false otherwise
+     */
     public boolean closeAccount( IDRecord theIDRecord ) {
 
         Message message = null;
@@ -180,6 +223,10 @@ public class BankProxyForTesting {
         }
     }
 
+    /**
+     * Sends a simple test message, used to test communications.
+     * @return String content of returning message
+     */
     public String sendTestMessage () {
         Message message = null;
         try {
@@ -196,6 +243,12 @@ public class BankProxyForTesting {
     }
 
 
+    /**
+     * Checks for an account's balance information, returning details
+     * about the balance and frozen balance.
+     * @param theIDRecord An IDRecord object specifying the account number
+     * @return BankAccount object giving account balance information
+     */
     public BankAccount checkBalance (IDRecord theIDRecord) {
         System.out.println("BankProxyForTesting: checkBalance() ");
         Message message = null;
@@ -253,6 +306,13 @@ public class BankProxyForTesting {
     }
 
 
+    /**
+     * Adds funds to an account, using an IDRecord to specify the account
+     * number and the amount to be added to the account.
+     * @param idRecord An IDRecord specifying account number and amount to
+     *                 be added
+     * @return BankAccount object giving account balance information
+     */
     public BankAccount addFunds (IDRecord idRecord) {
 
         System.out.println("BankProxyForTesting.addFunds() ");
