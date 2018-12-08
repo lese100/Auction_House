@@ -19,9 +19,10 @@ import javafx.scene.paint.Color;
 import java.text.DecimalFormat;
 import java.util.List;
 /**
- * creates a tab that represents the auctionHouse and its properties. This is used to allow the use and displaying of
- * multiple auction houses. This object constructs and handles the auction houses information and provides getters and
- * setters for updating the tab and capturing changes made to the tab.
+ * creates a tab that represents the auctionHouse and its properties. This is
+ * used to allow the use and displaying of multiple auction houses. This object
+ * constructs and handles the auction houses information and provides getters
+ * and setters for updating the tab and capturing changes made to the tab.
  * created: 11/30/18 by lb
  * last modified: 12/07/18 by lb
  * @author Liam Brady (lb)
@@ -42,14 +43,15 @@ public class AuctionTab {
     private HBox leaveHold, biddingArea;
     private DecimalFormat df;
     /**
-     * stores the each auction houses tab info. Formats the auctionHouse tab ,creates the needed items, and sets
-     * default values.
+     * stores the each auction houses tab info. Formats the auctionHouse tab ,
+     * creates the needed items, and sets default values.
      * @param items the items available
      * @param houseInfo house info
      * @param bid button for placing a bid
      * @param leave button for leaving the auction house
      */
-    public AuctionTab(List<AuctionItem> items, IDRecord houseInfo, Button bid, Button leave){
+    public AuctionTab(List<AuctionItem> items, IDRecord houseInfo, Button bid,
+                      Button leave){
         list = new ListView<>();
         list.setPrefSize(100,575);
         list.setOrientation(Orientation.VERTICAL);
@@ -80,12 +82,16 @@ public class AuctionTab {
         /*adds the items available at the auction house to the display*/
         addItems();
 
-        /*event Handler for when a item is selected from the list of auction Items*/
+        /*
+         * event Handler for when a item is selected from the list of auction
+         * Items
+         */
         list.getSelectionModel().selectedIndexProperty().addListener(
                 new ChangeListener<Number>() {
                     @Override
-                    public void changed(ObservableValue<? extends Number> observable,
-                                        Number oldValue, Number newValue) {
+                    public void changed(ObservableValue<? extends Number>
+                                                observable,Number oldValue,
+                                        Number newValue) {
                         int select = (int) newValue;
                         if(select < items.size() && select >= 0) {
                             selectedItem = select;
@@ -94,7 +100,10 @@ public class AuctionTab {
                     }
                 });
 
-        /*creates and formats the labels that hold auction Item information and placing bids*/
+        /*
+         * creates and formats the labels that hold auction Item information and
+         * placing bids
+         */
         proposedBid = new TextField("00.00");
         itemName = new Label("     Item");
         itemID = new Label("     ID");
@@ -132,10 +141,14 @@ public class AuctionTab {
 
         /*leave button formatting*/
         leaveHold = new HBox();
-        Label leaveSpacing = new Label("                                                                       ");
+        Label leaveSpacing = new Label("                               " +
+                "                                        ");
         leaveHold.getChildren().addAll(leaveSpacing,this.leave);
 
-        /*adds the leave button formatting to the pane and adds the pane to the "AuctionHouse" tab*/
+        /*
+         * adds the leave button formatting to the pane and adds the pane to the
+         * "AuctionHouse" tab
+         */
         pane.setPadding(new Insets(10,10,10,10));
         pane.setCenter(hold);
         pane.setBottom(leaveHold);
@@ -144,8 +157,9 @@ public class AuctionTab {
     }
 
     /**
-     * Since every auction tab uses the same buttons every time you switch tabs the buttons need to be redrawn on
-     * the current tab. This method is called to replace these buttons.
+     * Since every auction tab uses the same buttons every time you switch tabs
+     * the buttons need to be redrawn on the current tab. This method is called
+     * to replace these buttons.
      * @param leave the leave button
      * @param bid the bid button
      */
@@ -181,8 +195,9 @@ public class AuctionTab {
     }
 
     /**
-     * Displays a item selected from the List of items the auction house has. Edits the labels to match the item
-     * information. Also formats the prices to match dollar amounts.
+     * Displays a item selected from the List of items the auction house has.
+     * Edits the labels to match the item information. Also formats the prices
+     * to match dollar amounts.
      */
     public void DisplayItem(){
         AuctionItem hold = items.get(selectedItem);
@@ -192,11 +207,14 @@ public class AuctionTab {
                 minBid.setText("Min Bid: SOLD");
                 bid.setDisable(true);
             }else{
-                currentPrice.setText("Current Bid: $" + df.format(hold.getBid().getCurrentBid()));
-                minBid.setText("Min Bid: $" + df.format(hold.getBid().getMinBid()));
+                currentPrice.setText("Current Bid: $" + df.format(hold.getBid().
+                        getCurrentBid()));
+                minBid.setText("Min Bid: $" + df.format(hold.getBid().
+                        getMinBid()));
                 bid.setDisable(false);
             }
-            itemID.setText("     Item ID: " + Integer.toString(hold.getItemID()));
+            itemID.setText("     Item ID: " + Integer.toString(hold.
+                    getItemID()));
             itemName.setText("     Item Name: " + hold.getItemName());
         }else{
             System.out.println("no selected item");
@@ -221,13 +239,15 @@ public class AuctionTab {
      */
     public AuctionItem getSelectedItem(){return items.get(selectedItem);}
     /**
-     * allows the display to request the tab inorder to add it to the list of tabs
+     * allows the display to request the tab inorder to add it to the list
+     * of tabs
      * @return the tab
      */
     public Tab getTab(){return auctionHouse;}
 
     /**
-     * gets the bid that was proposed in the proposedBid textField and formats it to mach a dollar amount
+     * gets the bid that was proposed in the proposedBid textField and formats
+     * it to mach a dollar amount
      * @return the bid
      */
     public double getProposedBid(){

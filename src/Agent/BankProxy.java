@@ -6,7 +6,8 @@ import java.net.ConnectException;
 import java.util.ArrayList;
 
 /**
- * Handles all messages that will ever be sent to the bank and returns responses from each message to the Agent.
+ * Handles all messages that will ever be sent to the bank and returns responses
+ * from each message to the Agent.
  * created: 11/30/18 by lb
  * last modified: 12/07/18 by lb
  * @author Liam Brady (lb)
@@ -38,13 +39,16 @@ public class BankProxy {
      * @return myInfo updated with a account number provided by the bank
      */
     public IDRecord createBankAccount(IDRecord myInfo) {
-        Message<IDRecord> message = new Message<>(Message.MessageIdentifier.OPEN_AGENT_ACCT, myInfo);
+        Message<IDRecord> message = new Message<>(Message.MessageIdentifier.
+                OPEN_AGENT_ACCT, myInfo);
         Message<IDRecord> reply;
         reply = sendMSG(message);
         if(reply != null){
-            if(reply.getMessageIdentifier() == Message.MessageIdentifier.AGENT_ACCT_CONFIRMED){
+            if(reply.getMessageIdentifier() == Message.MessageIdentifier.
+                    AGENT_ACCT_CONFIRMED){
                 return reply.getMessageContent();
-            }else if(reply.getMessageIdentifier() == Message.MessageIdentifier.CASE_NOT_FOUND){
+            }else if(reply.getMessageIdentifier() == Message.MessageIdentifier.
+                    CASE_NOT_FOUND){
                 System.out.println("bank missing create account");
             }
         }
@@ -57,13 +61,16 @@ public class BankProxy {
      * @return List of auction houses and their info provided by the bank
      */
     public ArrayList<IDRecord> getListOfAuctionHouses(){
-        Message<ArrayList<IDRecord>> message = new Message(Message.MessageIdentifier.GET_LIST_OF_AUCTION_HOUSES, null);
+        Message<ArrayList<IDRecord>> message = new Message(Message.
+                MessageIdentifier.GET_LIST_OF_AUCTION_HOUSES, null);
         Message<ArrayList<IDRecord>> reply;
         reply = sendMSG(message);
         if(reply != null){
-            if(reply.getMessageIdentifier() == Message.MessageIdentifier.LIST_OF_AUCTION_HOUSES){
+            if(reply.getMessageIdentifier() == Message.MessageIdentifier.
+                    LIST_OF_AUCTION_HOUSES){
                 return reply.getMessageContent();
-            }else if(reply.getMessageIdentifier() == Message.MessageIdentifier.CASE_NOT_FOUND){
+            }else if(reply.getMessageIdentifier() == Message.MessageIdentifier.
+                    CASE_NOT_FOUND){
                 System.out.println("bank missing list of Auction Houses");
             }
         }
@@ -73,15 +80,19 @@ public class BankProxy {
     /**
      * Requests for a balance check from the bank
      * @param myID My current information
-     * @return and updated version of my information containing the correct balance.
+     * @return and updated version of my information containing the correct
+     * balance.
      */
     public BankAccount requestBalance(IDRecord myID){
-        Message<IDRecord> message = new Message<>(Message.MessageIdentifier.REQUEST_BALANCE,myID);
+        Message<IDRecord> message = new Message<>(Message.MessageIdentifier.
+                REQUEST_BALANCE,myID);
         Message<BankAccount> reply = sendMSG(message);
         if(reply != null){
-            if(reply.getMessageIdentifier() == Message.MessageIdentifier.BALANCE){
+            if(reply.getMessageIdentifier() == Message.MessageIdentifier.
+                    BALANCE){
                 return reply.getMessageContent();
-            }else if(reply.getMessageIdentifier() == Message.MessageIdentifier.CASE_NOT_FOUND){
+            }else if(reply.getMessageIdentifier() == Message.MessageIdentifier.
+                    CASE_NOT_FOUND){
                 System.out.println("Bank missing get balance");
             }
         }
@@ -89,18 +100,22 @@ public class BankProxy {
     }
 
     /**
-     * Asks the bank for a secretkey to interact with the selected auction house.
+     * Asks the bank for a secretkey to interact with the selected auction
+     * house.
      * @param selection the auction house I selected
      * @return the secretkey I must use to interact with the auction house.
      */
     public int getSecretKey(AccountLink selection){
-        Message<AccountLink> message = new Message<>(Message.MessageIdentifier.GET_SECRET_KEY,selection);
+        Message<AccountLink> message = new Message<>(Message.MessageIdentifier.
+                GET_SECRET_KEY,selection);
         Message<Integer> reply;
         reply = sendMSG(message);
         if(reply != null){
-            if(reply.getMessageIdentifier() == Message.MessageIdentifier.SECRET_KEY){
+            if(reply.getMessageIdentifier() == Message.MessageIdentifier.
+                    SECRET_KEY){
                 return reply.getMessageContent();
-            }else if(reply.getMessageIdentifier() == Message.MessageIdentifier.CASE_NOT_FOUND){
+            }else if(reply.getMessageIdentifier() == Message.MessageIdentifier.
+                    CASE_NOT_FOUND){
                 System.out.println("bank missing get Secret Key");
                 return 123456;
             }
@@ -114,13 +129,17 @@ public class BankProxy {
      * @return a boolean saying whether or not the bank accepted my request
      */
     public Boolean closeRequest(IDRecord myID) {
-        Message<IDRecord> message = new Message<>(Message.MessageIdentifier.CLOSE_REQUEST, myID);
+        Message<IDRecord> message = new Message<>(Message.MessageIdentifier.
+                CLOSE_REQUEST, myID);
         Message <Integer>reply = sendMSG(message);
-        if (reply.getMessageIdentifier() == Message.MessageIdentifier.CLOSE_REJECTED) {
+        if (reply.getMessageIdentifier() == Message.MessageIdentifier.
+                CLOSE_REJECTED) {
             return false;
-        } else if (reply.getMessageIdentifier() == Message.MessageIdentifier.CLOSE_ACCEPTED) {
+        } else if (reply.getMessageIdentifier() == Message.MessageIdentifier.
+                CLOSE_ACCEPTED) {
             return true;
-        } else if (reply.getMessageIdentifier() == Message.MessageIdentifier.CASE_NOT_FOUND) {
+        } else if (reply.getMessageIdentifier() == Message.MessageIdentifier.
+                CASE_NOT_FOUND) {
             System.out.println("Bank missing close request");
         }
         return true;
@@ -131,10 +150,12 @@ public class BankProxy {
      * @return get returned my updated account information after the transfer
      */
     public BankAccount transferFunds(AuctionItem purchasedItem){
-        Message<AuctionItem> message = new Message<>(Message.MessageIdentifier.TRANSFER_FUNDS,purchasedItem);
+        Message<AuctionItem> message = new Message<>(Message.MessageIdentifier.
+                TRANSFER_FUNDS,purchasedItem);
         Message<BankAccount> reply = sendMSG(message);
         if(reply != null){
-            if(reply.getMessageIdentifier() == Message.MessageIdentifier.TRANSFER_SUCCESS){
+            if(reply.getMessageIdentifier() == Message.MessageIdentifier.
+                    TRANSFER_SUCCESS){
                 return reply.getMessageContent();
             }else{
                 System.out.println("Bank missing transfer funds");

@@ -6,7 +6,8 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Handles all messages that will ever be sent to the Auction house and returns responses from each message to the
+ * Handles all messages that will ever be sent to the Auction house and returns
+ * responses from each message to the
  * Agent.
  * created: 11/30/18 by lb
  * last modified: 12/07/18 by lb
@@ -31,22 +32,27 @@ public class AuctionHouseProxy {
     }
 
     /**
-     * Joins the auction house with my user information and the secret key linking us. The Auction house
+     * Joins the auction house with my user information and the secret key
+     * linking us. The Auction house
      * then provides the list of items up for auction.
      * @param myRecord my user information
      * @param secretKey the secret key that does in place of my account number.
      * @return list of items up for auction
      */
     public List<AuctionItem> joinAH(IDRecord myRecord, int secretKey){
-        IDRecord temp = new IDRecord(myRecord.getRecordType(),myRecord.getName(),myRecord.getInitialBalance(),
+        IDRecord temp = new IDRecord(myRecord.getRecordType(),myRecord.getName()
+                ,myRecord.getInitialBalance(),
                 myRecord.getHostname(),myRecord.getPortNumber());
         temp.setNumericalID(secretKey);
-        Message<IDRecord> message = new Message<>(Message.MessageIdentifier.JOIN_AUCTION_HOUSE,temp);
+        Message<IDRecord> message = new Message<>(Message.MessageIdentifier.
+                JOIN_AUCTION_HOUSE,temp);
         Message<AuctionHouseInventory> reply = sendMSG(message);
         if(reply != null){
-            if(reply.getMessageIdentifier() == Message.MessageIdentifier.LIST_OF_AUCTION_HOUSE_ITEMS){
+            if(reply.getMessageIdentifier() == Message.MessageIdentifier.
+                    LIST_OF_AUCTION_HOUSE_ITEMS){
                 return reply.getMessageContent().getAuctions();
-            }else if(reply.getMessageIdentifier() == Message.MessageIdentifier.CASE_NOT_FOUND){
+            }else if(reply.getMessageIdentifier() == Message.MessageIdentifier.
+                    CASE_NOT_FOUND){
                 System.out.println("AuctionHouse missing list of items");
             }
         }
@@ -59,10 +65,12 @@ public class AuctionHouseProxy {
      * @return get returned my updated account information after the transfer
      */
     public void transferedFunds(AuctionItem purchasedItem){
-        Message<AuctionItem> message = new Message<>(Message.MessageIdentifier.TRANSFER_FUNDS,purchasedItem);
+        Message<AuctionItem> message = new Message<>(Message.MessageIdentifier.
+                TRANSFER_FUNDS,purchasedItem);
         Message<Integer> reply = sendMSG(message);
         if(reply != null){
-            if(reply.getMessageIdentifier() == Message.MessageIdentifier.TRANSFER_SUCCESS){
+            if(reply.getMessageIdentifier() == Message.MessageIdentifier.
+                    TRANSFER_SUCCESS){
             }else{
                 System.out.println("Bank missing transfer funds");
             }
@@ -70,23 +78,29 @@ public class AuctionHouseProxy {
     }
 
     /**
-     * Makes a IDrecord with the secret key instead of my account number. Sends a message to the auction house asking
-     * if you can leave with the IDRecord it created. Waits for a response.
+     * Makes a IDrecord with the secret key instead of my account number.
+     * Sends a message to the auction house asking if you can leave with the
+     * IDRecord it created. Waits for a response.
      * @param myRecord my User information
      * @param secretKey secretkey the auction house associates with me.
      * @return whether I'm allowed to leave or not.
      */
     public Boolean closeRequest(IDRecord myRecord, int secretKey){
-        IDRecord temp = new IDRecord(myRecord.getRecordType(),myRecord.getName(),myRecord.getInitialBalance(),
+        IDRecord temp = new IDRecord(myRecord.getRecordType(),myRecord.getName()
+                ,myRecord.getInitialBalance(),
                 myRecord.getHostname(),myRecord.getPortNumber());
         temp.setNumericalID(secretKey);
-        Message<IDRecord> message = new Message<>(Message.MessageIdentifier.CLOSE_REQUEST, temp);
+        Message<IDRecord> message = new Message<>(Message.MessageIdentifier.
+                CLOSE_REQUEST, temp);
         Message <Integer>reply = sendMSG(message);
-        if(reply.getMessageIdentifier() == Message.MessageIdentifier.CLOSE_REJECTED){
+        if(reply.getMessageIdentifier() == Message.MessageIdentifier.
+                CLOSE_REJECTED){
             return false;
-        }else if(reply.getMessageIdentifier() == Message.MessageIdentifier.CLOSE_ACCEPTED) {
+        }else if(reply.getMessageIdentifier() == Message.MessageIdentifier.
+                CLOSE_ACCEPTED) {
             return true;
-        }else if(reply.getMessageIdentifier() == Message.MessageIdentifier.CASE_NOT_FOUND){
+        }else if(reply.getMessageIdentifier() == Message.MessageIdentifier.
+                CASE_NOT_FOUND){
             System.out.println("Auction missing close request");
         }
         return true;
@@ -102,7 +116,8 @@ public class AuctionHouseProxy {
         Bid oldBid = item.getBid();
         oldBid.setSecretKey(secretKey);
         item.setBid(oldBid);
-        Message<AuctionItem> message = new Message<>(Message.MessageIdentifier.MAKE_BID,item);
+        Message<AuctionItem> message = new Message<>(Message.MessageIdentifier.
+                MAKE_BID,item);
         Message<String> reply = sendMSG(message);
         switch( reply.getMessageIdentifier() ) {
             case BID_REJECTED_INADEQUATE:
