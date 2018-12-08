@@ -1,6 +1,5 @@
 package Testing;
 
-import User.Display;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -16,7 +15,7 @@ import javafx.stage.Stage;
  */
 public class BankTest extends Application {
 
-    private Display display;
+    private BankClientWithDisplay display;
     private BankClientWithDisplay theDisplay;
 
     public static void main(String[] args) {
