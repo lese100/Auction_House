@@ -50,7 +50,7 @@ when completing the start-up process for an Auction House and an Agent.
 See the screen shot of the initial Bank GUI below (or see the file
 `BankGUI01.png` in the src/resource folder if the image does not appear):
 
-![Display Screen Shot](src/resource/BankGUIInitial.png)
+![Display Screen Shot](src/resource/BankGUI01.png)
 
 Once you supply the appropriate hostname and port number and click on the
 `Create Bank` button, a new GUI appears that lets you monitor the active
