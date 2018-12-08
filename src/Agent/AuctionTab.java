@@ -237,7 +237,10 @@ public class AuctionTab {
      * gets the selected item and returns it.
      * @return the selected item.
      */
-    public AuctionItem getSelectedItem(){return items.get(selectedItem);}
+    public AuctionItem getSelectedItem(){
+        if(selectedItem >= items.size() || selectedItem < 0){return null;}
+        return items.get(selectedItem);
+    }
     /**
      * allows the display to request the tab inorder to add it to the list
      * of tabs
