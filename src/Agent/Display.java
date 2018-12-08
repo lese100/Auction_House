@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 /**
+ * Object for creating and displaying new tabs for auctionHouses and banks. Designed to allow for multiple auctions
+ * and future use of multiple banks. Used for communication between the agent and the auctionHouse and Bank tabs.
  * created: 11/30/18 by lb
  * last modified: 12/07/18 by lb
  * @author Liam Brady (lb)
@@ -28,9 +30,21 @@ public class Display {
     private Button bid,leaveAuc,leaveBank,getAuction,getBalance,transfer,join;
     private IDRecord myInfo;
     private Stage stage;
+
     /**
-     * constructs the initial display for the bank.
-     * @param stage the main display stage
+     * Sets the initial values that are needed for creating new tabs. Creates a list of tabs that are displayed on the
+     * display. Creates the initial BankTab and adds it to the list of Tabs. Displays the list of tabs and has a event
+     * handler for when you select a different tab.
+     * @param stage the display
+     * @param myInfo the users info
+     * @param bid button for placing bids (AH Button)
+     * @param leaveAuc button for leaving a auction house (AH Button)
+     * @param leaveBank button for leaving the bank (Bank Button)
+     * @param getAuction button for requesting the list of auction houses (Bank Button)
+     * @param getBalance button for requesting the users banking information (Bank Button)
+     * @param transfer button for requesting the bank to transfer funds for a purchased item. (Bank Button)
+     * @param join button for joining a selected auction house in the list of auction houses (Bank Button)
+     * @param deposit the initial deposit that the bank tab will display in the history list.
      */
     public Display(Stage stage,IDRecord myInfo,Button bid,Button leaveAuc,Button leaveBank,Button getAuction,Button getBalance,
                    Button transfer,Button join,Double deposit){
@@ -64,8 +78,8 @@ public class Display {
     }
 
     /**
-     * creates a new tab for a auction i have connected to.
-     * @param items list of items i need to display in the tab
+     * creates a new tab for the Auction House the user connected to.
+     * @param items list of Auction items to display in the tab
      * @param auctionHouse auction house info
      */
     public void addAuctionTab(List<AuctionItem> items, IDRecord auctionHouse){
@@ -83,7 +97,9 @@ public class Display {
     }
 
     /**
-     *
+     * removes the current open tab from the list of tabs and removes the tab from the list of Auction house objects.
+     * This method is called by the auction leave button event handler after checking if you can leave the auction
+     * house.
      */
     public void removeCurrentTab(){
         auctions.remove(Integer.parseInt(currentTab.getId()));
@@ -91,9 +107,10 @@ public class Display {
     }
 
     /**
-     *
-     * @param ID
-     * @return
+     * checks to see if a auction house exists in the hashmap of bank tabs. Called when someone tries to join a auction
+     * house. This is used to make sure someone doesn't join the same auction house twice.
+     * @param ID to check for in the list of tabs
+     * @return whether or not the auction house exists.
      */
     public boolean doesAuctionExist(int ID){
         if(auctions.get(ID) != null) {
@@ -104,8 +121,10 @@ public class Display {
     }
 
     /**
-     *
-     * @return
+     * Called by the event handler for the bid button. gets the current selected AuctionTab, requests the current
+     * selected item from the tab, and sets the bidding state, and moves the proposed bid to the currentBid position.
+     * displays notifications for any potential errors.
+     * @return the updated AuctionItem that was selected
      */
     public AuctionItem getBid(){
         AuctionItem item = null;
@@ -127,8 +146,10 @@ public class Display {
     }
 
     /**
-     *
-     * @param update
+     * Tells the auctionHouse tab to update its list of auction items with a new updated list. Called when the
+     * Agent receives a notification to update an item list. grabs the house id and passes the list to the
+     * corresponding AuctionHouse tab.
+     * @param update AuctionHouseInventory has AuctionHouse id and the list of updated items
      */
     public void updateAuctionItems(AuctionHouseInventory update){
         List<AuctionItem> items = update.getAuctions();
@@ -137,28 +158,30 @@ public class Display {
     }
 
     /**
-     *
-     * @param auctionHouses
+     * Tells the BankTab to display a list of AuctionHouses provided by the bank. Called by the Get auctions button
+     * event handler.
+     * @param auctionHouses list of auction house IDRecords to be displayed.
      */
     public void displayAuctionHouses(ArrayList<IDRecord> auctionHouses){
         bank.setAucHouses(auctionHouses);
     }
 
     /**
-     *
-     * @return
+     * asks the bankTab for the auction house that's been selected join and return it. Called when the join button is
+     * clicked.
+     * @return IDRecord of the auction house the user would like to join.
      */
     public IDRecord getSelectedAuctionHouse(){return bank.getSelectedItem();}
 
     /**
-     *
-     * @return
+     * asks the bankTab for the item the have selected to be transferred.
+     * @return item that's being transferred
      */
     public AuctionItem getSelectedTransfer(){return bank.getSelectedToTransfer();}
 
     /**
-     *
-     * @param wonItem
+     * creates a copy of the auction item that the user has won and forwards it ot the bankTab object to be displayed
+     * @param wonItem the item won by the user
      */
     public void addTransferItem(AuctionItem wonItem){
         AuctionItem item = new AuctionItem(wonItem.getHouseID(),wonItem.getItemID(),wonItem.getItemName(),
@@ -169,14 +192,15 @@ public class Display {
     }
 
     /**
-     *
-     * @param account
+     * called as a setter to update the User information in the bank tab. Mainly called when the bank sends a updated
+     * bank account information.
+     * @param account bank account information that's forwarded to the bankTab object.
      */
     public void updateLabels(BankAccount account){bank.updateLabels(account);}
 
     /**
-     *
-     * @param msg
+     * displays a popup notification with a given message, mainly used to display notifications for user functionalitys.
+     * @param msg message being displayed in the popup
      */
     public void displayNotification(String msg){
         Stage newTransfer = new Stage();
@@ -190,8 +214,8 @@ public class Display {
     }
 
     /**
-     *
-     * @return
+     * gets the current tab from the list of tabs
+     * @return current tab
      */
     public int getCurrentTab(){
         return Integer.parseInt(currentTab.getId());

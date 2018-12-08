@@ -19,6 +19,9 @@ import javafx.scene.paint.Color;
 import java.text.DecimalFormat;
 import java.util.List;
 /**
+ * creates a tab that represents the auctionHouse and its properties. This is used to allow the use and displaying of
+ * multiple auction houses. This object constructs and handles the auction houses information and provides getters and
+ * setters for updating the tab and capturing changes made to the tab.
  * created: 11/30/18 by lb
  * last modified: 12/07/18 by lb
  * @author Liam Brady (lb)
@@ -39,7 +42,8 @@ public class AuctionTab {
     private HBox leaveHold, biddingArea;
     private DecimalFormat df;
     /**
-     * stores the eahc auction houses tab info.
+     * stores the each auction houses tab info. Formats the auctionHouse tab ,creates the needed items, and sets
+     * default values.
      * @param items the items available
      * @param houseInfo house info
      * @param bid button for placing a bid
@@ -54,13 +58,13 @@ public class AuctionTab {
         pane = new BorderPane();
         pane.setLeft(list);
         df = new DecimalFormat("####0.00");
-
         selectedItem = -1;
         this.items = items;
         this.bid = bid;
         this.leave = leave;
         this.houseInfo = houseInfo;
 
+        /*creates a new Tab for the auction house*/
         auctionHouse = new Tab();
         auctionHouse.setId(Integer.toString(houseInfo.getNumericalID()));
         auctionHouse.setClosable(false);
@@ -73,7 +77,10 @@ public class AuctionTab {
             auctionHouse.setText(houseInfo.getName());
             auctionHouse.setId(Integer.toString(houseInfo.getNumericalID()));
         }
+        /*adds the items available at the auction house to the display*/
         addItems();
+
+        /*event Handler for when a item is selected from the list of auction Items*/
         list.getSelectionModel().selectedIndexProperty().addListener(
                 new ChangeListener<Number>() {
                     @Override
@@ -87,6 +94,7 @@ public class AuctionTab {
                     }
                 });
 
+        /*creates and formats the labels that hold auction Item information and placing bids*/
         proposedBid = new TextField("00.00");
         itemName = new Label("     Item");
         itemID = new Label("     ID");
@@ -99,16 +107,17 @@ public class AuctionTab {
         biddingArea.getChildren().addAll(spacing,proposedBid,this.bid);
         biddingArea.setSpacing(10);
 
+        /*more formatting for the above items*/
         VBox pricing = new VBox();
         pricing.getChildren().addAll(currentPrice,minBid);
         HBox finalFormat = new HBox();
         finalFormat.getChildren().addAll(auctionLabels,pricing);
         finalFormat.setSpacing(10);
         finalFormat.setAlignment(Pos.BASELINE_LEFT);
-
         VBox mergeBoxes = new VBox();
         mergeBoxes.getChildren().addAll(finalFormat,biddingArea);
 
+        /*canvas the represents a placeholder for a Auction item image*/
         Canvas image = new Canvas(250,275);
         GraphicsContext gc = image.getGraphicsContext2D();
         gc.setFill(Color.WHITE);
@@ -116,14 +125,17 @@ public class AuctionTab {
         gc.setFill(Color.BLACK);
         gc.fillText("No Image Added",75,150);
 
+        /*the placing of the canvas above the item information labels*/
         VBox hold = new VBox();
         hold.getChildren().addAll(image,mergeBoxes);
         hold.setAlignment(Pos.BASELINE_CENTER);
 
+        /*leave button formatting*/
         leaveHold = new HBox();
         Label leaveSpacing = new Label("                                                                       ");
         leaveHold.getChildren().addAll(leaveSpacing,this.leave);
 
+        /*adds the leave button formatting to the pane and adds the pane to the "AuctionHouse" tab*/
         pane.setPadding(new Insets(10,10,10,10));
         pane.setCenter(hold);
         pane.setBottom(leaveHold);
@@ -132,9 +144,10 @@ public class AuctionTab {
     }
 
     /**
-     *
-     * @param leave
-     * @param bid
+     * Since every auction tab uses the same buttons every time you switch tabs the buttons need to be redrawn on
+     * the current tab. This method is called to replace these buttons.
+     * @param leave the leave button
+     * @param bid the bid button
      */
     public void replaceButtons(Button leave, Button bid){
         leaveHold.getChildren().remove(this.leave);
@@ -168,7 +181,8 @@ public class AuctionTab {
     }
 
     /**
-     *
+     * Displays a item selected from the List of items the auction house has. Edits the labels to match the item
+     * information. Also formats the prices to match dollar amounts.
      */
     public void DisplayItem(){
         AuctionItem hold = items.get(selectedItem);
@@ -213,8 +227,8 @@ public class AuctionTab {
     public Tab getTab(){return auctionHouse;}
 
     /**
-     *
-     * @return
+     * gets the bid that was proposed in the proposedBid textField and formats it to mach a dollar amount
+     * @return the bid
      */
     public double getProposedBid(){
         double bid = Double.parseDouble(proposedBid.getText())*100;

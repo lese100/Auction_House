@@ -309,7 +309,8 @@ public class Agent extends Application {
             }
         });
         /*
-        *
+        * Used the request the my account information the bank using my IDRecord. This is used to
+        * set the balance and frozen fund information. Updates the display with the received info.
         */
         getBalance.setOnAction(event -> {
             BankAccount info = bankProxy.requestBalance(myRecords);
@@ -320,7 +321,9 @@ public class Agent extends Application {
             }
         });
         /*
-        *
+        * Used to transfer the funds for a purchased item. Gets the item selected for transfer and sends that
+        * AuctionItem object to the bank using the BankProxy. removes the item from the list of items needing to be
+        * transferred. Requests my finances after the transfer and updates the display.
         */
         transfer.setOnAction(event -> {
             AuctionItem item = display.getSelectedTransfer();
@@ -339,7 +342,12 @@ public class Agent extends Application {
             }
         });
         /*
-        *
+        * Used to join a auctionHouse from the list provided by the RequestAuctions button. Gets the current selected
+        * item in the auction house list from the display. clears the list and makes it so you can't click the button
+        * again till the list of auction houses is requested again. Makes sure you aren't already connected to that
+        * auction house. Sets up the auction houses Proxy and asks for a secret key for the auction house from the bank.
+        * creates a new tab for the auction house in the display and sends a join AH message to the auction house.
+        * Stores all the information in a auctionHouseLink and adds it to a hashmap.
         */
         join.setOnAction(event -> {
             IDRecord newAuctionHouse = display.getSelectedAuctionHouse();
