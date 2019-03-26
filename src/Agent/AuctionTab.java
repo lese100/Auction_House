@@ -38,7 +38,7 @@ public class AuctionTab {
     private Button bid, leave;
     private BorderPane pane;
     private int selectedItem;
-    private Label itemName, itemID, currentPrice, minBid;
+    private Label itemName, itemID, currentPrice, minBid,timer;
     private TextField proposedBid;
     private HBox leaveHold, biddingArea;
     private DecimalFormat df;
@@ -65,6 +65,7 @@ public class AuctionTab {
         this.bid = bid;
         this.leave = leave;
         this.houseInfo = houseInfo;
+
 
         /*creates a new Tab for the auction house*/
         auctionHouse = new Tab();
@@ -110,9 +111,10 @@ public class AuctionTab {
         currentPrice = new Label("price");
         minBid = new Label("min");
         Label spacing = new Label("     My Bid:");
+        timer = new Label("     Bid End In: --");
         VBox auctionLabels = new VBox();
         biddingArea = new HBox();
-        auctionLabels.getChildren().addAll(itemName,itemID);
+        auctionLabels.getChildren().addAll(itemName,itemID,timer);
         biddingArea.getChildren().addAll(spacing,proposedBid,this.bid);
         biddingArea.setSpacing(10);
 
@@ -205,12 +207,18 @@ public class AuctionTab {
             if(hold.getBid().getBidState() == Bid.BidState.SOLD) {
                 currentPrice.setText("Current Bid: SOLD");
                 minBid.setText("Min Bid: SOLD");
+                timer.setText("     Bid End In: --");
                 bid.setDisable(true);
             }else{
                 currentPrice.setText("Current Bid: $" + df.format(hold.getBid().
                         getCurrentBid()));
                 minBid.setText("Min Bid: $" + df.format(hold.getBid().
                         getMinBid()));
+                if(hold.getTimeLeftOnBid() == 0){
+                    timer.setText("     Bid End In: --");
+                }else {
+                    timer.setText("     Bid End In: " + hold.getTimeLeftOnBid() + " Second(s)");
+                }
                 bid.setDisable(false);
             }
             itemID.setText("     Item ID: " + Integer.toString(hold.

@@ -299,7 +299,6 @@ public class AuctionHouse {
     public void updateAgentsAboutChanges(){
         AuctionHouseInventory ahi =
                 new AuctionHouseInventory(idRecord.getNumericalID(), auctions);
-
         for(AgentProxy ap : connectedAgents.values()){
             ap.updateAuctions(ahi);
         }
@@ -309,6 +308,7 @@ public class AuctionHouse {
      * Updates the AuctionHouse GUI with the current set of AuctionItems.
      */
     public void updateDisplay(){
+        updateAgentsAboutChanges();
         display.updateAuctionItemDisplay(auctions);
     }
 

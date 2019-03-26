@@ -32,7 +32,7 @@ public class AuctionItem implements Serializable {
     //irrelevant when passing an AuctionItem between Public Auction
     //components, and need not be serialized.
     private transient BidTimer bidTimer;
-    private transient int timeLeftOnBid;
+    private int timeLeftOnBid;
 
     // ****************************** //
     //   Constructor(s)               //
